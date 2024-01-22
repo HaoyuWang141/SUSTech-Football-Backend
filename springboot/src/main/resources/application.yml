@@ -1,0 +1,33 @@
+spring:
+  profiles:
+    active: dev
+  devtools:
+    restart:
+      enabled: true  #设置开启热部署
+      additional-paths: src/main/java #重启目录
+      exclude: WEB-INF/**
+  freemarker:
+    cache: false    #页面不加载缓存，修改即时生效
+  mvc:
+    static-path-pattern: /**
+  #    path match:
+  #      matching-strategy: ANT_PATH_MATCHER
+
+  servlet:
+    multipart:
+      max-file-size: 10MB # 通过http上传单个文件最大大小
+      max-request-size: 10MB # 通过http一次性上传文件的总大小
+
+  web:
+    resources:
+      static-locations: /upload/
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    #    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
+  jackson:
+    property-naming-strategy: SNAKE_CASE_TO_LOWER_CASE_WITH_UNDERSCORES
+
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
