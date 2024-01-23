@@ -78,7 +78,7 @@ CREATE TABLE team_player
 );
 
 -- 球队-教练
-CREATE TABLE team_player
+CREATE TABLE team_coach
 (
     team_id  INT REFERENCES team (team_id),
     coach_id INT REFERENCES coach (coach_id),
@@ -110,10 +110,11 @@ CREATE TABLE match_referee
 CREATE TABLE match_player_action
 (
     match_id  INT REFERENCES match,
+    team_id   INT REFERENCES team,
     player_id INT REFERENCES player,
     action    VARCHAR, -- 进球、红牌、黄牌
-    time      TIME, -- 比赛开始的时间
-    PRIMARY KEY (match_id, player_id, action, time)
+    time      TIME,    -- 比赛开始的时间
+    PRIMARY KEY (match_id, team_id, player_id, action, time)
 );
 
 -- 赛事表
@@ -141,7 +142,7 @@ CREATE TABLE event_team
 );
 
 -- 比赛-裁判
-CREATE TABLE match_referee
+CREATE TABLE event_referee
 (
     event_id   INT REFERENCES event,
     referee_id INT REFERENCES referee,

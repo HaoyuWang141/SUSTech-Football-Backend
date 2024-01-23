@@ -1,0 +1,8 @@
+server:
+  port: 8085
+
+spring:
+  datasource:
+    url: jdbc:postgresql://114.132.51.227:5432/football
+    username: admin_football
+    password: 111111

@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/football</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="football@114.132.51.227" uuid="cbd92085-a9da-4c2d-9d59-054e57175099">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://114.132.51.227:5432/football</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
