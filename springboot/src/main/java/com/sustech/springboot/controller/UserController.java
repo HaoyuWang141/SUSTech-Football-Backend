@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.springboot.entity.User;
 import com.sustech.springboot.exception.BadRequestException;
 import com.sustech.springboot.exception.ConflictException;
+import com.sustech.springboot.exception.InternalServerErrorException;
 import com.sustech.springboot.exception.UnauthorizedAccessException;
 import com.sustech.springboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,6 @@ public class UserController {
         throw new UnauthorizedAccessException("用户名或密码错误");
     }
 
-
     @PostMapping("/register")
     public ResponseEntity<User> register(String username, String password) {
         if (username == null || password == null) {
@@ -67,7 +67,7 @@ public class UserController {
         if (userService.save(user)) {
             return ResponseEntity.ok(user);
         } else {
-            throw new BadRequestException("注册失败");
+            throw new InternalServerErrorException("注册失败");
         }
     }
 

@@ -77,11 +77,30 @@ CREATE TABLE team_player
     PRIMARY KEY (team_id, player_id)
 );
 
+-- 球队邀请球员/球员申请加入球队
+CREATE TABLE team_player_request
+(
+    team_id   INT REFERENCES team (team_id),
+    player_id INT REFERENCES player (player_id),
+    type      VARCHAR CHECK ( type IN ('INVITATION', 'APPLICATION') ),
+    status    VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    PRIMARY KEY (team_id, player_id, type)
+);
+
 -- 球队-教练
 CREATE TABLE team_coach
 (
     team_id  INT REFERENCES team (team_id),
     coach_id INT REFERENCES coach (coach_id),
+    PRIMARY KEY (team_id, coach_id)
+);
+
+-- 球队邀请教练
+CREATE TABLE team_coach_request
+(
+    team_id  INT REFERENCES team (team_id),
+    coach_id INT REFERENCES coach (coach_id),
+    status   VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
     PRIMARY KEY (team_id, coach_id)
 );
 
@@ -98,11 +117,30 @@ CREATE TABLE match
     video_url       VARCHAR
 );
 
+-- 比赛(友谊赛)邀请球队
+CREATE TABLE match_team_request
+(
+    match_id INT REFERENCES match,
+    team_id  INT REFERENCES team,
+    type     VARCHAR CHECK ( type IN ('HOME', 'AWAY') ),
+    status   VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    PRIMARY KEY (match_id, team_id)
+);
+
 -- 比赛-裁判
 CREATE TABLE match_referee
 (
     match_id   INT REFERENCES match,
     referee_id INT REFERENCES referee,
+    PRIMARY KEY (match_id, referee_id)
+);
+
+-- 比赛邀请裁判
+CREATE TABLE match_referee_request
+(
+    match_id   INT REFERENCES match,
+    referee_id INT REFERENCES referee,
+    status     VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
     PRIMARY KEY (match_id, referee_id)
 );
 
@@ -141,6 +179,16 @@ CREATE TABLE event_team
     PRIMARY KEY (event_id, team_id)
 );
 
+-- 赛事邀请球队/球队申请加入赛事
+CREATE TABLE event_team_request
+(
+    event_id INT REFERENCES event (event_id),
+    team_id  INT REFERENCES team (team_id),
+    type     VARCHAR CHECK ( type IN ('INVITATION', 'APPLICATION') ),
+    status   VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    PRIMARY KEY (event_id, team_id, type)
+);
+
 -- 比赛-裁判
 CREATE TABLE event_referee
 (
@@ -149,10 +197,37 @@ CREATE TABLE event_referee
     PRIMARY KEY (event_id, referee_id)
 );
 
+-- 赛事邀请裁判
+CREATE TABLE event_referee_request
+(
+    event_id   INT REFERENCES event,
+    referee_id INT REFERENCES referee,
+    status     VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    PRIMARY KEY (event_id, referee_id)
+);
+
 -- 赛事-比赛
 CREATE TABLE event_match
 (
     event_id INT REFERENCES event,
     match_id INT REFERENCES match,
+    PROPERTY VARCHAR,
     PRIMARY KEY (event_id, match_id)
+);
+
+-- 通知表
+CREATE TABLE notification
+(
+    notification_id SERIAL PRIMARY KEY,
+    publisher_id    INT REFERENCES "user",
+    type            VARCHAR CHECK ( type IN ('ALL_USERS',
+                                             'TEAM_TO_PLAYER',
+                                             'EVENT_TO_TEAM',
+                                             'EVENT_TO_PLAYER',
+                                             'MATCH_TO_TEAM',
+                                             'MATCH_TO_PLAYER') ),
+    source_id       INT,
+    target_id       INT,
+    content         TEXT,
+    time            TIMESTAMP
 );

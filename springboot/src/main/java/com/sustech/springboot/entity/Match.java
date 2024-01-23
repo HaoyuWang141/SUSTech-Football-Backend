@@ -1,12 +1,14 @@
 package com.sustech.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +23,8 @@ public class Match {
     private Integer awayTeamScore;
     private String liveUrl;
     private String videoUrl;
+    @TableField(exist = false)
+    private Referee referee;
+    @TableField(exist = false)
+    private List<MatchPlayerAction> matchPlayerActionList;
 }
