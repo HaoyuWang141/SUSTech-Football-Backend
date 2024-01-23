@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.sustech</groupId>
-    <artifactId>springboot</artifactId>
+    <artifactId>football</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>springboot</name>
     <description>springboot</description>
@@ -95,6 +95,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
