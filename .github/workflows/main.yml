@@ -1,0 +1,27 @@
+name: Deploy to Tencent Server
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'springboot/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: deploy
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: |
+            cd ~/SUSTech-Football/
+            git pull origin main
+            ./deploy_script.sh
+          host: ${{ secrets.HOST }}
+          username: lighthouse
+          password: ${{ secrets.PASSWORD }}
