@@ -189,7 +189,7 @@ CREATE TABLE event_team_request
     PRIMARY KEY (event_id, team_id, type)
 );
 
--- 比赛-裁判
+-- 赛事-裁判
 CREATE TABLE event_referee
 (
     event_id   INT REFERENCES event,

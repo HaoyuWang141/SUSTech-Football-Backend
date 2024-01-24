@@ -53,7 +53,7 @@ public class PlayerController {
         return ResponseEntity.ok(player);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Player>> getAllPlayers() {
         return ResponseEntity.ok(playerService.list());
     }
@@ -68,7 +68,7 @@ public class PlayerController {
     }
 
     @Deprecated
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
         if (playerService.removeById(id)) {
             return ResponseEntity.ok().build();
@@ -99,8 +99,8 @@ public class PlayerController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/requestJoinTeam")
-    public ResponseEntity<Void> requestJoinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
+    @PostMapping("/applyJoinTeam")
+    public ResponseEntity<Void> applyJoinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
         if (playerId == null || teamId == null) {
             throw new BadRequestException("球员id和球队id不能为空");
         }
@@ -141,8 +141,8 @@ public class PlayerController {
         return ResponseEntity.ok(teamPlayerRequestService.list(queryWrapper));
     }
 
-    @PostMapping("/responseTeamInvitation")
-    public ResponseEntity<Void> responseTeamInvitation(@RequestParam Long playerId, @RequestParam Long teamId, @RequestParam Boolean accept) {
+    @PostMapping("/replyTeamInvitation")
+    public ResponseEntity<Void> replyTeamInvitation(@RequestParam Long playerId, @RequestParam Long teamId, @RequestParam Boolean accept) {
         if (playerId == null || teamId == null) {
             throw new BadRequestException("球员id和球队id不能为空");
         }
@@ -165,6 +165,11 @@ public class PlayerController {
         }
         if (!teamPlayerRequestService.updateById(teamPlayerRequest)) {
             throw new RuntimeException("回应邀请失败");
+        }
+        if (accept) {
+            if (!teamPlayerService.save(teamPlayer)) {
+                throw new RuntimeException("加入球队失败");
+            }
         }
         return ResponseEntity.ok().build();
     }
