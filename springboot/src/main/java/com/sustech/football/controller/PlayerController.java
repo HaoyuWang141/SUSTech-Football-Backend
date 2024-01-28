@@ -1,6 +1,5 @@
 package com.sustech.football.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.Player;
 import com.sustech.football.entity.TeamPlayer;
 import com.sustech.football.entity.TeamPlayerRequest;
@@ -12,7 +11,6 @@ import com.sustech.football.service.TeamPlayerRequestService;
 import com.sustech.football.service.TeamPlayerService;
 import com.sustech.football.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,9 +27,9 @@ public class PlayerController {
 
     @Autowired
     public PlayerController(PlayerService playerService,
-                            TeamService teamService,
-                            TeamPlayerService teamPlayerService,
-                            TeamPlayerRequestService teamPlayerRequestService) {
+            TeamService teamService,
+            TeamPlayerService teamPlayerService,
+            TeamPlayerRequestService teamPlayerRequestService) {
         this.playerService = playerService;
         this.teamService = teamService;
         this.teamPlayerService = teamPlayerService;
@@ -39,47 +37,58 @@ public class PlayerController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
-        if (playerService.save(player)) {
-            return ResponseEntity.ok(player);
-        } else {
+    public Player createPlayer(@RequestBody Player player) {
+        if (player == null) {
+            throw new BadRequestException("传入球员为空");
+        }
+        if (player.getPlayerId() != null) {
+            throw new BadRequestException("传入球员的ID不为空");
+        }
+        if (!playerService.save(player)) {
             throw new BadRequestException("创建球员失败");
         }
+        return player;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Player> getPlayerById(@PathVariable Long id) {
+    public Player getPlayerById(@PathVariable Long id) {
         Player player = playerService.getById(id);
-        return ResponseEntity.ok(player);
+        if (player == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        return player;
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Player>> getAllPlayers() {
-        return ResponseEntity.ok(playerService.list());
+    public List<Player> getAllPlayers() {
+        return playerService.list();
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Player> updatePlayer(@RequestBody Player player) {
-        if (playerService.updateById(player)) {
-            return ResponseEntity.ok(player);
-        } else {
+    public Player updatePlayer(@RequestBody Player player) {
+        if (player == null) {
+            throw new BadRequestException("传入球员为空");
+        }
+        if (player.getPlayerId() == null) {
+            throw new BadRequestException("传入球员的ID为空");
+        }
+        if (!playerService.updateById(player)) {
             throw new BadRequestException("更新球员失败");
         }
+        return player;
     }
 
     @Deprecated
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
-        if (playerService.removeById(id)) {
-            return ResponseEntity.ok().build();
-        } else {
+    @DeleteMapping("/{id}")
+    public void deletePlayer(@PathVariable Long id) {
+        if (!playerService.removeById(id)) {
             throw new BadRequestException("删除球员失败");
         }
     }
 
     @Deprecated
     @PostMapping("/joinTeam")
-    public ResponseEntity<Void> joinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
+    public void joinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
         if (playerId == null || teamId == null) {
             throw new BadRequestException("球员id和球队id不能为空");
         }
@@ -96,11 +105,10 @@ public class PlayerController {
         if (!teamPlayerService.save(teamPlayer)) {
             throw new RuntimeException("加入球队失败");
         }
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/applyJoinTeam")
-    public ResponseEntity<Void> applyJoinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
+    public void applyJoinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
         if (playerId == null || teamId == null) {
             throw new BadRequestException("球员id和球队id不能为空");
         }
@@ -124,25 +132,24 @@ public class PlayerController {
         if (!teamPlayerRequestService.save(teamPlayerRequest)) {
             throw new RuntimeException("申请加入球队失败");
         }
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/getTeamInvitations")
-    public ResponseEntity<List<TeamPlayerRequest>> getTeamInvitations(@RequestParam Long playerId) {
+    public List<TeamPlayerRequest> getTeamInvitations(@RequestParam Long playerId) {
         if (playerId == null) {
             throw new BadRequestException("球员id不能为空");
         }
         if (playerService.getById(playerId) == null) {
             throw new ResourceNotFoundException("球员不存在");
         }
-        QueryWrapper<TeamPlayerRequest> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("player_id", playerId);
-        queryWrapper.like("type", TeamPlayerRequest.TYPE_INVITATION);
-        return ResponseEntity.ok(teamPlayerRequestService.list(queryWrapper));
+        return teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_INVITATION);
     }
 
     @PostMapping("/replyTeamInvitation")
-    public ResponseEntity<Void> replyTeamInvitation(@RequestParam Long playerId, @RequestParam Long teamId, @RequestParam Boolean accept) {
+    public void replyTeamInvitation(
+            @RequestParam Long playerId,
+            @RequestParam Long teamId,
+            @RequestParam Boolean accept) {
         if (playerId == null || teamId == null) {
             throw new BadRequestException("球员id和球队id不能为空");
         }
@@ -152,7 +159,7 @@ public class PlayerController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        TeamPlayer teamPlayer = new TeamPlayer(playerId, teamId);
+        TeamPlayer teamPlayer = new TeamPlayer(teamId, playerId);
         if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
             throw new ConflictException("球员已经加入球队");
         }
@@ -171,7 +178,5 @@ public class PlayerController {
                 throw new RuntimeException("加入球队失败");
             }
         }
-        return ResponseEntity.ok().build();
     }
 }
-
