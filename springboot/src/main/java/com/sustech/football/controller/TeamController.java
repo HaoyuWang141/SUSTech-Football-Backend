@@ -38,8 +38,8 @@ public class TeamController {
         return team;
     }
 
-    @GetMapping("/{id}")
-    public Team getTeamById(@PathVariable Long id) {
+    @GetMapping("/get")
+    public Team getTeamById(Long id) {
         Team team = teamService.getById(id);
         if (team == null) {
             throw new ResourceNotFoundException("球队不存在");
@@ -47,7 +47,7 @@ public class TeamController {
         return team;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/getAll")
     public List<Team> getAllTeams() {
         return teamService.list();
     }
@@ -67,14 +67,14 @@ public class TeamController {
     }
 
     @Deprecated
-    @DeleteMapping("/{id}")
-    public void deleteTeam(@PathVariable Long id) {
+    @DeleteMapping("/delete")
+    public void deleteTeam(Long id) {
         if (!teamService.removeById(id)) {
             throw new ResourceNotFoundException("球队不存在");
         }
     }
 
-    @PostMapping("/inviteManager")
+    @PostMapping("/manager/invite")
     public void inviteManager(@RequestParam Long managerId, @RequestParam Long teamId) {
         if (managerId == null || teamId == null) {
             throw new BadRequestException("传入的管理员ID或队伍ID为空");
@@ -88,7 +88,7 @@ public class TeamController {
         teamService.inviteManager(new TeamManager(managerId, teamId));
     }
 
-    @GetMapping("/getManagers")
+    @GetMapping("/manager/getAll")
     public List<Long> getManagers(@RequestParam Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -99,7 +99,7 @@ public class TeamController {
         return teamService.getManagers(teamId);
     }
 
-    @DeleteMapping("/deleteManager")
+    @DeleteMapping("/manager/delete")
     public void deleteManager(Long teamId, Long managerId) {
         if (managerId == null || teamId == null) {
             throw new BadRequestException("传入的管理员ID或队伍ID为空");
@@ -113,7 +113,7 @@ public class TeamController {
         teamService.deleteManager(new TeamManager(teamId, managerId));
     }
 
-    @PostMapping("/invitePlayer")
+    @PostMapping("/player/invite")
     public void invitePlayer(@RequestParam Long teamId, @RequestParam Long playerId) {
         if (playerId == null || teamId == null) {
             throw new BadRequestException("传入的球员ID或队伍ID为空");
@@ -127,7 +127,7 @@ public class TeamController {
         teamService.invitePlayer(new TeamPlayer(teamId, playerId));
     }
 
-    @GetMapping("/getPlayerApplications")
+    @GetMapping("/player/getApplications")
     public List<TeamPlayerRequest> getPlayerApplications(@RequestParam Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -138,7 +138,7 @@ public class TeamController {
         return teamService.getPlayerApplications(teamId);
     }
 
-    @PostMapping("/replyPlayerApplication")
+    @PostMapping("/player/replyApplication")
     public void replyPlayerApplication(
             @RequestParam Long teamId,
             @RequestParam Long playerId,
@@ -155,7 +155,7 @@ public class TeamController {
         teamService.replyPlayerApplication(teamId, playerId, accept);
     }
 
-    @GetMapping("/getPlayers")
+    @GetMapping("/player/getAll")
     public List<Player> getPlayers(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -166,7 +166,7 @@ public class TeamController {
         return teamService.getPlayers(teamId);
     }
 
-    @DeleteMapping("/deletePlayer")
+    @DeleteMapping("/player/delete")
     public void deletePlayer(Long teamId, Long playerId) {
         if (playerId == null || teamId == null) {
             throw new BadRequestException("传入的球员ID或队伍ID为空");
@@ -180,7 +180,7 @@ public class TeamController {
         teamService.deletePlayer(new TeamPlayer(teamId, playerId));
     }
 
-    @PostMapping("/inviteCoach")
+    @PostMapping("/coach/invite")
     public void inviteCoach(Long teamId, Long coachId) {
         if (coachId == null || teamId == null) {
             throw new BadRequestException("传入的教练ID或队伍ID为空");
@@ -194,7 +194,7 @@ public class TeamController {
         teamService.inviteCoach(new TeamCoach(teamId, coachId));
     }
 
-    @GetMapping("/getCoaches")
+    @GetMapping("/coach/getAll")
     public List<Coach> getCoaches(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -205,7 +205,7 @@ public class TeamController {
         return teamService.getCoaches(teamId);
     }
 
-    @DeleteMapping("/deleteCoach")
+    @DeleteMapping("/coach/delete")
     public void deleteCoach(Long teamId, Long coachId) {
         if (coachId == null || teamId == null) {
             throw new BadRequestException("传入的教练ID或队伍ID为空");
