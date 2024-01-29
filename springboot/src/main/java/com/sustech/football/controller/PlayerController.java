@@ -1,15 +1,8 @@
 package com.sustech.football.controller;
 
-import com.sustech.football.entity.Player;
-import com.sustech.football.entity.TeamPlayer;
-import com.sustech.football.entity.TeamPlayerRequest;
-import com.sustech.football.exception.BadRequestException;
-import com.sustech.football.exception.ConflictException;
-import com.sustech.football.exception.ResourceNotFoundException;
-import com.sustech.football.service.PlayerService;
-import com.sustech.football.service.TeamPlayerRequestService;
-import com.sustech.football.service.TeamPlayerService;
-import com.sustech.football.service.TeamService;
+import com.sustech.football.entity.*;
+import com.sustech.football.exception.*;
+import com.sustech.football.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -17,13 +17,6 @@ public class TeamPlayerRequest {
     public static final String STATUS_ACCEPTED = "ACCEPTED";
     public static final String STATUS_REJECTED = "REJECTED";
 
-    public TeamPlayerRequest(Long teamId, Long playerId, String type, String status) {
-        this.teamId = teamId;
-        this.playerId = playerId;
-        this.type = type;
-        this.status = status;
-    }
-
     @MppMultiId
     private Long teamId;
     @MppMultiId
@@ -35,4 +28,11 @@ public class TeamPlayerRequest {
     private Team team;
     @TableField(exist = false)
     private Player player;
+
+    public TeamPlayerRequest(Long teamId, Long playerId, String type, String status) {
+        this.teamId = teamId;
+        this.playerId = playerId;
+        this.type = type;
+        this.status = status;
+    }
 }

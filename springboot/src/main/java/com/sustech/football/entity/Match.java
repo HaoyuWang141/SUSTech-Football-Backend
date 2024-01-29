@@ -24,6 +24,10 @@ public class Match {
     private String liveUrl;
     private String videoUrl;
     @TableField(exist = false)
+    private Team homeTeam;
+    @TableField(exist = false)
+    private Team awayTeam;
+    @TableField(exist = false)
     private Referee referee;
     @TableField(exist = false)
     private List<MatchPlayerAction> matchPlayerActionList;

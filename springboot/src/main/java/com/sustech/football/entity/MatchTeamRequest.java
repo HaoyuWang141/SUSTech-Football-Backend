@@ -1,5 +1,6 @@
 package com.sustech.football.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,4 +23,22 @@ public class MatchTeamRequest {
     private Long teamId;
     private String type;
     private String status;
+    @TableField(exist = false)
+    private Match match;
+    @TableField(exist = false)
+    private Team team;
+
+    public MatchTeamRequest(Long matchId, Long teamId, String type) {
+        this.matchId = matchId;
+        this.teamId = teamId;
+        this.type = type;
+        this.status = STATUS_PENDING;
+    }
+
+    public MatchTeamRequest(Long matchId, Long teamId, String type, String status) {
+        this.matchId = matchId;
+        this.teamId = teamId;
+        this.type = type;
+        this.status = status;
+    }
 }

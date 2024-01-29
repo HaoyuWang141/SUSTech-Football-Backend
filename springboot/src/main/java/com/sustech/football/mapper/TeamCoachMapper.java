@@ -19,4 +19,12 @@ public interface TeamCoachMapper extends MppBaseMapper<TeamCoach> {
             @Result(column = "team_id", property = "team", one = @One(select = "com.sustech.football.mapper.TeamMapper.selectById")),
     })
     List<TeamCoach> selectListWithTeam(Long coachId);
+
+    @Select("select * from team_coach where team_id=#{teamId}")
+    @Results({
+            @Result(column = "team_id", property = "teamId"),
+            @Result(column = "coach_id", property = "coachId"),
+            @Result(column = "coach_id", property = "coach", one = @One(select = "com.sustech.football.mapper.CoachMapper.selectById")),
+    })
+    List<TeamCoach> selectListWithCoach(Long teamId);
 }

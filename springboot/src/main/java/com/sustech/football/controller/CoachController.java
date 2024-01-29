@@ -1,16 +1,12 @@
 package com.sustech.football.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.Coach;
 import com.sustech.football.entity.Team;
-import com.sustech.football.entity.TeamCoach;
 import com.sustech.football.entity.TeamCoachRequest;
 import com.sustech.football.exception.BadRequestException;
-import com.sustech.football.exception.ConflictException;
 import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.service.CoachService;
 import com.sustech.football.service.TeamCoachRequestService;
-import com.sustech.football.service.TeamCoachService;
 import com.sustech.football.service.TeamService;
 
 import java.util.List;
@@ -25,17 +21,14 @@ public class CoachController {
     private final CoachService coachService;
     private final TeamService teamService;
     private final TeamCoachRequestService teamCoachRequestService;
-    private final TeamCoachService teamCoachService;
 
     @Autowired
     public CoachController(CoachService coachService,
             TeamService teamService,
-            TeamCoachRequestService teamCoachRequestService,
-            TeamCoachService teamCoachService) {
+            TeamCoachRequestService teamCoachRequestService) {
         this.coachService = coachService;
         this.teamService = teamService;
         this.teamCoachRequestService = teamCoachRequestService;
-        this.teamCoachService = teamCoachService;
     }
 
     @PostMapping("/create")

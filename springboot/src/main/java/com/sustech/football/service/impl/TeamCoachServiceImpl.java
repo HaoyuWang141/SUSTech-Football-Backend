@@ -20,4 +20,9 @@ public class TeamCoachServiceImpl extends MppServiceImpl<TeamCoachMapper, TeamCo
     public List<TeamCoach> listWithTeam(Long coachId) {
         return teamCoachMapper.selectListWithTeam(coachId);
     }
+
+    @Override
+    public List<TeamCoach> listWithCoach(Long teamId) {
+        return teamCoachMapper.selectListWithCoach(teamId);
+    }
 }
