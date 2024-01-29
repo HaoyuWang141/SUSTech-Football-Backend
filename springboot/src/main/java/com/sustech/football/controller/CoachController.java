@@ -45,8 +45,8 @@ public class CoachController {
         return coach;
     }
 
-    @GetMapping("/{id}")
-    public Coach getCoachById(@PathVariable Long id) {
+    @GetMapping("/get")
+    public Coach getCoachById(Long id) {
         Coach coach = coachService.getById(id);
         if (coach == null) {
             throw new BadRequestException("教练不存在");
@@ -54,7 +54,7 @@ public class CoachController {
         return coach;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/getAll")
     public List<Coach> getAllCoaches() {
         return coachService.list();
     }
@@ -74,14 +74,14 @@ public class CoachController {
     }
 
     @Deprecated
-    @DeleteMapping("/{id}")
-    public void deleteCoach(@PathVariable Long id) {
+    @DeleteMapping("/delete")
+    public void deleteCoach(Long id) {
         if (!coachService.removeById(id)) {
             throw new BadRequestException("删除教练失败");
         }
     }
 
-    @GetMapping("/getTeamInvitations")
+    @GetMapping("/team/getInvitations")
     public List<TeamCoachRequest> getTeamInvitations(@RequestParam Long coachId) {
         if (coachId == null) {
             throw new BadRequestException("教练id不能为空");
@@ -92,7 +92,7 @@ public class CoachController {
         return teamCoachRequestService.listWithTeam(coachId);
     }
 
-    @PostMapping("/replyTeamInvitation")
+    @PostMapping("/team/replyInvitation")
     public void replyTeamInvitation(
             @RequestParam Long coachId,
             @RequestParam Long teamId,
@@ -109,7 +109,7 @@ public class CoachController {
         coachService.replyTeamInvitation(coachId, teamId, accept);
     }
 
-    @GetMapping("/getTeams")
+    @GetMapping("/team/getAll")
     public List<Team> getTeams(@RequestParam Long coachId) {
         if (coachId == null) {
             throw new BadRequestException("教练id不能为空");
