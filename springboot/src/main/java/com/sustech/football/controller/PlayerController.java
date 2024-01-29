@@ -43,8 +43,8 @@ public class PlayerController {
         return player;
     }
 
-    @GetMapping("/{id}")
-    public Player getPlayerById(@PathVariable Long id) {
+    @GetMapping("/get")
+    public Player getPlayerById(Long id) {
         Player player = playerService.getById(id);
         if (player == null) {
             throw new ResourceNotFoundException("球员不存在");
@@ -52,7 +52,7 @@ public class PlayerController {
         return player;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/getAll")
     public List<Player> getAllPlayers() {
         return playerService.list();
     }
@@ -72,8 +72,8 @@ public class PlayerController {
     }
 
     @Deprecated
-    @DeleteMapping("/{id}")
-    public void deletePlayer(@PathVariable Long id) {
+    @DeleteMapping("/delete")
+    public void deletePlayer(Long id) {
         if (!playerService.removeById(id)) {
             throw new BadRequestException("删除球员失败");
         }
@@ -100,7 +100,7 @@ public class PlayerController {
         }
     }
 
-    @PostMapping("/applyJoinTeam")
+    @PostMapping("/team/applyToJoin")
     public void applyJoinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
         if (playerId == null || teamId == null) {
             throw new BadRequestException("球员id和球队id不能为空");
@@ -127,7 +127,7 @@ public class PlayerController {
         }
     }
 
-    @GetMapping("/getTeamInvitations")
+    @GetMapping("/team/getInvitations")
     public List<TeamPlayerRequest> getTeamInvitations(@RequestParam Long playerId) {
         if (playerId == null) {
             throw new BadRequestException("球员id不能为空");
@@ -138,7 +138,7 @@ public class PlayerController {
         return teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_INVITATION);
     }
 
-    @PostMapping("/replyTeamInvitation")
+    @PostMapping("/team/replyInvitation")
     public void replyTeamInvitation(
             @RequestParam Long playerId,
             @RequestParam Long teamId,

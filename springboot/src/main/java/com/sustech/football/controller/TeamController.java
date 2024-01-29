@@ -219,7 +219,7 @@ public class TeamController {
         teamService.deleteCoach(new TeamCoach(teamId, coachId));
     }
 
-    @GetMapping("/getMatchInvitations")
+    @GetMapping("/match/getInvitations")
     public List<MatchTeamRequest> getMatchInvitations(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -230,7 +230,7 @@ public class TeamController {
         return teamService.getMatchInvitations(teamId);
     }
 
-    @PostMapping("/replyMatchInvitation")
+    @PostMapping("/match/replyInvitation")
     public void replyMatchInvitation(Long teamId, Long matchId, Boolean accept) {
         if (matchId == null || teamId == null || accept == null) {
             throw new BadRequestException("传入的比赛ID或队伍ID或状态为空");
@@ -244,7 +244,7 @@ public class TeamController {
         teamService.replyMatchInvitation(teamId, matchId, accept);
     }
 
-    @GetMapping("/getMatches")
+    @GetMapping("/match/getAll")
     public List<Match> getMatches(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -255,7 +255,7 @@ public class TeamController {
         return teamService.getMatches(teamId);
     }
 
-    @PostMapping("/requestJoinEvent")
+    @PostMapping("/event/applyToJoin")
     public void requestJoinEvent(Long teamId, Long eventId) {
         if (eventId == null || teamId == null) {
             throw new BadRequestException("传入的赛事ID或队伍ID为空");
@@ -269,7 +269,7 @@ public class TeamController {
         teamService.requestJoinEvent(new EventTeam(eventId, teamId));
     }
 
-    @GetMapping("/getEventInvitations")
+    @GetMapping("/event/getInvitations")
     public List<EventTeamRequest> getEventInvitations(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -280,7 +280,7 @@ public class TeamController {
         return teamService.getEventInvitations(teamId);
     }
 
-    @PostMapping("/replyEventInvitation")
+    @PostMapping("/event/replyInvitation")
     public void replyEventApplication(Long teamId, Long eventId, Boolean accept) {
         if (eventId == null || teamId == null || accept == null) {
             throw new BadRequestException("传入的赛事ID或队伍ID或状态为空");
@@ -294,7 +294,7 @@ public class TeamController {
         teamService.replyEventInvitation(teamId, eventId, accept);
     }
 
-    @GetMapping("/getEvents")
+    @GetMapping("/event/getAll")
     public List<Event> getEvents(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -305,7 +305,7 @@ public class TeamController {
         return teamService.getEvents(teamId);
     }
 
-    @PostMapping("/addUniform")
+    @PostMapping("/uniform/add")
     public void addUniform(Long teamId, String uniformUrl) {
         if (teamId == null || uniformUrl == null) {
             throw new BadRequestException("传入的队伍ID或队服URL为空");
@@ -316,7 +316,7 @@ public class TeamController {
         teamService.addUniform(new TeamUniform(teamId, uniformUrl));
     }
 
-    @GetMapping("/getTeamUniformUrls")
+    @GetMapping("/uniform/getAll")
     public List<String> getTeamUniformUrls(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
@@ -327,7 +327,7 @@ public class TeamController {
                 .toList();
     }
 
-    @DeleteMapping("/deleteUniform")
+    @DeleteMapping("/uniform/delete")
     public void deleteUniform(Long teamId, String uniformUrl) {
         if (teamId == null || uniformUrl == null) {
             throw new BadRequestException("传入的队伍ID或队服URL为空");
