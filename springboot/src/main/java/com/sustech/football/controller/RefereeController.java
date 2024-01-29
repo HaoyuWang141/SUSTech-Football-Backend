@@ -1,63 +1,66 @@
 package com.sustech.football.controller;
 
+import com.sustech.football.entity.Referee;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/referee")
 public class RefereeController {
-    @RequestMapping("/create")
-    public void createReferee() {
-
+    @PostMapping("/create")
+    public Referee createReferee(@RequestBody Referee referee) {
+        return null;
     }
 
-    @RequestMapping("/{id}")
-    public void getRefereeById(@PathVariable Long id) {
-
+    @GetMapping("/get")
+    public Referee getReferee(Long id) {
+        return null;
     }
 
-    @RequestMapping("/all")
-    public void getAllReferees() {
-
+    @GetMapping("/getAll")
+    public List<Referee> getAllReferees() {
+        return null;
     }
 
-    @RequestMapping("/update")
-    public void updateReferee() {
+    @PutMapping("/update")
+    public void updateReferee(@RequestBody Referee referee) {
 
     }
 
     @Deprecated
-    @RequestMapping("/delete")
-    public void deleteReferee() {
+    @DeleteMapping("/delete")
+    public void deleteReferee(Long refereeId) {
 
     }
 
-    @GetMapping("/getMatchInvitations")
+    @GetMapping("/match/getInvitations")
     public void getMatchInvitations() {
 
     }
 
-    @PostMapping("/replyMatchInvitation")
+    @PostMapping("/match/replyInvitation")
     public void replyMatchInvitation() {
 
     }
 
-    @GetMapping("/getMatches")
+    @GetMapping("/match/getAll")
     public void getMatches() {
 
     }
 
-    @GetMapping("/getEventInvitations")
+    @GetMapping("/event/getInvitations")
     public void getEventInvitations() {
 
     }
 
-    @PostMapping("/replyEventInvitation")
+    @PostMapping("/event/replyInvitation")
     public void replyEventInvitation() {
 
     }
 
-    @GetMapping("/getEvents")
+    @GetMapping("/event/getAll")
     public void getEvents() {
 
     }

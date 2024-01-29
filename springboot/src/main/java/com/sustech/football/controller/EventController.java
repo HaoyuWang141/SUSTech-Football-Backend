@@ -1,102 +1,105 @@
 package com.sustech.football.controller;
 
+import com.sustech.football.entity.Event;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/event")
 public class EventController {
     @PostMapping("/create")
-    public void createEvent() {
-
+    public Event createEvent(@RequestBody Event event) {
+        return null;
     }
 
-    @GetMapping("/{id}")
-    public void getEventById(@PathVariable Long id) {
-
+    @GetMapping("/get")
+    public Event getEvent(Long id) {
+        return null;
     }
 
-    @GetMapping("/all")
-    public void getAllEvents() {
-
+    @GetMapping("/getAll")
+    public List<Event> getAllEvents() {
+        return null;
     }
 
     @PutMapping("/update")
-    public void updateEvent() {
+    public void updateEvent(@RequestBody Event event) {
 
     }
 
     @DeleteMapping("/delete")
-    public void deleteEvent() {
+    public void deleteEvent(Long eventId) {
 
     }
 
-    @PostMapping("/inviteManager")
+    @PostMapping("/manager/invite")
     public void inviteManager() {
 
     }
 
-    @GetMapping("/getManagers")
+    @GetMapping("/manager/getAll")
     public void getManagers() {
 
     }
 
-    @DeleteMapping("/deleteManager")
+    @DeleteMapping("/manager/delete")
     public void deleteManager() {
 
     }
 
-    @PostMapping("/inviteTeam")
+    @PostMapping("/team/invite")
     public void inviteTeam() {
 
     }
 
-    @GetMapping("/getTeamInvitations")
+    @GetMapping("/team/getInvitations")
     public void getTeamInvitations() {
 
     }
 
-    @PostMapping("/replyTeamInvitation")
+    @PostMapping("/team/replyInvitation")
     public void replyTeamInvitation() {
 
     }
 
-    @GetMapping("/getTeam")
+    @GetMapping("/team/getAll")
     public void getTeam() {
 
     }
 
-    @DeleteMapping("/deleteTeam")
+    @DeleteMapping("/team/delete")
     public void deleteTeam() {
 
     }
 
-    @PostMapping("/addMatch")
+    @PostMapping("/match/add")
     public void addMatch() {
 
     }
 
-    @GetMapping("/getMatches")
+    @GetMapping("/match/getAll")
     public void getMatches() {
 
     }
 
-    @DeleteMapping("/deleteMatch")
+    @DeleteMapping("/match/delete")
     public void deleteMatch() {
 
     }
 
-    @PostMapping("/inviteReferee")
+    @PostMapping("/referee/invite")
     public void inviteReferee() {
 
     }
 
-    @GetMapping("/getReferees")
+    @GetMapping("/referee/getAll")
     public void getReferees() {
 
     }
 
-    @DeleteMapping("/deleteReferee")
+    @DeleteMapping("/referee/delete")
     public void deleteReferee() {
 
     }

@@ -1,82 +1,80 @@
 package com.sustech.football.controller;
 
+import com.sustech.football.entity.Match;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/match")
 public class MatchController {
-    @RequestMapping("/create")
-    public void createMatch() {
+    @PostMapping("/create")
+    public Match createMatch(@RequestBody Match match) {
+        return null;
+    }
+
+    @GetMapping("/get")
+    public Match getMatch(Long id) {
+        return null;
+    }
+
+    @GetMapping("/getAll")
+    public List<Match> getAllMatches() {
+        return null;
+    }
+
+    @PutMapping("/update")
+    public void updateMatch(@RequestBody Match match) {
 
     }
 
-    @RequestMapping("/{id}")
-    public void getMatchById() {
+    @DeleteMapping("/delete")
+    public void deleteMatch(Long matchId) {
 
     }
 
-    @RequestMapping("/all")
-    public void getAllMatches() {
-
-    }
-
-    @RequestMapping("/update")
-    public void updateMatch() {
-
-    }
-
-    @RequestMapping("/delete")
-    public void deleteMatch() {
-
-    }
-
-    @PostMapping("/inviteManager")
+    @PostMapping("/manager/invite")
     public void inviteManager() {
 
     }
 
-    @GetMapping("/getManagers")
+    @GetMapping("/manager/getAll")
     public void getManagers() {
 
     }
 
-    @DeleteMapping("/deleteManager")
+    @DeleteMapping("/manager/delete")
     public void deleteManager() {
 
     }
 
-    @PostMapping("/inviteTeam")
+    @PostMapping("/team/invite")
     public void inviteTeam() {
 
     }
 
-    @GetMapping("/getTeam")
-    public void getTeam() {
-
-    }
-
-    @DeleteMapping("/deleteTeam")
+    @DeleteMapping("/team/delete")
     public void deleteTeam() {
 
     }
 
-    @PostMapping("/inviteReferee")
+    @PostMapping("/referee/invite")
     public void inviteReferee() {
 
     }
 
-    @GetMapping("/getReferees")
+    @GetMapping("/referee/getAll")
     public void getReferees() {
 
     }
 
-    @DeleteMapping("/deleteReferee")
+    @DeleteMapping("/referee/delete")
     public void deleteReferee() {
 
     }
 
-    @PostMapping("/updateResult")
+    @PostMapping("/referee/updateResult")
     public void updateResult() {
 
     }
