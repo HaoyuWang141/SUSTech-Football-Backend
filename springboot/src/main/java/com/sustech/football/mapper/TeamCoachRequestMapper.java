@@ -16,7 +16,7 @@ public interface TeamCoachRequestMapper extends MppBaseMapper<TeamCoachRequest> 
             @Result(column = "team_id", property = "teamId"),
             @Result(column = "coach_id", property = "coachId"),
             @Result(column = "status", property = "status"),
-            @Result(column = "team_id", property = "team", one = @One(select = "com.sustech.football.mapper.TeamMapper.selectById", fetchType = FetchType.EAGER)),
+            @Result(column = "team_id", property = "team", one = @One(select = "com.sustech.football.mapper.TeamMapper.selectById")),
     })
     List<TeamCoachRequest> selectListWithTeam(Long coachId);
 
@@ -25,7 +25,7 @@ public interface TeamCoachRequestMapper extends MppBaseMapper<TeamCoachRequest> 
             @Result(column = "team_id", property = "teamId"),
             @Result(column = "coach_id", property = "coachId"),
             @Result(column = "status", property = "status"),
-            @Result(column = "coach_id", property = "coach", one = @One(select = "com.sustech.football.mapper.CoachMapper.selectById", fetchType = FetchType.EAGER)),
+            @Result(column = "coach_id", property = "coach", one = @One(select = "com.sustech.football.mapper.CoachMapper.selectById")),
     })
     List<TeamCoachRequest> selectListWithCoach(Long teamId);
 }
