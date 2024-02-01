@@ -238,6 +238,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
+    @Transactional
     public boolean replyEventInvitation(Long teamId, Long eventId, Boolean accept) {
         EventTeam eventTeam = new EventTeam(eventId, teamId);
         if (eventTeamService.selectByMultiId(eventTeam) != null) {
