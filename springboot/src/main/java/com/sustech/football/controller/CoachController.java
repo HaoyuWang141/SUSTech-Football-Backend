@@ -47,6 +47,9 @@ public class CoachController {
 
     @GetMapping("/get")
     public Coach getCoachById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("传入教练的ID为空");
+        }
         Coach coach = coachService.getById(id);
         if (coach == null) {
             throw new BadRequestException("教练不存在");

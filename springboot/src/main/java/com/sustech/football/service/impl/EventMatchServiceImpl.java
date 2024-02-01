@@ -7,7 +7,12 @@ import com.sustech.football.mapper.EventMatchMapper;
 import com.sustech.football.service.EventMatchService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class EventMatchServiceImpl extends MppServiceImpl<EventMatchMapper, EventMatch> implements EventMatchService
-{
+public class EventMatchServiceImpl extends MppServiceImpl<EventMatchMapper, EventMatch> implements EventMatchService {
+    @Override
+    public List<EventMatch> listWithMatch(Long eventId) {
+        return baseMapper.selectListWithMatch(eventId);
+    }
 }

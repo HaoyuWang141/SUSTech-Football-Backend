@@ -2,6 +2,7 @@ package com.sustech.football.controller;
 
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
+import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.service.MatchService;
 
 import com.sustech.football.service.PlayerService;
@@ -96,13 +97,13 @@ public class MatchController {
             throw new BadRequestException("比赛ID和管理员ID不能为空");
         }
         if (matchService.getById(matchId) == null) {
-            throw new BadRequestException("比赛不存在");
+            throw new ResourceNotFoundException("比赛不存在");
         }
         if (userService.getById(managerId) == null) {
-            throw new BadRequestException("管理员不存在");
+            throw new ResourceNotFoundException("管理员不存在");
         }
         if (matchService.inviteManager(new MatchManager(matchId, managerId, false))) {
-            throw new BadRequestException("邀请管理员失败");
+            throw new RuntimeException("邀请管理员失败");
         }
     }
 
@@ -135,8 +136,8 @@ public class MatchController {
 
     @PostMapping("/team/invite")
     public void inviteTeam(Long matchId, Long teamId, Boolean isHomeTeam) {
-        if (matchId == null || teamId == null) {
-            throw new BadRequestException("比赛ID和球队ID不能为空");
+        if (matchId == null || teamId == null || isHomeTeam == null) {
+            throw new BadRequestException("传入的参数不能为空");
         }
         if (matchService.getById(matchId) == null) {
             throw new BadRequestException("比赛不存在");

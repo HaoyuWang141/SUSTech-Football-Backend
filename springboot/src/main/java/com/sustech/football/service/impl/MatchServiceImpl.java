@@ -34,7 +34,7 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
             throw new ConflictException("该用户已经是该比赛的管理员");
         }
         if (!matchManagerService.saveOrUpdateByMultiId(matchManager)) {
-            throw new ConflictException("邀请失败");
+            throw new RuntimeException("邀请失败");
         }
         return true;
     }
