@@ -66,6 +66,7 @@ CREATE TABLE team_manager
 (
     user_id INT REFERENCES "user",
     team_id INT REFERENCES team,
+    is_owner BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (user_id, team_id)
 );
 
@@ -115,6 +116,14 @@ CREATE TABLE match
     away_team_score INT,
     live_url        VARCHAR,
     video_url       VARCHAR
+);
+
+CREATE TABLE match_manager
+(
+    match_id INT REFERENCES match,
+    user_id  INT REFERENCES "user",
+    is_owner BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (match_id, user_id)
 );
 
 -- 比赛(友谊赛)邀请球队
@@ -168,6 +177,7 @@ CREATE TABLE event_manager
 (
     event_id INT REFERENCES event (event_id),
     user_id  INT REFERENCES "user",
+    is_owner BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (event_id, user_id)
 );
 

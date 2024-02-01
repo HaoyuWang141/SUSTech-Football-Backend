@@ -14,11 +14,13 @@ public class TeamManager {
     private Long userId;
     @MppMultiId
     private Long teamId;
+    private Boolean isOwner;
     @TableField(exist = false)
     private Team team;
 
-    public TeamManager(Long userId, Long teamId) {
+    public TeamManager(Long userId, Long teamId, Boolean isOwner) {
         this.userId = userId;
         this.teamId = teamId;
+        this.isOwner = isOwner;
     }
 }

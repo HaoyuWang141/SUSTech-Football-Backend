@@ -9,18 +9,18 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatchReferee {
+public class MatchManager {
     @MppMultiId
     private Long matchId;
     @MppMultiId
-    private Long refereeId;
+    private Long userId;
+    private Boolean isOwner;
     @TableField(exist = false)
     private Match match;
-    @TableField(exist = false)
-    private Referee referee;
 
-    public MatchReferee(Long matchId, Long refereeId) {
+    public MatchManager(Long matchId, Long userId, Boolean isOwner) {
         this.matchId = matchId;
-        this.refereeId = refereeId;
+        this.userId = userId;
+        this.isOwner = isOwner;
     }
 }

@@ -1,5 +1,6 @@
 package com.sustech.football.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,4 +19,20 @@ public class MatchRefereeRequest {
     @MppMultiId
     private Long refereeId;
     private String status;
+    @TableField(exist = false)
+    private Match match;
+    @TableField(exist = false)
+    private Referee referee;
+
+    public MatchRefereeRequest(Long matchId, Long refereeId) {
+        this.matchId = matchId;
+        this.refereeId = refereeId;
+        this.status = STATUS_PENDING;
+    }
+
+    public MatchRefereeRequest(Long matchId, Long refereeId, String status) {
+        this.matchId = matchId;
+        this.refereeId = refereeId;
+        this.status = status;
+    }
 }

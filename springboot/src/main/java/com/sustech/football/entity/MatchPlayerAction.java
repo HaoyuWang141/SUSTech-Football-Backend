@@ -12,11 +12,11 @@ import java.sql.Time;
 @AllArgsConstructor
 public class MatchPlayerAction {
     @MppMultiId
-    private Long match_id;
+    private Long matchId;
     @MppMultiId
-    private Long team_id;
+    private Long teamId;
     @MppMultiId
-    private Long player_id;
+    private Long playerId;
     @MppMultiId
     private String action;
     @MppMultiId

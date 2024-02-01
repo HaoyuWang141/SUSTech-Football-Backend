@@ -1,6 +1,7 @@
 package com.sustech.football.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.sustech.football.service.*;
@@ -25,7 +26,14 @@ public class TeamController {
     private MatchService matchService;
 
     @PostMapping("/create")
-    public Team createTeam(@RequestBody Team team) {
+    @Transactional
+    public Team createTeam(Long ownerId, @RequestBody Team team) {
+        if (ownerId == null) {
+            throw new BadRequestException("传入的队伍管理员ID为空");
+        }
+        if (userService.getById(ownerId) == null) {
+            throw new ResourceNotFoundException("管理员所示用户不存在");
+        }
         if (team == null) {
             throw new BadRequestException("传入球队为空");
         }
@@ -33,6 +41,9 @@ public class TeamController {
             throw new BadRequestException("传入球队的ID不为空");
         }
         if (!teamService.save(team)) {
+            throw new BadRequestException("创建球队失败");
+        }
+        if (!teamService.inviteManager(new TeamManager(ownerId, team.getTeamId(), true))) {
             throw new BadRequestException("创建球队失败");
         }
         return team;
@@ -85,7 +96,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.inviteManager(new TeamManager(managerId, teamId));
+        if (!teamService.inviteManager(new TeamManager(managerId, teamId, false))) {
+            throw new BadRequestException("邀请管理员失败");
+        }
     }
 
     @GetMapping("/manager/getAll")
@@ -110,7 +123,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.deleteManager(new TeamManager(teamId, managerId));
+        if (!teamService.deleteManager(new TeamManager(teamId, managerId, false))) {
+            throw new BadRequestException("删除管理员失败");
+        }
     }
 
     @PostMapping("/player/invite")
@@ -124,7 +139,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.invitePlayer(new TeamPlayer(teamId, playerId));
+        if (!teamService.invitePlayer(new TeamPlayer(teamId, playerId))) {
+            throw new BadRequestException("邀请球员失败");
+        }
     }
 
     @GetMapping("/player/getApplications")
@@ -152,7 +169,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.replyPlayerApplication(teamId, playerId, accept);
+        if (!teamService.replyPlayerApplication(teamId, playerId, accept)) {
+            throw new BadRequestException("回复球员申请失败");
+        }
     }
 
     @GetMapping("/player/getAll")
@@ -177,7 +196,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.deletePlayer(new TeamPlayer(teamId, playerId));
+        if (!teamService.deletePlayer(new TeamPlayer(teamId, playerId))) {
+            throw new BadRequestException("删除球员失败");
+        }
     }
 
     @PostMapping("/coach/invite")
@@ -191,7 +212,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.inviteCoach(new TeamCoach(teamId, coachId));
+        if (!teamService.inviteCoach(new TeamCoach(teamId, coachId))) {
+            throw new BadRequestException("邀请教练失败");
+        }
     }
 
     @GetMapping("/coach/getAll")
@@ -216,7 +239,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.deleteCoach(new TeamCoach(teamId, coachId));
+        if (!teamService.deleteCoach(new TeamCoach(teamId, coachId))) {
+            throw new BadRequestException("删除教练失败");
+        }
     }
 
     @GetMapping("/match/getInvitations")
@@ -241,7 +266,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.replyMatchInvitation(teamId, matchId, accept);
+        if (!teamService.replyMatchInvitation(teamId, matchId, accept)) {
+            throw new BadRequestException("回复比赛邀请失败");
+        }
     }
 
     @GetMapping("/match/getAll")
@@ -266,7 +293,9 @@ public class TeamController {
         if (matchService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
         }
-        teamService.requestJoinEvent(new EventTeam(eventId, teamId));
+        if (!teamService.requestJoinEvent(new EventTeam(eventId, teamId))) {
+            throw new BadRequestException("申请加入赛事失败");
+        }
     }
 
     @GetMapping("/event/getInvitations")
@@ -291,7 +320,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.replyEventInvitation(teamId, eventId, accept);
+        if (!teamService.replyEventInvitation(teamId, eventId, accept)) {
+            throw new BadRequestException("回复赛事邀请失败");
+        }
     }
 
     @GetMapping("/event/getAll")
@@ -313,7 +344,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.addUniform(new TeamUniform(teamId, uniformUrl));
+        if (!teamService.addUniform(new TeamUniform(teamId, uniformUrl))) {
+            throw new BadRequestException("添加队服失败");
+        }
     }
 
     @GetMapping("/uniform/getAll")
@@ -335,7 +368,9 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        teamService.deleteUniform(new TeamUniform(teamId, uniformUrl));
+        if (!teamService.deleteUniform(new TeamUniform(teamId, uniformUrl))) {
+            throw new BadRequestException("删除队服失败");
+        }
     }
 
 }

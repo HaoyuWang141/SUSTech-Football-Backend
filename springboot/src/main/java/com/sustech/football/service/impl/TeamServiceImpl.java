@@ -40,13 +40,14 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     private TeamUniformService teamUniformService;
 
     @Override
-    public void inviteManager(TeamManager teamManager) {
+    public boolean inviteManager(TeamManager teamManager) {
         if (teamManagerService.selectByMultiId(teamManager) != null) {
             throw new ConflictException("该用户已经是该球队的管理员");
         }
-        if (!teamManagerService.save(teamManager)) {
+        if (!teamManagerService.saveOrUpdateByMultiId(teamManager)) {
             throw new BadRequestException("邀请管理员失败");
         }
+        return true;
     }
 
     @Override
@@ -57,15 +58,16 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public void deleteManager(TeamManager teamManager) {
+    public boolean deleteManager(TeamManager teamManager) {
         if (!teamManagerService.deleteByMultiId(teamManager)) {
             throw new BadRequestException("删除管理员失败");
         }
+        return true;
     }
 
     @Override
     @Transactional
-    public void invitePlayer(TeamPlayer teamPlayer) {
+    public boolean invitePlayer(TeamPlayer teamPlayer) {
         if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
             throw new ConflictException("该球员已经在球队中");
         }
@@ -76,9 +78,10 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (teamPlayerRequestService.selectByMultiId(teamPlayerRequest) != null) {
             throw new BadRequestException("曾经向该球员发出过邀请，请勿重复发送");
         }
-        if (!teamPlayerRequestService.save(teamPlayerRequest)) {
+        if (!teamPlayerRequestService.saveOrUpdateByMultiId(teamPlayerRequest)) {
             throw new BadRequestException("邀请球员失败");
         }
+        return true;
     }
 
     @Override
@@ -88,7 +91,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
     @Override
     @Transactional
-    public void replyPlayerApplication(Long teamId, Long playerId, Boolean accept) {
+    public boolean replyPlayerApplication(Long teamId, Long playerId, Boolean accept) {
         TeamPlayer teamPlayer = new TeamPlayer(teamId, playerId);
         if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
             throw new ConflictException("该球员已经在球队中");
@@ -102,10 +105,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         }
         teamPlayerRequestService.updateByMultiId(teamPlayerRequest);
         if (accept) {
-            if (!teamPlayerService.save(teamPlayer)) {
+            if (!teamPlayerService.saveOrUpdateByMultiId(teamPlayer)) {
                 throw new RuntimeException("加入球队失败");
             }
         }
+        return true;
     }
 
     @Override
@@ -118,14 +122,15 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public void deletePlayer(TeamPlayer teamPlayer) {
+    public boolean deletePlayer(TeamPlayer teamPlayer) {
         if (!teamPlayerService.deleteByMultiId(teamPlayer)) {
             throw new BadRequestException("删除球员失败");
         }
+        return true;
     }
 
     @Override
-    public void inviteCoach(TeamCoach teamCoach) {
+    public boolean inviteCoach(TeamCoach teamCoach) {
         if (teamCoachService.selectByMultiId(teamCoach) != null) {
             throw new ConflictException("该教练已经在球队中");
         }
@@ -134,9 +139,10 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (teamCoachRequestService.selectByMultiId(teamCoachRequest) != null) {
             throw new ConflictException("曾经向该教练发出过邀请，请勿重复发送");
         }
-        if (!teamCoachService.save(teamCoach)) {
+        if (!teamCoachRequestService.saveOrUpdateByMultiId(teamCoachRequest)) {
             throw new RuntimeException("邀请教练失败");
         }
+        return true;
     }
 
     @Override
@@ -149,10 +155,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public void deleteCoach(TeamCoach teamCoach) {
+    public boolean deleteCoach(TeamCoach teamCoach) {
         if (!teamCoachService.deleteByMultiId(teamCoach)) {
             throw new BadRequestException("删除教练失败");
         }
+        return true;
     }
 
     @Override
@@ -162,7 +169,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
     @Override
     @Transactional
-    public void replyMatchInvitation(Long teamId, Long matchId, Boolean accept) {
+    public boolean replyMatchInvitation(Long teamId, Long matchId, Boolean accept) {
         Match match = matchService.getById(matchId);
         if (match.getHomeTeamId() != null && match.getHomeTeamId().equals(teamId)) {
             throw new ConflictException("该球队已经是主队");
@@ -199,6 +206,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 throw new RuntimeException("更新比赛失败");
             }
         }
+        return true;
     }
 
     @Override
@@ -209,7 +217,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public void requestJoinEvent(EventTeam eventTeam) {
+    public boolean requestJoinEvent(EventTeam eventTeam) {
         if (eventTeamService.selectByMultiId(eventTeam) != null) {
             throw new ConflictException("该球队已经参加该赛事");
         }
@@ -218,9 +226,10 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) != null) {
             throw new ConflictException("曾经向该赛事发出过申请，请勿重复发送");
         }
-        if (!eventTeamRequestService.save(eventTeamRequest)) {
+        if (!eventTeamRequestService.saveOrUpdateByMultiId(eventTeamRequest)) {
             throw new RuntimeException("申请参加赛事失败");
         }
+        return true;
     }
 
     @Override
@@ -229,7 +238,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public void replyEventInvitation(Long teamId, Long eventId, Boolean accept) {
+    public boolean replyEventInvitation(Long teamId, Long eventId, Boolean accept) {
         EventTeam eventTeam = new EventTeam(eventId, teamId);
         if (eventTeamService.selectByMultiId(eventTeam) != null) {
             throw new ConflictException("该球队已经参加该赛事");
@@ -244,10 +253,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             throw new RuntimeException("回复赛事邀请失败");
         }
         if (accept) {
-            if (!eventTeamService.save(eventTeam)) {
+            if (!eventTeamService.saveOrUpdateByMultiId(eventTeam)) {
                 throw new RuntimeException("参加赛事失败");
             }
         }
+        return true;
     }
 
     @Override
@@ -260,10 +270,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public void addUniform(TeamUniform teamUniform) {
-        if (!teamUniformService.save(teamUniform)) {
+    public boolean addUniform(TeamUniform teamUniform) {
+        if (!teamUniformService.saveOrUpdateByMultiId(teamUniform)) {
             throw new BadRequestException("添加队服失败");
         }
+        return true;
     }
 
     @Override
@@ -274,9 +285,10 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public void deleteUniform(TeamUniform teamUniform) {
+    public boolean deleteUniform(TeamUniform teamUniform) {
         if (!teamUniformService.deleteByMultiId(teamUniform)) {
             throw new BadRequestException("删除队服失败");
         }
+        return true;
     }
 }
