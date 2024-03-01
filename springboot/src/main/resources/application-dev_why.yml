@@ -1,8 +1,20 @@
 server:
   port: 8085
+  ssl:
+    enabled: true
+    key-store: keystore_football.p12
+    key-store-type: PKCS12
+    key-store-password: 111111
+    key-alias: ssl_football
 
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/football
+#    username: postgres
+#    password: 111111
+#
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/football
-    username: postgres
+    url: jdbc:postgresql://114.132.51.227:5432/football
+    username: admin_football
     password: 111111

@@ -7,6 +7,7 @@ import com.sustech.football.exception.ConflictException;
 import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.UnauthorizedAccessException;
 import com.sustech.football.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +75,10 @@ public class UserController {
     @PostMapping("/logout")
     public String logout() {
         return "logout";
+    }
+
+    @PostMapping("/favorite")
+    @Operation(summary = "收藏", description = "type类型可选：team, player, match, event")
+    public void favorite(Long userId, String type, Long id) {
     }
 }
