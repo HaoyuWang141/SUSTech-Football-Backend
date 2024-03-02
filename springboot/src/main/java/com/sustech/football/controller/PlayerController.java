@@ -172,4 +172,18 @@ public class PlayerController {
             }
         }
     }
+
+    @GetMapping("/getMatches")
+    public List<Match> getMatches(@RequestParam Long playerId) {
+        if (playerId == null) {
+            throw new BadRequestException("球员id不能为空");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        return null;
+        // TODO: 2024-3-2
+//        return playerService.getMatches(playerId);
+    }
+
 }

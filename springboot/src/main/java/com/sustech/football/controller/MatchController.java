@@ -259,4 +259,17 @@ public class MatchController {
             throw new BadRequestException("更新比赛球员动作失败");
         }
     }
+
+    @GetMapping("/getEvent")
+    public Event getEvent(Long matchId, Long eventId) {
+        if (matchId == null || eventId == null) {
+            throw new BadRequestException("比赛ID和事件ID不能为空");
+        }
+        if (matchService.getById(matchId) == null) {
+            throw new BadRequestException("比赛不存在");
+        }
+        return null;
+        // TODO: 2024-3-2
+//        return matchService.getEvent(matchId, eventId);
+    }
 }

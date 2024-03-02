@@ -77,7 +77,6 @@ public class TeamController {
         return team;
     }
 
-    @Deprecated
     @DeleteMapping("/delete")
     public void deleteTeam(Long id) {
         if (!teamService.removeById(id)) {
