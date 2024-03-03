@@ -189,6 +189,28 @@ CREATE TABLE event_team
     PRIMARY KEY (event_id, team_id)
 );
 
+-- 小组
+CREATE TABLE event_group
+(
+    group_id SERIAL PRIMARY KEY,
+    event_id INT REFERENCES event (event_id),
+    name     VARCHAR(255) NOT NULL
+);
+
+-- 小组-球队
+CREATE TABLE event_group_team
+(
+    group_id            INT REFERENCES event_group (group_id),
+    team_id             INT REFERENCES team (team_id),
+    num_wins            INT, -- 胜场
+    num_draws           INT, -- 平局
+    num_losses          INT, -- 负场
+    num_goals_for       INT, -- 进球数
+    num_goals_against   INT, -- 失球数
+    score               INT, -- 积分
+    PRIMARY KEY (group_id, team_id)
+);
+
 -- 赛事邀请球队/球队申请加入赛事
 CREATE TABLE event_team_request
 (
@@ -216,13 +238,34 @@ CREATE TABLE event_referee_request
     PRIMARY KEY (event_id, referee_id)
 );
 
+-- 赛事-比赛阶段
+CREATE TABLE event_stage
+(
+    event_id INT REFERENCES event,
+    stage    VARCHAR,
+    PRIMARY KEY (event_id, stage)
+);
+
+CREATE TABLE event_stage_tag
+(
+    event_id INT REFERENCES event,
+    stage    VARCHAR,
+    tag     VARCHAR,
+    FOREIGN KEY (event_id, stage) REFERENCES event_stage,
+    PRIMARY KEY (event_id, stage, tag)
+);
+
 -- 赛事-比赛
 CREATE TABLE event_match
 (
     event_id INT REFERENCES event,
     match_id INT REFERENCES match,
+    stage    VARCHAR,
+    tag      VARCHAR,
     PROPERTY VARCHAR,
-    PRIMARY KEY (event_id, match_id)
+    PRIMARY KEY (event_id, match_id),
+    FOREIGN KEY (event_id, stage) REFERENCES event_stage,
+    FOREIGN KEY (event_id, stage, tag) REFERENCES event_stage_tag
 );
 
 -- 通知表
