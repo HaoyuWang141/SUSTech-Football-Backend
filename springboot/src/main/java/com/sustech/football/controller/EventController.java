@@ -1,5 +1,6 @@
 package com.sustech.football.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ResourceNotFoundException;
@@ -24,6 +25,15 @@ public class EventController {
     private MatchService matchService;
     @Autowired
     private RefereeService refereeService;
+    @Autowired
+    private EventGroupService eventGroupService;
+    @Autowired
+    private EventGroupTeamService eventGroupTeamService;
+    @Autowired
+    private EventStageService eventStageService;
+    @Autowired
+    private EventStageTagService eventStageTagService;
+
 
     @PostMapping("/create")
     public Event createEvent(Long ownerId, @RequestBody Event event) {
@@ -206,8 +216,167 @@ public class EventController {
         }
     }
 
+    @PostMapping("/group/new")
+    public EventGroup newGroup(Long eventId, String groupName) {
+        if (eventId == null || groupName == null) {
+            throw new BadRequestException("传入的赛事ID或组名为空");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        EventGroup group = new EventGroup(eventId, groupName);
+        if (!eventGroupService.save(group)) {
+            throw new RuntimeException("创建分组失败");
+        }
+        return group;
+    }
+
+    @GetMapping("/group/getByEventId")
+    public List<EventGroup> getGroups(Long eventId) {
+        if (eventId == null) {
+            throw new BadRequestException("传入的赛事ID为空");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        QueryWrapper<EventGroup> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("event_id", eventId);
+        return eventGroupService.list(queryWrapper);
+    }
+
+    @PutMapping("/group/updateName")
+    public void updateGroup(Integer groupId, String name) {
+        if (groupId == null || name == null) {
+            throw new BadRequestException("传入的分组ID或组名为空");
+        }
+        if (eventGroupService.getById(groupId) == null) {
+            throw new ResourceNotFoundException("分组不存在");
+        }
+        EventGroup group = eventGroupService.getById(groupId);
+        group.setName(name);
+        if (!eventGroupService.updateById(group)) {
+            throw new RuntimeException("更新分组名失败");
+        }
+    }
+
+    @DeleteMapping("/group/delete")
+    public void deleteGroup(Long groupId) {
+        if (groupId == null) {
+            throw new BadRequestException("传入的分组ID为空");
+        }
+        if (eventGroupService.getById(groupId) == null) {
+            throw new ResourceNotFoundException("分组不存在");
+        }
+        if (eventGroupTeamService.remove(new QueryWrapper<EventGroupTeam>().eq("group_id", groupId))) {
+            throw new RuntimeException("删除分组内的球队失败");
+        }
+        if (!eventGroupService.removeById(groupId)) {
+            throw new RuntimeException("删除分组失败");
+        }
+    }
+
+    @PostMapping("/group/addTeam")
+    public void addTeamIntoGroup(Long groupId, Long teamId) {
+        if (groupId == null || teamId == null) {
+            throw new BadRequestException("传入的分组ID或球队ID为空");
+        }
+        if (eventGroupService.getById(groupId) == null) {
+            throw new ResourceNotFoundException("分组不存在");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        if (!eventGroupTeamService.saveOrUpdateByMultiId(new EventGroupTeam(groupId, teamId))) {
+            throw new RuntimeException("添加球队到分组失败");
+        }
+    }
+
+    @DeleteMapping("/group/deleteTeam")
+    public void deleteTeamFromGroup(Long groupId, Long teamId) {
+        if (groupId == null || teamId == null) {
+            throw new BadRequestException("传入的分组ID或球队ID为空");
+        }
+        if (eventGroupService.getById(groupId) == null) {
+            throw new ResourceNotFoundException("分组不存在");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        if (!eventGroupTeamService.deleteByMultiId(new EventGroupTeam(groupId, teamId))) {
+            throw new RuntimeException("删除球队失败");
+        }
+    }
+
+    @PostMapping("/stage/new")
+    public EventStage newStage(Long eventId, String stageName) {
+        if (eventId == null || stageName == null) {
+            throw new BadRequestException("传入的赛事ID或阶段名为空");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        EventStage stage = new EventStage(eventId, stageName);
+        if (!eventStageService.saveOrUpdateByMultiId(stage)) {
+            throw new RuntimeException("创建阶段失败");
+        }
+        return stage;
+    }
+
+    @DeleteMapping("/stage/delete")
+    public void deleteStage(Long eventId, String stageName) {
+        if (eventId == null || stageName == null) {
+            throw new BadRequestException("传入的赛事ID或阶段名为空");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        if (eventStageService.selectByMultiId(new EventStage(eventId, stageName)) == null) {
+            throw new ResourceNotFoundException("阶段不存在");
+        }
+        if (!eventStageService.deleteByMultiId(new EventStage(eventId, stageName))) {
+            throw new RuntimeException("删除阶段失败");
+        }
+    }
+
+    @PostMapping("/tag/new")
+    public EventStageTag newTag(Long eventId, String stageName, String tagName) {
+        if (eventId == null || stageName == null || tagName == null) {
+            throw new BadRequestException("传入的赛事ID或阶段名或标签名为空");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        if (eventStageService.selectByMultiId(new EventStage(eventId, stageName)) == null) {
+            throw new ResourceNotFoundException("阶段不存在");
+        }
+        EventStageTag tag = new EventStageTag(eventId, stageName, tagName);
+        if (!eventStageTagService.saveOrUpdateByMultiId(tag)) {
+            throw new RuntimeException("创建标签失败");
+        }
+        return tag;
+    }
+
+    @DeleteMapping("/tag/delete")
+    public void deleteTag(Long eventId, String stageName, String tagName) {
+        if (eventId == null || stageName == null || tagName == null) {
+            throw new BadRequestException("传入的赛事ID或阶段名或标签名为空");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        if (eventStageService.selectByMultiId(new EventStage(eventId, stageName)) == null) {
+            throw new ResourceNotFoundException("阶段不存在");
+        }
+        if (eventStageTagService.selectByMultiId(new EventStageTag(eventId, stageName, tagName)) == null) {
+            throw new ResourceNotFoundException("标签不存在");
+        }
+        if (!eventStageTagService.deleteByMultiId(new EventStageTag(eventId, stageName, tagName))) {
+            throw new RuntimeException("删除标签失败");
+        }
+    }
+
     @PostMapping("/match/add")
-    public void addMatch(Long eventId, Match match) {
+    public void addMatch(Long eventId, Match match, String stage, String tag) {
         if (eventId == null || match == null) {
             throw new BadRequestException("传入的赛事ID或比赛为空");
         }
@@ -217,7 +386,7 @@ public class EventController {
         if (match.getMatchId() != null) {
             throw new BadRequestException("传入的比赛已有ID");
         }
-        if (!eventService.addMatch(eventId, match)) {
+        if (!eventService.addMatch(eventId, match, stage, tag)) {
             throw new RuntimeException("添加比赛失败");
         }
     }

@@ -238,19 +238,20 @@ CREATE TABLE event_referee_request
     PRIMARY KEY (event_id, referee_id)
 );
 
--- 赛事-比赛阶段
+-- 赛事-比赛阶段：小组赛、淘汰赛、排位赛等
 CREATE TABLE event_stage
 (
     event_id INT REFERENCES event,
-    stage    VARCHAR,
+    stage    VARCHAR, -- 小组赛、淘汰赛、排位赛等
     PRIMARY KEY (event_id, stage)
 );
 
+-- 【赛事-比赛阶段】-标签：如stage=小组赛，tag=A组、B组等；stage=淘汰赛，tag=1/8决赛、1/4决赛等
 CREATE TABLE event_stage_tag
 (
     event_id INT REFERENCES event,
-    stage    VARCHAR,
-    tag     VARCHAR,
+    stage    VARCHAR, -- 小组赛、淘汰赛、排位赛等
+    tag     VARCHAR, -- A组、B组等；1/8决赛、1/4决赛等
     FOREIGN KEY (event_id, stage) REFERENCES event_stage,
     PRIMARY KEY (event_id, stage, tag)
 );

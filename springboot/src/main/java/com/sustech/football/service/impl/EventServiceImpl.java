@@ -120,11 +120,11 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     }
 
     @Override
-    public boolean addMatch(Long eventId, Match match) {
+    public boolean addMatch(Long eventId, Match match, String stage, String tag) {
         if (!matchService.save(match)) {
             throw new RuntimeException("添加比赛失败");
         }
-        if (!eventMatchService.saveOrUpdateByMultiId(new EventMatch(eventId, match.getMatchId()))) {
+        if (!eventMatchService.saveOrUpdateByMultiId(new EventMatch(eventId, match.getMatchId(), stage, tag))) {
             throw new RuntimeException("添加赛事比赛失败");
         }
         return true;

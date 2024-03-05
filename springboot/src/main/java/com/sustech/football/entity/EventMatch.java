@@ -14,6 +14,8 @@ public class EventMatch {
     private Long eventId;
     @MppMultiId
     private Long matchId;
+    private String stage;
+    private String tag;
     @TableField(exist = false)
     private Event event;
     @TableField(exist = false)
@@ -22,5 +24,12 @@ public class EventMatch {
     public EventMatch(Long eventId, Long matchId) {
         this.eventId = eventId;
         this.matchId = matchId;
+    }
+
+    public EventMatch(Long eventId, Long matchId, String stage, String tag) {
+        this.eventId = eventId;
+        this.matchId = matchId;
+        this.stage = stage;
+        this.tag = tag;
     }
 }

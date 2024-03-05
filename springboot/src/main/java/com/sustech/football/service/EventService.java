@@ -15,7 +15,7 @@ public interface EventService extends IService<Event> {
     boolean replyTeamApplication(EventTeamRequest eventTeamRequest);
     List<Team> getTeams(Long eventId);
     boolean deleteTeam(EventTeam eventTeam);
-    boolean addMatch(Long eventId, Match match);
+    boolean addMatch(Long eventId, Match match, String stage, String tag);
     List<Match> getMatches(Long eventId);
     boolean deleteMatch(EventMatch eventMatch);
     boolean inviteReferee(EventRefereeRequest eventRefereeRequest);
