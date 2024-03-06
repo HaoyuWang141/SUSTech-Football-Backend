@@ -21,7 +21,7 @@ CREATE TABLE player
     college        VARCHAR(255), -- 若本科生/研究生/教职工则有院系
     admission_year INT,          -- 入学年份
     bio            TEXT,         -- 个人简介
-    user_id        INT REFERENCES "user"
+    user_id        INT REFERENCES t_user
 );
 
 -- 教练表
@@ -31,7 +31,7 @@ CREATE TABLE coach
     name      VARCHAR(255) NOT NULL,
     photo_url VARCHAR(255),
     bio       TEXT,
-    user_id   INT REFERENCES "user"
+    user_id   INT REFERENCES t_user
 );
 
 -- 裁判表
@@ -41,7 +41,7 @@ CREATE TABLE referee
     name       VARCHAR(255) NOT NULL,
     photo_url  VARCHAR(255),
     bio        TEXT,
-    user_id    INT REFERENCES "user"
+    user_id    INT REFERENCES t_user
 );
 
 -- 球队表
@@ -64,7 +64,7 @@ CREATE TABLE team_uniform
 -- 球队管理者表
 CREATE TABLE team_manager
 (
-    user_id INT REFERENCES "user",
+    user_id INT REFERENCES t_user,
     team_id INT REFERENCES team,
     is_owner BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (user_id, team_id)
@@ -121,7 +121,7 @@ CREATE TABLE match
 CREATE TABLE match_manager
 (
     match_id INT REFERENCES match,
-    user_id  INT REFERENCES "user",
+    user_id  INT REFERENCES t_user,
     is_owner BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (match_id, user_id)
 );
@@ -176,7 +176,7 @@ CREATE TABLE event
 CREATE TABLE event_manager
 (
     event_id INT REFERENCES event (event_id),
-    user_id  INT REFERENCES "user",
+    user_id  INT REFERENCES t_user,
     is_owner BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (event_id, user_id)
 );
@@ -273,7 +273,7 @@ CREATE TABLE event_match
 CREATE TABLE notification
 (
     notification_id SERIAL PRIMARY KEY,
-    publisher_id    INT REFERENCES "user",
+    publisher_id    INT REFERENCES t_user,
     type            VARCHAR CHECK ( type IN ('ALL_USERS',
                                              'TEAM_TO_PLAYER',
                                              'EVENT_TO_TEAM',
