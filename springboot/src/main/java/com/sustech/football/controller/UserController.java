@@ -11,10 +11,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -26,6 +28,18 @@ public class UserController {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @PostMapping("/wxLogin")
+    public ResponseEntity<String> wxLogin(String code) {
+        String appid = "wxca12f9a07b0c63e2";
+        String appsecret = "1d3743bc2b7b109493ba284ccbaa2420";
+        String url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + appid + "&secret=" + appsecret + "&js_code=" + code + "&grant_type=authorization_code";
+        String response = restTemplate.getForObject(url, String.class);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/login")
