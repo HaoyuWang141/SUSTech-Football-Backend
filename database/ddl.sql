@@ -285,3 +285,35 @@ CREATE TABLE notification
     content         TEXT,
     time            TIMESTAMP
 );
+
+-- 收藏用户表
+CREATE TABLE favorite_user
+(
+    user_id      INT REFERENCES t_user (user_id),
+    favorite_id  INT REFERENCES t_user (user_id),
+    PRIMARY KEY (user_id, favorite_id)
+);
+
+-- 收藏球队表
+CREATE TABLE favorite_team
+(
+    user_id      INT REFERENCES t_user (user_id),
+    team_id      INT REFERENCES team (team_id),
+    PRIMARY KEY (user_id, team_id)
+);
+
+-- 收藏赛事表
+CREATE TABLE favorite_event
+(
+    user_id      INT REFERENCES t_user (user_id),
+    event_id     INT REFERENCES event (event_id),
+    PRIMARY KEY (user_id, event_id)
+);
+
+-- 收藏比赛表
+CREATE TABLE favorite_match
+(
+    user_id      INT REFERENCES t_user (user_id),
+    match_id     INT REFERENCES match (match_id),
+    PRIMARY KEY (user_id, match_id)
+);

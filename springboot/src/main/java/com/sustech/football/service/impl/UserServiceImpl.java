@@ -28,17 +28,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public boolean favoritePlayer(Long userId, Long playerId) {
+    public boolean favoriteUser(Long userId, Long favoriteId) {
         return false;
     }
 
     @Override
-    public boolean unfavoritePlayer(Long userId, Long playerId) {
+    public boolean unfavoriteUser(Long userId, Long favoriteId) {
         return false;
     }
 
     @Override
-    public List<Player> getFavoritePlayers(Long userId) {
+    public List<User> getFavoriteUsers(Long userId) {
         return null;
     }
 
