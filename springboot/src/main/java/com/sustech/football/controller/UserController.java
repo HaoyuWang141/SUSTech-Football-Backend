@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Long> login(String openid, String session_key) {
+    public ResponseEntity<User> login(String openid, String session_key) {
         if (openid == null || session_key == null) {
             throw new BadRequestException("openid和session_key不能为空");
         }
@@ -67,7 +67,7 @@ public class UserController {
             }
         }
 
-        return ResponseEntity.ok().body(user.getUserId());
+        return ResponseEntity.ok().body(user);
     }
 
     @PostMapping("/register")
