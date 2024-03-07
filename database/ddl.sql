@@ -1,9 +1,11 @@
 -- 用户表
-CREATE TABLE "user"
+CREATE TABLE t_user
 (
     user_id  SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL
+    openid   VARCHAR(255) NOT NULL UNIQUE,
+    session_key VARCHAR(255) NOT NULL,
+    nick_name  VARCHAR(255),
+    avatar_url VARCHAR(255)
 );
 
 -- 球员表

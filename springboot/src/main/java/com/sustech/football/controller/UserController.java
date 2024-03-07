@@ -3,12 +3,11 @@ package com.sustech.football.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.sustech.football.entity.User;
-import com.sustech.football.exception.BadRequestException;
-import com.sustech.football.exception.ConflictException;
-import com.sustech.football.exception.InternalServerErrorException;
-import com.sustech.football.exception.UnauthorizedAccessException;
+import com.sustech.football.exception.*;
 import com.sustech.football.service.UserService;
+import com.sustech.football.utils.WXBizDataCrypt;
 import io.swagger.v3.oas.annotations.Operation;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +24,8 @@ import java.util.Map;
 public class UserController {
 
     private UserService userService;
+    private String appid = "wxca12f9a07b0c63e2";
+    private String appsecret = "1d3743bc2b7b109493ba284ccbaa2420";
 
     @Autowired
     public UserController(UserService userService) {
@@ -36,8 +37,6 @@ public class UserController {
 
     @PostMapping("/wxLogin")
     public ResponseEntity<String> wxLogin(String code) {
-        String appid = "wxca12f9a07b0c63e2";
-        String appsecret = "1d3743bc2b7b109493ba284ccbaa2420";
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + appid + "&secret=" + appsecret + "&js_code=" + code + "&grant_type=authorization_code";
         String response = restTemplate.getForObject(url, String.class);
         return ResponseEntity.ok().body(response);
@@ -48,20 +47,21 @@ public class UserController {
         if (openid == null || session_key == null) {
             throw new BadRequestException("openid和session_key不能为空");
         }
+        System.out.println(openid + "\n" + session_key);
 //        String access_token = "ACCESS_TOKEN";
         // signature = hmac_sha256(session_key, "")
 //        String url = "GET https://api.weixin.qq.com/wxa/checksession?access_token=ACCESS_TOKEN&signature=SIGNATURE&openid=OPENID&sig_method=hmac_sha256";
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("username", openid);
+        queryWrapper.like("openid", openid);
         User user = userService.getOne(queryWrapper);
         if (user == null) {
-            user = new User(null, openid, session_key);
+            user = new User(openid, session_key);
             if (!userService.save(user)) {
                 throw new InternalServerErrorException("注册失败");
             }
         } else {
             UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("username", openid).set("password", session_key);
+            updateWrapper.eq("openid", openid).set("session_key", session_key);
             if (!userService.update(updateWrapper)) {
                 throw new InternalServerErrorException("???");
             }
@@ -70,29 +70,36 @@ public class UserController {
         return ResponseEntity.ok().body(user);
     }
 
-    @PostMapping("/register")
-    @Deprecated
-    public ResponseEntity<User> register(String username, String password) {
-        if (username == null || password == null) {
-            throw new BadRequestException("用户名和密码不能为空");
+    @PostMapping("/get")
+    public User getUser(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("参数错误");
         }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("username", username);
-        User user = userService.getOne(queryWrapper);
-        if (user != null) {
-            throw new ConflictException("用户名已存在");
+        User user = userService.getById(userId);
+        if (user == null) {
+            throw new ResourceNotFoundException("用户不存在");
         }
-        user = new User(null, username, password);
-        if (userService.save(user)) {
-            return ResponseEntity.ok(user);
-        } else {
-            throw new InternalServerErrorException("注册失败");
-        }
+        return user;
     }
 
-    @PostMapping("/logout")
-    public String logout() {
-        return "logout";
+    @PostMapping("/update")
+    public void update(Long userId, @RequestParam(required = false) String avatarUrl, @RequestParam(required = false) String nickName) {
+        if (userId == null || avatarUrl == null || nickName == null) {
+            throw new BadRequestException("参数错误");
+        }
+        User user = userService.getById(userId);
+        if (user == null) {
+            throw new ResourceNotFoundException("用户不存在");
+        }
+        if (avatarUrl != null && !avatarUrl.isEmpty()) {
+            user.setAvatarUrl(avatarUrl);
+        }
+        if (nickName != null && !nickName.isEmpty()) {
+            user.setNickName(nickName);
+        }
+        if (!userService.updateById(user)) {
+            throw new InternalServerErrorException("更新失败");
+        }
     }
 
     @PostMapping("/favorite")
@@ -165,5 +172,29 @@ public class UserController {
             case "event" -> userService.getFavoriteEvents(userId);
             default -> throw new BadRequestException("参数错误");
         };
+    }
+
+    @GetMapping("/getData")
+    public String getData(String encryptedData, String iv, String userId) {
+        User user = userService.getById(Long.parseLong(userId));
+        if (user == null) {
+            throw new UnauthorizedAccessException("用户不存在");
+        }
+        String sessionKey = user.getSessionKey();
+        WXBizDataCrypt crypt = new WXBizDataCrypt(appid, sessionKey);
+        System.out.println(encryptedData);
+        System.out.println(iv);
+        System.out.println(appid);
+        System.out.println(sessionKey);
+        String result = "";
+        try {
+            JSONObject decryptedData = crypt.decryptData(encryptedData, iv);
+            result = decryptedData.toString();
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InternalServerErrorException("解密失败");
+        }
+        return result;
     }
 }

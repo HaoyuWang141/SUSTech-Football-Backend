@@ -1,4 +1,5 @@
 package com.sustech.football.entity;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -13,7 +14,21 @@ import lombok.NoArgsConstructor;
 public class User {
     @TableId(type = IdType.AUTO)
     private Long userId;
-    private String username;
-    private String password;
+    private String openid;
+    private String sessionKey;
+    private String avatarUrl;
+    private String nickName;
+
+    public User(String openid, String sessionKey) {
+        this.openid = openid;
+        this.sessionKey = sessionKey;
+    }
+
+    public User(String openid, String sessionKey, String avatarUrl, String nickName) {
+        this.openid = openid;
+        this.sessionKey = sessionKey;
+        this.avatarUrl = avatarUrl;
+        this.nickName = nickName;
+    }
 }
 
