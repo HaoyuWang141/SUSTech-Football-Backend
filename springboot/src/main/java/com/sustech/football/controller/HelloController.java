@@ -16,13 +16,4 @@ public class HelloController {
         System.out.println("hello");
         return "hello";
     }
-
-    @GetMapping("/user")
-    public User user() {
-        User user = new User();
-        user.setUserId(0L);
-        user.setUsername("testUser");
-        user.setPassword("testPassword");
-        return user;
-    }
 }
