@@ -13,11 +13,11 @@ public interface UserService extends IService<User> {
 
     List<Team> getFavoriteTeams(Long userId);
 
-    boolean favoritePlayer(Long userId, Long playerId);
+    boolean favoriteUser(Long userId, Long favoriteId);
 
-    boolean unfavoritePlayer(Long userId, Long playerId);
+    boolean unfavoriteUser(Long userId, Long favoriteId);
 
-    List<Player> getFavoritePlayers(Long userId);
+    List<User> getFavoriteUsers(Long userId);
 
     boolean favoriteMatch(Long userId, Long matchId);
 
