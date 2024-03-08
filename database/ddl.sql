@@ -114,8 +114,10 @@ CREATE TABLE match
     home_team_id    INT REFERENCES team (team_id),
     away_team_id    INT REFERENCES team (team_id),
     time            TIMESTAMP,
-    home_team_score INT,
-    away_team_score INT,
+    home_team_score INT DEFAULT 0,
+    away_team_score INT DEFAULT 0,
+    home_team_penalty INT DEFAULT 0,
+    away_team_penalty INT DEFAULT 0,
     live_url        VARCHAR,
     video_url       VARCHAR
 );
@@ -204,12 +206,12 @@ CREATE TABLE event_group_team
 (
     group_id            INT REFERENCES event_group (group_id),
     team_id             INT REFERENCES team (team_id),
-    num_wins            INT, -- 胜场
-    num_draws           INT, -- 平局
-    num_losses          INT, -- 负场
-    num_goals_for       INT, -- 进球数
-    num_goals_against   INT, -- 失球数
-    score               INT, -- 积分
+    num_wins            INT DEFAULT 0, -- 胜场
+    num_draws           INT DEFAULT 0, -- 平局
+    num_losses          INT DEFAULT 0, -- 负场
+    num_goals_for       INT DEFAULT 0, -- 进球数
+    num_goals_against   INT DEFAULT 0, -- 失球数
+    score               INT DEFAULT 0, -- 积分
     PRIMARY KEY (group_id, team_id)
 );
 

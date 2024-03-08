@@ -1,4 +1,3 @@
-
 package com.sustech.football.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -30,6 +29,72 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     private EventRefereeService eventRefereeService;
     @Autowired
     private EventRefereeRequestService eventRefereeRequestService;
+    @Autowired
+    private EventGroupService eventGroupService;
+    @Autowired
+    private EventGroupTeamService eventGroupTeamService;
+
+    @Override
+    public Event getDetailedEvent(Long eventId) {
+        Event event = getById(eventId);
+        if (event == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        List<EventManager> eventManagers = eventManagerService.list(new QueryWrapper<EventManager>().eq("event_id", eventId));
+        event.setManagerList(eventManagers.stream().map(EventManager::getUserId).toList());
+        List<EventTeam> eventTeams = eventTeamService.listWithTeam(eventId);
+        event.setTeamList(eventTeams.stream().map(EventTeam::getTeam).map(t -> new Event.Team(t.getTeamId(), t.getName(), t.getLogoUrl())).toList());
+        List<EventGroup> eventGroups = eventGroupService.list(new QueryWrapper<EventGroup>().eq("event_id", eventId));
+        event.setGroupList(eventGroups.stream().map(g -> {
+            Event.Group group = new Event.Group();
+            group.setGroupId(g.getGroupId());
+            group.setName(g.getName());
+            List<EventGroupTeam> eventGroupTeams = eventGroupTeamService.list(new QueryWrapper<EventGroupTeam>().eq("group_id", g.getGroupId()));
+            group.setTeamList(eventGroupTeams.stream().map(t -> {
+                Event.Group.Team team = new Event.Group.Team();
+                for (EventTeam et : eventTeams) {
+                    if (et.getTeamId().equals(t.getTeamId())) {
+                        team.setTeam(new Event.Team(et.getTeamId(), et.getTeam().getName(), et.getTeam().getLogoUrl()));
+                        break;
+                    }
+                }
+                team.setNumWins(t.getNumWins());
+                team.setNumDraws(t.getNumDraws());
+                team.setNumLosses(t.getNumLosses());
+                team.setNumGoalsFor(t.getNumGoalsFor());
+                team.setNumGoalsAgainst(t.getNumGoalsAgainst());
+                team.setScore(t.getScore());
+                return team;
+            }).toList());
+            return group;
+        }).toList());
+        List<EventMatch> eventMatches = eventMatchService.list(new QueryWrapper<EventMatch>().eq("event_id", eventId));
+        eventMatches.forEach(em -> {
+            Match match = matchService.getById(em.getMatchId());
+            for (EventTeam et: eventTeams){
+                if (et.getTeamId().equals(match.getHomeTeamId())){
+                    match.setHomeTeam(et.getTeam());
+                }
+                if (et.getTeamId().equals(match.getAwayTeamId())){
+                    match.setAwayTeam(et.getTeam());
+                }
+            }
+            em.setMatch(match);
+        });
+        event.setMatchList(eventMatches.stream().map(EventMatch::getMatch).toList());
+        event.setStageList(eventMatches.stream().map(EventMatch::getStage).distinct().map(stage -> {
+            Event.Stage eventStage = new Event.Stage();
+            eventStage.setStageName(stage);
+            eventStage.setTags(eventMatches.stream().filter(em -> em.getStage().equals(stage)).map(EventMatch::getTag).distinct().map(tag -> {
+                Event.Tag eventTag = new Event.Tag();
+                eventTag.setTagName(tag);
+                eventTag.setMatches(eventMatches.stream().filter(em2 -> em2.getStage().equals(stage) && em2.getTag().equals(tag)).map(EventMatch::getMatch).toList());
+                return eventTag;
+            }).toList());
+            return eventStage;
+        }).toList());
+        return event;
+    }
 
     @Override
     public boolean inviteManager(EventManager eventManager) {
@@ -101,11 +166,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
 
     @Override
     public List<Team> getTeams(Long eventId) {
-        return eventTeamService
-                .listWithTeam(eventId)
-                .stream()
-                .map(EventTeam::getTeam)
-                .toList();
+        return eventTeamService.listWithTeam(eventId).stream().map(EventTeam::getTeam).toList();
     }
 
     @Override
@@ -132,11 +193,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
 
     @Override
     public List<Match> getMatches(Long eventId) {
-        return eventMatchService
-                .listWithMatch(eventId)
-                .stream()
-                .map(EventMatch::getMatch)
-                .toList();
+        return eventMatchService.listWithMatch(eventId).stream().map(EventMatch::getMatch).toList();
     }
 
     @Override
@@ -167,11 +224,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
 
     @Override
     public List<Referee> getReferees(Long eventId) {
-        return eventRefereeService
-                .listWithReferee(eventId)
-                .stream()
-                .map(EventReferee::getReferee)
-                .toList();
+        return eventRefereeService.listWithReferee(eventId).stream().map(EventReferee::getReferee).toList();
     }
 
     @Override

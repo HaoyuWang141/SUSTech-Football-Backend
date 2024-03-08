@@ -19,7 +19,7 @@ public class EventGroup {
     private String name;
     @TableField(exist = false)
     private Event event;
-    @TableField
+    @TableField(exist = false)
     private List<Team> teams;
 
     public EventGroup(Long eventId, String name) {

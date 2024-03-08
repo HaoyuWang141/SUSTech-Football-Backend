@@ -21,6 +21,8 @@ public class Match {
     private Timestamp time;
     private Integer homeTeamScore;
     private Integer awayTeamScore;
+    private Integer homeTeamPenalty;
+    private Integer awayTeamPenalty;
     private String liveUrl;
     private String videoUrl;
     @TableField(exist = false)
