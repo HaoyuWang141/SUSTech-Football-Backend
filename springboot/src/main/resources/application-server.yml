@@ -14,4 +14,4 @@ spring:
     password: 111111
 
 file:
-  upload-dir: ~/SUSTech-Football-Upload/
+  upload-dir: /home/lighthouse/SUSTech-Football-Upload/
