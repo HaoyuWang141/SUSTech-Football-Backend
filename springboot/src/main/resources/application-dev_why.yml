@@ -21,3 +21,11 @@ spring:
 
 file:
   upload-dir: E:\SUSTech-Football-Upload/
+
+logging:
+  level:
+    root: debug
+    org:
+      springframework:
+        jdbc:
+          core: debug

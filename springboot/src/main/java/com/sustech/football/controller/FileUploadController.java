@@ -40,7 +40,7 @@ public class FileUploadController {
             file.transferTo(saveFile);
 
             // 返回文件访问的URL
-            return "/download/" + uniqueFileName;
+            return uniqueFileName;
         } catch (IOException e) {
             e.printStackTrace();
             throw new BadRequestException("文件上传失败：" + e.getMessage());

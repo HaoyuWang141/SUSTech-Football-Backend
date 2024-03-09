@@ -17,15 +17,17 @@ public class Event {
     @Data
     @NoArgsConstructor
     public static class Team {
-        public Team(Long id, String name, String logo) {
+        public Team(Long id, String name, String logo, Integer playerCount) {
             this.id = id;
             this.name = name;
             this.logo = logo;
+            this.playerCount = playerCount;
         }
 
         Long id;
         String name;
         String logo;
+        Integer playerCount;
     }
 
     @Data

@@ -33,6 +33,8 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     private EventGroupService eventGroupService;
     @Autowired
     private EventGroupTeamService eventGroupTeamService;
+    @Autowired
+    private TeamPlayerService teamPlayerService;
 
     @Override
     public Event getDetailedEvent(Long eventId) {
@@ -43,7 +45,13 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         List<EventManager> eventManagers = eventManagerService.list(new QueryWrapper<EventManager>().eq("event_id", eventId));
         event.setManagerList(eventManagers.stream().map(EventManager::getUserId).toList());
         List<EventTeam> eventTeams = eventTeamService.listWithTeam(eventId);
-        event.setTeamList(eventTeams.stream().map(EventTeam::getTeam).map(t -> new Event.Team(t.getTeamId(), t.getName(), t.getLogoUrl())).toList());
+        for (EventTeam et : eventTeams) {
+            List<TeamPlayer> teamPlayerList = teamPlayerService.listWithPlayer(et.getTeam().getTeamId());
+            log.debug("teamPlayerList:" + teamPlayerList);
+            et.getTeam().setPlayerList(teamPlayerList.stream().map(TeamPlayer::getPlayer).toList());
+            log.debug("et.getTeam().getPlayerList():" + et.getTeam().getPlayerList());
+        }
+        event.setTeamList(eventTeams.stream().map(EventTeam::getTeam).map(t -> new Event.Team(t.getTeamId(), t.getName(), t.getLogoUrl(), t.getPlayerList().size())).toList());
         List<EventGroup> eventGroups = eventGroupService.list(new QueryWrapper<EventGroup>().eq("event_id", eventId));
         event.setGroupList(eventGroups.stream().map(g -> {
             Event.Group group = new Event.Group();
@@ -54,7 +62,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
                 Event.Group.Team team = new Event.Group.Team();
                 for (EventTeam et : eventTeams) {
                     if (et.getTeamId().equals(t.getTeamId())) {
-                        team.setTeam(new Event.Team(et.getTeamId(), et.getTeam().getName(), et.getTeam().getLogoUrl()));
+                        team.setTeam(new Event.Team(et.getTeamId(), et.getTeam().getName(), et.getTeam().getLogoUrl(), et.getTeam().getPlayerList().size()));
                         break;
                     }
                 }
@@ -71,11 +79,11 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         List<EventMatch> eventMatches = eventMatchService.list(new QueryWrapper<EventMatch>().eq("event_id", eventId));
         eventMatches.forEach(em -> {
             Match match = matchService.getById(em.getMatchId());
-            for (EventTeam et: eventTeams){
-                if (et.getTeamId().equals(match.getHomeTeamId())){
+            for (EventTeam et : eventTeams) {
+                if (et.getTeamId().equals(match.getHomeTeamId())) {
                     match.setHomeTeam(et.getTeam());
                 }
-                if (et.getTeamId().equals(match.getAwayTeamId())){
+                if (et.getTeamId().equals(match.getAwayTeamId())) {
                     match.setAwayTeam(et.getTeam());
                 }
             }
