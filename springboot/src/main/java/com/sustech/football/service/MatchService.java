@@ -6,6 +6,7 @@ import com.sustech.football.entity.*;
 import java.util.List;
 
 public interface MatchService extends IService<Match> {
+    Match getMatch(Long matchId);
     boolean inviteManager(MatchManager matchManager);
 
     List<Long> getManagers(Long matchId);

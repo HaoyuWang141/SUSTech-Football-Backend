@@ -47,9 +47,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         List<EventTeam> eventTeams = eventTeamService.listWithTeam(eventId);
         for (EventTeam et : eventTeams) {
             List<TeamPlayer> teamPlayerList = teamPlayerService.listWithPlayer(et.getTeam().getTeamId());
-            log.debug("teamPlayerList:" + teamPlayerList);
             et.getTeam().setPlayerList(teamPlayerList.stream().map(TeamPlayer::getPlayer).toList());
-            log.debug("et.getTeam().getPlayerList():" + et.getTeam().getPlayerList());
         }
         event.setTeamList(eventTeams.stream().map(EventTeam::getTeam).map(t -> new Event.Team(t.getTeamId(), t.getName(), t.getLogoUrl(), t.getPlayerList().size())).toList());
         List<EventGroup> eventGroups = eventGroupService.list(new QueryWrapper<EventGroup>().eq("event_id", eventId));

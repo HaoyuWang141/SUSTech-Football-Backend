@@ -63,18 +63,6 @@ public class EventController {
         if (id == null) {
             throw new BadRequestException("传入的赛事ID为空");
         }
-        Event event = eventService.getById(id);
-        if (event == null) {
-            throw new BadRequestException("传入的赛事ID不存在");
-        }
-        return event;
-    }
-
-    @GetMapping("/getDetail")
-    public Event getDetailedEvent(Long id) {
-        if (id == null) {
-            throw new BadRequestException("传入的赛事ID为空");
-        }
         Event event = null;
         try {
             event = eventService.getDetailedEvent(id);

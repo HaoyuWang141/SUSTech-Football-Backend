@@ -31,8 +31,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     @Autowired
     private MatchTeamRequestService matchTeamRequestService;
     @Autowired
-    private EventService eventService;
-    @Autowired
     private EventTeamService eventTeamService;
     @Autowired
     private EventTeamRequestService eventTeamRequestService;

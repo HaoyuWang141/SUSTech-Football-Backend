@@ -56,7 +56,7 @@ public class MatchController {
         if (id == null) {
             throw new BadRequestException("比赛ID不能为空");
         }
-        Match match = matchService.getById(id);
+        Match match = matchService.getMatch(id);
         if (match == null) {
             throw new BadRequestException("比赛不存在");
         }

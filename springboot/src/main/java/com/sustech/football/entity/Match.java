@@ -23,14 +23,12 @@ public class Match {
     private Integer awayTeamScore;
     private Integer homeTeamPenalty;
     private Integer awayTeamPenalty;
-    private String liveUrl;
-    private String videoUrl;
     @TableField(exist = false)
     private Team homeTeam;
     @TableField(exist = false)
     private Team awayTeam;
     @TableField(exist = false)
-    private Referee referee;
+    private List<Referee> refereeList;
     @TableField(exist = false)
     private List<MatchPlayerAction> matchPlayerActionList;
 }

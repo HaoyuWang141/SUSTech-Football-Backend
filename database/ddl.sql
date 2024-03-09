@@ -1,11 +1,11 @@
 -- 用户表
 CREATE TABLE t_user
 (
-    user_id  SERIAL PRIMARY KEY,
-    openid   VARCHAR(255) NOT NULL UNIQUE,
+    user_id     SERIAL PRIMARY KEY,
+    openid      VARCHAR(255) NOT NULL UNIQUE,
     session_key VARCHAR(255) NOT NULL,
-    nick_name  VARCHAR(255),
-    avatar_url VARCHAR(255)
+    nick_name   VARCHAR(255),
+    avatar_url  VARCHAR(255)
 );
 
 -- 球员表
@@ -66,8 +66,8 @@ CREATE TABLE team_uniform
 -- 球队管理者表
 CREATE TABLE team_manager
 (
-    user_id INT REFERENCES t_user,
-    team_id INT REFERENCES team,
+    user_id  INT REFERENCES t_user,
+    team_id  INT REFERENCES team,
     is_owner BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (user_id, team_id)
 );
@@ -110,16 +110,14 @@ CREATE TABLE team_coach_request
 -- 比赛表
 CREATE TABLE match
 (
-    match_id        SERIAL PRIMARY KEY,
-    home_team_id    INT REFERENCES team (team_id),
-    away_team_id    INT REFERENCES team (team_id),
-    time            TIMESTAMP,
-    home_team_score INT DEFAULT 0,
-    away_team_score INT DEFAULT 0,
+    match_id          SERIAL PRIMARY KEY,
+    home_team_id      INT REFERENCES team (team_id),
+    away_team_id      INT REFERENCES team (team_id),
+    time              TIMESTAMP,
+    home_team_score   INT DEFAULT 0,
+    away_team_score   INT DEFAULT 0,
     home_team_penalty INT DEFAULT 0,
-    away_team_penalty INT DEFAULT 0,
-    live_url        VARCHAR,
-    video_url       VARCHAR
+    away_team_penalty INT DEFAULT 0
 );
 
 CREATE TABLE match_manager
@@ -164,8 +162,24 @@ CREATE TABLE match_player_action
     team_id   INT REFERENCES team,
     player_id INT REFERENCES player,
     action    VARCHAR, -- 进球、红牌、黄牌
-    time      TIME,    -- 比赛开始的时间
+    time      INTEGER, -- 比赛开始的时间
     PRIMARY KEY (match_id, team_id, player_id, action, time)
+);
+
+CREATE TABLE match_live
+(
+    live_id   SERIAL PRIMARY KEY,
+    match_id  INT REFERENCES match,
+    live_name VARCHAR(255),
+    live_url  VARCHAR(255)
+);
+
+CREATE TABLE match_video
+(
+    video_id   SERIAL PRIMARY KEY,
+    match_id   INT REFERENCES match,
+    video_name VARCHAR(255),
+    video_url  VARCHAR(255)
 );
 
 -- 赛事表
@@ -204,14 +218,14 @@ CREATE TABLE event_group
 -- 小组-球队
 CREATE TABLE event_group_team
 (
-    group_id            INT REFERENCES event_group (group_id),
-    team_id             INT REFERENCES team (team_id),
-    num_wins            INT DEFAULT 0, -- 胜场
-    num_draws           INT DEFAULT 0, -- 平局
-    num_losses          INT DEFAULT 0, -- 负场
-    num_goals_for       INT DEFAULT 0, -- 进球数
-    num_goals_against   INT DEFAULT 0, -- 失球数
-    score               INT DEFAULT 0, -- 积分
+    group_id          INT REFERENCES event_group (group_id),
+    team_id           INT REFERENCES team (team_id),
+    num_wins          INT DEFAULT 0, -- 胜场
+    num_draws         INT DEFAULT 0, -- 平局
+    num_losses        INT DEFAULT 0, -- 负场
+    num_goals_for     INT DEFAULT 0, -- 进球数
+    num_goals_against INT DEFAULT 0, -- 失球数
+    score             INT DEFAULT 0, -- 积分
     PRIMARY KEY (group_id, team_id)
 );
 
@@ -255,7 +269,7 @@ CREATE TABLE event_stage_tag
 (
     event_id INT REFERENCES event,
     stage    VARCHAR, -- 小组赛、淘汰赛、排位赛等
-    tag     VARCHAR, -- A组、B组等；1/8决赛、1/4决赛等
+    tag      VARCHAR, -- A组、B组等；1/8决赛、1/4决赛等
     FOREIGN KEY (event_id, stage) REFERENCES event_stage,
     PRIMARY KEY (event_id, stage, tag)
 );
@@ -293,31 +307,31 @@ CREATE TABLE notification
 -- 收藏用户表
 CREATE TABLE favorite_user
 (
-    user_id      INT REFERENCES t_user (user_id),
-    favorite_id  INT REFERENCES t_user (user_id),
+    user_id     INT REFERENCES t_user (user_id),
+    favorite_id INT REFERENCES t_user (user_id),
     PRIMARY KEY (user_id, favorite_id)
 );
 
 -- 收藏球队表
 CREATE TABLE favorite_team
 (
-    user_id      INT REFERENCES t_user (user_id),
-    team_id      INT REFERENCES team (team_id),
+    user_id INT REFERENCES t_user (user_id),
+    team_id INT REFERENCES team (team_id),
     PRIMARY KEY (user_id, team_id)
 );
 
 -- 收藏赛事表
 CREATE TABLE favorite_event
 (
-    user_id      INT REFERENCES t_user (user_id),
-    event_id     INT REFERENCES event (event_id),
+    user_id  INT REFERENCES t_user (user_id),
+    event_id INT REFERENCES event (event_id),
     PRIMARY KEY (user_id, event_id)
 );
 
 -- 收藏比赛表
 CREATE TABLE favorite_match
 (
-    user_id      INT REFERENCES t_user (user_id),
-    match_id     INT REFERENCES match (match_id),
+    user_id  INT REFERENCES t_user (user_id),
+    match_id INT REFERENCES match (match_id),
     PRIMARY KEY (user_id, match_id)
 );

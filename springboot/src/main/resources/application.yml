@@ -27,3 +27,5 @@ spring:
     #    driver-class-name: com.mysql.jdbc.Driver
     driver-class-name: org.postgresql.Driver
 
+  main:
+    allow-circular-references: true

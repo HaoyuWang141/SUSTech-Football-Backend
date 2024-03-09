@@ -27,6 +27,34 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     private MatchTeamRequestService matchTeamRequestService;
     @Autowired
     private MatchPlayerActionService matchPlayerActionService;
+    @Autowired
+    private TeamService teamService;
+    @Autowired
+    private TeamPlayerService teamPlayerService;
+
+    @Override
+    public Match getMatch(Long matchId) {
+        Match match = getById(matchId);
+        if (match == null) {
+            throw new ResourceNotFoundException("比赛不存在");
+        }
+        if (match.getHomeTeamId() != null) {
+            Team homeTeam = teamService.getById(match.getHomeTeamId());
+            homeTeam.setPlayerList(teamPlayerService.listWithPlayer(homeTeam.getTeamId()).stream().map(TeamPlayer::getPlayer).toList());
+            match.setHomeTeam(homeTeam);
+        }
+        if (match.getAwayTeamId() != null) {
+            Team awayTeam = teamService.getById(match.getAwayTeamId());
+            awayTeam.setPlayerList(teamPlayerService.listWithPlayer(awayTeam.getTeamId()).stream().map(TeamPlayer::getPlayer).toList());
+            match.setAwayTeam(awayTeam);
+        }
+        match.setRefereeList(matchRefereeService.listWithReferee(matchId)
+                .stream()
+                .map(MatchReferee::getReferee)
+                .toList());
+        match.setMatchPlayerActionList(matchPlayerActionService.list(new QueryWrapper<MatchPlayerAction>().eq("match_id", matchId)));
+        return match;
+    }
 
     @Override
     public boolean inviteManager(MatchManager matchManager) {

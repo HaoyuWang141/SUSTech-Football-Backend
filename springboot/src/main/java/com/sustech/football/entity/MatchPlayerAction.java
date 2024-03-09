@@ -20,5 +20,5 @@ public class MatchPlayerAction {
     @MppMultiId
     private String action;
     @MppMultiId
-    private Time time;
+    private Integer time;
 }
