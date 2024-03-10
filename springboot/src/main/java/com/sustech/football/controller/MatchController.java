@@ -1,13 +1,11 @@
 package com.sustech.football.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ResourceNotFoundException;
-import com.sustech.football.service.MatchService;
+import com.sustech.football.service.*;
 
-import com.sustech.football.service.PlayerService;
-import com.sustech.football.service.TeamService;
-import com.sustech.football.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +24,10 @@ public class MatchController {
     private TeamService teamService;
     @Autowired
     private PlayerService playerService;
+    @Autowired
+    private MatchLiveService matchLiveService;
+    @Autowired
+    private MatchVideoService matchVideoService;
 
     @PostMapping("/create")
     @Transactional
@@ -271,5 +273,127 @@ public class MatchController {
         return null;
         // TODO: 2024-3-2
 //        return matchService.getEvent(matchId, eventId);
+    }
+
+    @PostMapping("/live/add")
+    public MatchLive addLive(Long matchId, String liveName, String liveUrl) {
+        if (matchId == null || liveName == null || liveUrl == null) {
+            throw new BadRequestException("比赛ID和直播名称和直播地址不能为空");
+        }
+        if (matchService.getById(matchId) == null) {
+            throw new BadRequestException("比赛不存在");
+        }
+        MatchLive matchLive = new MatchLive(null, matchId, liveName, liveUrl);
+        matchLiveService.save(matchLive);
+        return matchLive;
+    }
+
+    @PutMapping("/live/update")
+    public void updateLive(@RequestBody MatchLive matchLive) {
+        if (matchLive == null) {
+            throw new BadRequestException("直播信息不能为空");
+        }
+        if (matchLive.getLiveId() == null) {
+            throw new BadRequestException("更新的直播, 其ID不能为空");
+        }
+        if (!matchLiveService.updateById(matchLive)) {
+            throw new BadRequestException("更新直播失败");
+        }
+    }
+
+    @DeleteMapping("/live/delete")
+    public void deleteLive(Long liveId) {
+        if (liveId == null) {
+            throw new BadRequestException("直播ID不能为空");
+        }
+        if (!matchLiveService.removeById(liveId)) {
+            throw new BadRequestException("删除直播失败");
+        }
+    }
+
+    @GetMapping("/live/get")
+    public MatchLive getLive(Long liveId) {
+        if (liveId == null) {
+            throw new BadRequestException("ID不能为空");
+        }
+        MatchLive matchLive = matchLiveService.getById(liveId);
+        if (matchLive == null) {
+            throw new ResourceNotFoundException("直播源不存在");
+        }
+        return matchLive;
+    }
+
+    @GetMapping("/live/getAll")
+    public List<MatchLive> getAllLives(Long matchId) {
+        if (matchId == null) {
+            throw new BadRequestException("比赛ID不能为空");
+        }
+        if (matchService.getById(matchId) == null) {
+            throw new ResourceNotFoundException("比赛不存在");
+        }
+        QueryWrapper<MatchLive> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("match_id", matchId);
+        return matchLiveService.list(queryWrapper);
+    }
+
+    @PostMapping("/video/add")
+    public MatchVideo addVideo(Long matchId, String videoName, String videoUrl) {
+        if (matchId == null || videoName == null || videoUrl == null) {
+            throw new BadRequestException("比赛ID和视频名称和视频地址不能为空");
+        }
+        if (matchService.getById(matchId) == null) {
+            throw new BadRequestException("比赛不存在");
+        }
+        MatchVideo matchVideo = new MatchVideo(null, matchId, videoName, videoUrl);
+        matchVideoService.save(matchVideo);
+        return matchVideo;
+    }
+
+    @PutMapping("/video/update")
+    public void updateVideo(@RequestBody MatchVideo matchVideo) {
+        if (matchVideo == null) {
+            throw new BadRequestException("视频信息不能为空");
+        }
+        if (matchVideo.getVideoId() == null) {
+            throw new BadRequestException("更新的视频, 其ID不能为空");
+        }
+        if (!matchVideoService.updateById(matchVideo)) {
+            throw new BadRequestException("更新视频失败");
+        }
+    }
+
+    @DeleteMapping("/video/delete")
+    public void deleteVideo(Long videoId) {
+        if (videoId == null) {
+            throw new BadRequestException("视频ID不能为空");
+        }
+        if (!matchVideoService.removeById(videoId)) {
+            throw new BadRequestException("删除视频失败");
+        }
+    }
+
+    @GetMapping("/video/get")
+    public MatchVideo getVideo (Long videoId) {
+        if (videoId == null) {
+            throw new BadRequestException("ID不能为空");
+        }
+        MatchVideo matchVideo = matchVideoService.getById(videoId);
+        if (matchVideo == null) {
+            throw new ResourceNotFoundException("视频源不存在");
+        }
+        return matchVideo;
+    }
+
+    @GetMapping("/video/getAll")
+    public List<MatchVideo> getAllVideos(Long matchId) {
+        if (matchId == null) {
+            throw new BadRequestException("比赛ID不能为空");
+        }
+        if (matchService.getById(matchId) == null) {
+            throw new BadRequestException("比赛不存在");
+        }
+        QueryWrapper<MatchVideo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("match_id", matchId);
+        return matchVideoService.list(queryWrapper);
     }
 }
