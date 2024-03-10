@@ -67,7 +67,7 @@ public class MatchController {
 
     @GetMapping("/getAll")
     public List<Match> getAllMatches() {
-        return matchService.list();
+        return matchService.getAllMatches();
     }
 
     @PutMapping("/update")
