@@ -67,7 +67,12 @@ public class MatchController {
 
     @GetMapping("/getAll")
     public List<Match> getAllMatches() {
-        return matchService.list();
+        List<Match> matchList = matchService.list();
+        matchList.forEach(match -> {
+            match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
+            match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
+        });
+        return matchList;
     }
 
     @PutMapping("/update")
@@ -373,7 +378,7 @@ public class MatchController {
     }
 
     @GetMapping("/video/get")
-    public MatchVideo getVideo (Long videoId) {
+    public MatchVideo getVideo(Long videoId) {
         if (videoId == null) {
             throw new BadRequestException("ID不能为空");
         }
