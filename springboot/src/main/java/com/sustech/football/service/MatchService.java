@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface MatchService extends IService<Match> {
     Match getMatch(Long matchId);
+
+    List<Match> getAllMatches();
+
     boolean inviteManager(MatchManager matchManager);
 
     List<Long> getManagers(Long matchId);

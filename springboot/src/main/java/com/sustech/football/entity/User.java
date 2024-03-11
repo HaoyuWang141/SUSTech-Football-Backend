@@ -24,11 +24,18 @@ public class User {
         this.sessionKey = sessionKey;
     }
 
+    public User(Long userId, String avatarUrl, String nickName) {
+        this.userId = userId;
+        this.avatarUrl = avatarUrl;
+        this.nickName = nickName;
+    }
+
     public User(String openid, String sessionKey, String avatarUrl, String nickName) {
         this.openid = openid;
         this.sessionKey = sessionKey;
         this.avatarUrl = avatarUrl;
         this.nickName = nickName;
     }
+
 }
 

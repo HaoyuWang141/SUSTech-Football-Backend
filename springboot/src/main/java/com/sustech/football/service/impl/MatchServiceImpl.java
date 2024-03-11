@@ -55,6 +55,21 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         match.setMatchPlayerActionList(matchPlayerActionService.list(new QueryWrapper<MatchPlayerAction>().eq("match_id", matchId)));
         return match;
     }
+    public List<Match> getAllMatches() {
+        List<Match> matches=list();
+        for (Match match: matches){
+            if (match.getHomeTeamId() != null) {
+                Team homeTeam = teamService.getById(match.getHomeTeamId());
+                match.setHomeTeam(homeTeam);
+            }
+            if (match.getAwayTeamId() != null) {
+                Team awayTeam = teamService.getById(match.getAwayTeamId());
+                match.setAwayTeam(awayTeam);
+            }
+        }
+
+        return matches;
+    }
 
     @Override
     public boolean inviteManager(MatchManager matchManager) {
