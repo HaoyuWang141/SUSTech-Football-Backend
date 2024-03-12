@@ -2,6 +2,7 @@ package com.sustech.football.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.sustech.football.entity.Match;
 import com.sustech.football.entity.User;
 import com.sustech.football.exception.*;
 import com.sustech.football.service.UserService;
@@ -125,4 +126,29 @@ public class UserController {
         }
         return result;
     }
+
+    @GetMapping("/getUserManageMatch")
+    public List<Match> getUserManageMatch(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("用户ID不能为空");
+        }
+        return userService.getUserManageMatches(userId);
+    }
+
+    @GetMapping("/getUserManageEvent")
+    public List<com.sustech.football.entity.Event> getUserManageEvent(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("用户ID不能为空");
+        }
+        return userService.getUserManageEvents(userId);
+    }
+
+    @GetMapping("/getUserManageTeam")
+    public List<com.sustech.football.entity.Team> getUserManageTeam(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("用户ID不能为空");
+        }
+        return userService.getUserManageTeams(userId);
+    }
+
 }
