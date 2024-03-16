@@ -85,6 +85,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
                     match.setAwayTeam(et.getTeam());
                 }
             }
+            match.setMatchEvent(new MatchEvent(em));
             em.setMatch(match);
         });
         event.setMatchList(eventMatches.stream().map(EventMatch::getMatch).toList());

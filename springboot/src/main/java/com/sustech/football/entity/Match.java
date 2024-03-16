@@ -31,4 +31,6 @@ public class Match {
     private List<Referee> refereeList;
     @TableField(exist = false)
     private List<MatchPlayerAction> matchPlayerActionList;
+    @TableField(exist = false)
+    private MatchEvent matchEvent;
 }
