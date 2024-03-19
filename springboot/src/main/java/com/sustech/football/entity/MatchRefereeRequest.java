@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +21,7 @@ public class MatchRefereeRequest {
     @MppMultiId
     private Long refereeId;
     private String status;
+    private Timestamp lastUpdate;
     @TableField(exist = false)
     private Match match;
     @TableField(exist = false)

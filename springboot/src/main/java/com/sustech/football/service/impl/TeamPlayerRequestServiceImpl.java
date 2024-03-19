@@ -5,6 +5,7 @@ import com.sustech.football.entity.TeamPlayerRequest;
 import com.sustech.football.mapper.TeamPlayerRequestMapper;
 import com.sustech.football.service.TeamPlayerRequestService;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,11 @@ public class TeamPlayerRequestServiceImpl extends MppServiceImpl<TeamPlayerReque
     @Override
     public List<TeamPlayerRequest> listWithPlayer(Long teamId, String type) {
         return teamPlayerRequestMapper.selectListWithPlayer(teamId, type);
+    }
+
+    @Override
+    public boolean saveOrUpdateRequestWithTime(TeamPlayerRequest teamPlayerRequest) {
+        teamPlayerRequest.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        return this.saveOrUpdateByMultiId(teamPlayerRequest);
     }
 }

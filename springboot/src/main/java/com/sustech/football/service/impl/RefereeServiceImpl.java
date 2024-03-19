@@ -39,7 +39,7 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
         if (matchRefereeRequestService.selectByMultiId(matchRefereeRequest) == null) {
             throw new BadRequestException("该比赛未邀请该裁判加入");
         }
-        if (!matchRefereeRequestService.updateByMultiId(matchRefereeRequest)) {
+        if (!matchRefereeRequestService.saveOrUpdateRequestWithTime(matchRefereeRequest)) {
             throw new RuntimeException("回复比赛邀请失败");
         }
         if (matchRefereeRequest.getStatus().equals(MatchRefereeRequest.STATUS_ACCEPTED)) {
@@ -73,7 +73,7 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
         if (eventRefereeRequestService.selectByMultiId(eventRefereeRequest) == null) {
             throw new BadRequestException("该赛事未邀请该裁判加入");
         }
-        if (!eventRefereeRequestService.updateByMultiId(eventRefereeRequest)) {
+        if (!eventRefereeRequestService.saveOrUpdateRequestWithTime(eventRefereeRequest)) {
             throw new RuntimeException("回复赛事邀请失败");
         }
         if (eventRefereeRequest.getStatus().equals(EventRefereeRequest.STATUS_ACCEPTED)) {

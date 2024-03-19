@@ -101,7 +101,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (teamPlayerRequestService.selectByMultiId(teamPlayerRequest) == null) {
             throw new BadRequestException("该球员没有申请加入球队");
         }
-        teamPlayerRequestService.updateByMultiId(teamPlayerRequest);
+        teamPlayerRequestService.saveOrUpdateRequestWithTime(teamPlayerRequest);
         if (accept) {
             if (!teamPlayerService.saveOrUpdateByMultiId(teamPlayer)) {
                 throw new RuntimeException("加入球队失败");
@@ -183,7 +183,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (matchTeamRequestService.selectByMultiId(matchTeamRequest) == null) {
             throw new BadRequestException("该球队没有收到该比赛的邀请");
         }
-        if (!matchTeamRequestService.updateByMultiId(matchTeamRequest)) {
+        if (!matchTeamRequestService.saveOrUpdateRequestWithTime(matchTeamRequest)) {
             throw new RuntimeException("回复比赛邀请失败");
         }
         if (match.getHomeTeamId() != null && matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_HOME)) {
@@ -224,7 +224,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) != null) {
             throw new ConflictException("曾经向该赛事发出过申请，请勿重复发送");
         }
-        if (!eventTeamRequestService.saveOrUpdateByMultiId(eventTeamRequest)) {
+        if (!eventTeamRequestService.saveOrUpdateRequestWithTime(eventTeamRequest)) {
             throw new RuntimeException("申请参加赛事失败");
         }
         return true;
@@ -248,7 +248,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) == null) {
             throw new BadRequestException("该球队没有收到该赛事的邀请");
         }
-        if (!eventTeamRequestService.updateByMultiId(eventTeamRequest)) {
+        if (!eventTeamRequestService.saveOrUpdateRequestWithTime(eventTeamRequest)) {
             throw new RuntimeException("回复赛事邀请失败");
         }
         if (accept) {

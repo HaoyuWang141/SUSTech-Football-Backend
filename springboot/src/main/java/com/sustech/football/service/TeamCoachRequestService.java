@@ -8,4 +8,5 @@ import com.sustech.football.entity.TeamCoachRequest;
 public interface TeamCoachRequestService extends IMppService<TeamCoachRequest> {
     List<TeamCoachRequest> listWithTeam(Long coachId);
     List<TeamCoachRequest> listWithCoach(Long teamId);
+    boolean saveOrUpdateRequestWithTime(TeamCoachRequest teamCoachRequest);
 }

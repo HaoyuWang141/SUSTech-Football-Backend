@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### scripts ###
+mvnw
+mvnw.cmd
+
+### key files ###
+*.pfx
+*.p12

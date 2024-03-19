@@ -108,7 +108,7 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         if (matchTeamRequestService.selectByMultiId(matchTeamRequest) != null) {
             throw new ConflictException("该队伍已经被邀请");
         }
-        if (!matchTeamRequestService.saveOrUpdateByMultiId(matchTeamRequest)) {
+        if (!matchTeamRequestService.updateByMultiId(matchTeamRequest)) {
             throw new RuntimeException("邀请失败");
         }
         return true;
@@ -148,7 +148,7 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         if (matchRefereeRequestService.selectByMultiId(matchRefereeRequest) != null) {
             throw new ConflictException("已经邀请过该裁判，请勿重复发送");
         }
-        if (!matchRefereeRequestService.saveOrUpdateByMultiId(matchRefereeRequest)) {
+        if (!matchRefereeRequestService.saveOrUpdateRequestWithTime(matchRefereeRequest)) {
             throw new RuntimeException("邀请裁判失败");
         }
         return true;

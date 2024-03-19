@@ -83,10 +83,11 @@ CREATE TABLE team_player
 -- 球队邀请球员/球员申请加入球队
 CREATE TABLE team_player_request
 (
-    team_id   INT REFERENCES team (team_id),
-    player_id INT REFERENCES player (player_id),
-    type      VARCHAR CHECK ( type IN ('INVITATION', 'APPLICATION') ),
-    status    VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    team_id      INT REFERENCES team (team_id),
+    player_id    INT REFERENCES player (player_id),
+    type         VARCHAR CHECK ( type IN ('INVITATION', 'APPLICATION') ),
+    status       VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    last_updated TIMESTAMP,
     PRIMARY KEY (team_id, player_id, type)
 );
 
@@ -101,9 +102,10 @@ CREATE TABLE team_coach
 -- 球队邀请教练
 CREATE TABLE team_coach_request
 (
-    team_id  INT REFERENCES team (team_id),
-    coach_id INT REFERENCES coach (coach_id),
-    status   VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    team_id      INT REFERENCES team (team_id),
+    coach_id     INT REFERENCES coach (coach_id),
+    status       VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    last_updated TIMESTAMP,
     PRIMARY KEY (team_id, coach_id)
 );
 
@@ -131,10 +133,11 @@ CREATE TABLE match_manager
 -- 比赛(友谊赛)邀请球队
 CREATE TABLE match_team_request
 (
-    match_id INT REFERENCES match,
-    team_id  INT REFERENCES team,
-    type     VARCHAR CHECK ( type IN ('HOME', 'AWAY') ),
-    status   VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    match_id     INT REFERENCES match,
+    team_id      INT REFERENCES team,
+    type         VARCHAR CHECK ( type IN ('HOME', 'AWAY') ),
+    status       VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    last_updated TIMESTAMP,
     PRIMARY KEY (match_id, team_id)
 );
 
@@ -149,9 +152,10 @@ CREATE TABLE match_referee
 -- 比赛邀请裁判
 CREATE TABLE match_referee_request
 (
-    match_id   INT REFERENCES match,
-    referee_id INT REFERENCES referee,
-    status     VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    match_id     INT REFERENCES match,
+    referee_id   INT REFERENCES referee,
+    status       VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    last_updated TIMESTAMP,
     PRIMARY KEY (match_id, referee_id)
 );
 
@@ -232,10 +236,11 @@ CREATE TABLE event_group_team
 -- 赛事邀请球队/球队申请加入赛事
 CREATE TABLE event_team_request
 (
-    event_id INT REFERENCES event (event_id),
-    team_id  INT REFERENCES team (team_id),
-    type     VARCHAR CHECK ( type IN ('INVITATION', 'APPLICATION') ),
-    status   VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    event_id     INT REFERENCES event (event_id),
+    team_id      INT REFERENCES team (team_id),
+    type         VARCHAR CHECK ( type IN ('INVITATION', 'APPLICATION') ),
+    status       VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    last_updated TIMESTAMP,
     PRIMARY KEY (event_id, team_id, type)
 );
 
@@ -250,9 +255,10 @@ CREATE TABLE event_referee
 -- 赛事邀请裁判
 CREATE TABLE event_referee_request
 (
-    event_id   INT REFERENCES event,
-    referee_id INT REFERENCES referee,
-    status     VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    event_id    INT REFERENCES event,
+    referee_id  INT REFERENCES referee,
+    status      VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
+    last_update TIMESTAMP,
     PRIMARY KEY (event_id, referee_id)
 );
 

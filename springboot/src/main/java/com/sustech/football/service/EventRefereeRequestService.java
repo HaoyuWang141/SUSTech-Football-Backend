@@ -7,5 +7,8 @@ import java.util.List;
 
 public interface EventRefereeRequestService extends IMppService<EventRefereeRequest> {
     List<EventRefereeRequest> listWithEvent(Long refereeId);
+
     List<EventRefereeRequest> listWithReferee(Long eventId);
+
+    boolean saveOrUpdateRequestWithTime(EventRefereeRequest eventRefereeRequest);
 }

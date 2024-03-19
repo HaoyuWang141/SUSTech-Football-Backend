@@ -7,5 +7,8 @@ import com.sustech.football.entity.TeamPlayerRequest;
 
 public interface TeamPlayerRequestService extends IMppService<TeamPlayerRequest> {
     List<TeamPlayerRequest> listWithTeam(Long playerId, String type);
+
     List<TeamPlayerRequest> listWithPlayer(Long teamId, String type);
+
+    boolean saveOrUpdateRequestWithTime(TeamPlayerRequest teamPlayerRequest);
 }

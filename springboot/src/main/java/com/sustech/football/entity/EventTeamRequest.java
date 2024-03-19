@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,6 +26,7 @@ public class EventTeamRequest {
     @MppMultiId
     private String type;
     private String status;
+    private Timestamp lastUpdate;
     @TableField(exist = false)
     private Event event;
     @TableField(exist = false)

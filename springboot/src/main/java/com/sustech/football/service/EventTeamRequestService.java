@@ -8,4 +8,6 @@ import java.util.List;
 public interface EventTeamRequestService extends IMppService<EventTeamRequest> {
     List<EventTeamRequest> listWithEvent(Long teamId, String type);
     List<EventTeamRequest> listWithTeam(Long eventId, String type);
+
+    boolean saveOrUpdateRequestWithTime(EventTeamRequest eventTeamRequest);
 }

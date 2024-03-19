@@ -5,6 +5,7 @@ import com.sustech.football.entity.TeamCoachRequest;
 import com.sustech.football.mapper.TeamCoachRequestMapper;
 import com.sustech.football.service.TeamCoachRequestService;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,11 @@ public class TeamCoachRequestServiceImpl extends MppServiceImpl<TeamCoachRequest
     @Override
     public List<TeamCoachRequest> listWithCoach(Long teamId) {
         return teamCoachRequestMapper.selectListWithCoach(teamId);
+    }
+
+    @Override
+    public boolean saveOrUpdateRequestWithTime(TeamCoachRequest teamCoachRequest) {
+        teamCoachRequest.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        return this.saveOrUpdateByMultiId(teamCoachRequest);
     }
 }

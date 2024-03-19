@@ -6,6 +6,7 @@ import com.sustech.football.mapper.EventRefereeRequestMapper;
 import com.sustech.football.service.EventRefereeRequestService;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -18,5 +19,11 @@ public class EventRefereeRequestServiceImpl extends MppServiceImpl<EventRefereeR
     @Override
     public List<EventRefereeRequest> listWithReferee(Long eventId) {
         return baseMapper.selectListWithReferee(eventId);
+    }
+
+    @Override
+    public boolean saveOrUpdateRequestWithTime(EventRefereeRequest eventRefereeRequest) {
+        eventRefereeRequest.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        return this.saveOrUpdateByMultiId(eventRefereeRequest);
     }
 }
