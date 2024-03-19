@@ -20,9 +20,9 @@ public class PlayerController {
 
     @Autowired
     public PlayerController(PlayerService playerService,
-            TeamService teamService,
-            TeamPlayerService teamPlayerService,
-            TeamPlayerRequestService teamPlayerRequestService) {
+                            TeamService teamService,
+                            TeamPlayerService teamPlayerService,
+                            TeamPlayerRequestService teamPlayerRequestService) {
         this.playerService = playerService;
         this.teamService = teamService;
         this.teamPlayerService = teamPlayerService;
@@ -55,6 +55,11 @@ public class PlayerController {
     @GetMapping("/getAll")
     public List<Player> getAllPlayers() {
         return playerService.list();
+    }
+
+    @GetMapping("/getByIdList")
+    public List<Player> getPlayersByIds(List<Long> idList) {
+        return playerService.listByIds(idList);
     }
 
     @PutMapping("/update")

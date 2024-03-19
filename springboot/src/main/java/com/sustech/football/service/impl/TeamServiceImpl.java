@@ -9,6 +9,7 @@ import com.sustech.football.mapper.TeamMapper;
 import com.sustech.football.service.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,25 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     private EventTeamRequestService eventTeamRequestService;
     @Autowired
     private TeamUniformService teamUniformService;
+    @Autowired
+    private UserService userService;
+
+    @Override
+    public Team getTeamById(Long teamId) {
+        Team team = getById(teamId);
+        team.setPlayerList(this.getPlayers(teamId));
+        team.setCoachList(this.getCoaches(teamId));
+        team.setManagerList(this.getManagers(teamId).stream().map(userService::getById).toList());
+        team.setMatchList(this.getMatches(teamId));
+        team.setEventList(this.getEvents(teamId));
+        return team;
+    }
+
+    @Override
+    public List<Team> getTeamsByIdList(List<Long> teamIdList) {
+        return teamIdList.stream()
+                .map(this::getTeamById).toList();
+    }
 
     @Override
     public boolean inviteManager(TeamManager teamManager) {

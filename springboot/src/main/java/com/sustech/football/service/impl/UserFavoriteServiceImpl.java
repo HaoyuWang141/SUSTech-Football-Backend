@@ -126,7 +126,12 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
 
     @Override
     public List<Match> getFavoriteMatches(Long userId) {
-        return favoriteMatchMapper.selectFavoriteWithUser(userId).stream().map(FavoriteMatch::getMatch).toList();
+        List<Match> matches = favoriteMatchMapper.selectFavoriteWithUser(userId).stream().map(FavoriteMatch::getMatch).toList();
+        for (Match match : matches) {
+            match.setHomeTeam(teamMapper.selectById(match.getHomeTeamId()));
+            match.setAwayTeam(teamMapper.selectById(match.getAwayTeamId()));
+        }
+        return matches;
     }
 
     @Override

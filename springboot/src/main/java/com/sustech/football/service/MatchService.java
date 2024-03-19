@@ -8,6 +8,8 @@ import java.util.List;
 public interface MatchService extends IService<Match> {
     Match getMatch(Long matchId);
 
+    List<Match> getMatchByIdList(List<Long> matchIdList);
+
     List<Match> getAllMatches();
 
     boolean inviteManager(MatchManager matchManager);
@@ -29,4 +31,5 @@ public interface MatchService extends IService<Match> {
     boolean updateResult(Long refereeId, Match match);
 
     boolean addPlayerAction(Long refereeId, MatchPlayerAction matchPlayerAction);
+
 }

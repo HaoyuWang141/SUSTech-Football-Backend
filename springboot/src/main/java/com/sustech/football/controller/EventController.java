@@ -66,8 +66,7 @@ public class EventController {
         Event event = null;
         try {
             event = eventService.getDetailedEvent(id);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         if (event == null) {
@@ -79,6 +78,11 @@ public class EventController {
     @GetMapping("/getAll")
     public List<Event> getAllEvents() {
         return eventService.list();
+    }
+
+    @GetMapping("/getByIdList")
+    public List<Event> getEventsByIdLists(List<Long> idList) {
+        return eventService.listByIds(idList);
     }
 
     @PutMapping("/update")

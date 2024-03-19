@@ -8,7 +8,9 @@ import com.sustech.football.service.*;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -51,7 +53,7 @@ public class TeamController {
 
     @GetMapping("/get")
     public Team getTeamById(Long id) {
-        Team team = teamService.getById(id);
+        Team team = teamService.getTeamById(id);
         if (team == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
@@ -61,6 +63,14 @@ public class TeamController {
     @GetMapping("/getAll")
     public List<Team> getAllTeams() {
         return teamService.list();
+    }
+
+    @GetMapping("/getByIdList")
+    public List<Team> getTeamsByIdList(@RequestParam List<Long> idList) {
+        if (idList == null || idList.isEmpty()) {
+            throw new BadRequestException("传入的队伍ID列表为空");
+        }
+        return teamService.getTeamsByIdList(idList);
     }
 
     @PutMapping("/update")
