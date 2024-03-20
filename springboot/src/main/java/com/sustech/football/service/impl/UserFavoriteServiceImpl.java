@@ -105,7 +105,7 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
             queryWrapper.in("user_id", user.getUserId());
             Player player = playerMapper.selectOne(queryWrapper);
             if (player == null) {
-                throw new BadRequestException("用户未绑定球员");
+                continue;
             }
             user.setAvatarUrl(player.getPhotoUrl());
             user.setNickName(player.getName());
