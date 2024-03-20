@@ -1,5 +1,6 @@
 package com.sustech.football.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.mapper.*;
@@ -32,6 +33,8 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
     private UserMapper userMapper;
     @Autowired
     private EventMapper eventMapper;
+    @Autowired
+    private PlayerMapper playerMapper;
 
     @Override
     public boolean favoriteTeam(Long userId, Long teamId) {
@@ -96,6 +99,16 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
         for (User user : users) {
             user.setSessionKey(null);
             user.setOpenid(null);
+        }
+        for (User user : users) {
+            QueryWrapper<Player> queryWrapper = new QueryWrapper<>();
+            queryWrapper.in("user_id", user.getUserId());
+            Player player = playerMapper.selectOne(queryWrapper);
+            if (player == null) {
+                throw new BadRequestException("用户未绑定球员");
+            }
+            user.setAvatarUrl(player.getPhotoUrl());
+            user.setNickName(player.getName());
         }
         return users;
     }
