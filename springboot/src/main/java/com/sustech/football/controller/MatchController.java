@@ -75,12 +75,12 @@ public class MatchController {
         return matchList;
     }
 
-    @GetMapping("getByIdList")
-    public List<Match> getMatchByIdList(@RequestBody List<Long> matchIdList) {
-        if (matchIdList == null) {
+    @GetMapping("/getByIdList")
+    public List<Match> getMatchByIdList(@RequestParam List<Long> idList) {
+        if (idList == null) {
             throw new BadRequestException("比赛ID列表不能为空");
         }
-        return matchService.getMatchByIdList(matchIdList);
+        return matchService.getMatchByIdList(idList);
     }
 
     @PutMapping("/update")
