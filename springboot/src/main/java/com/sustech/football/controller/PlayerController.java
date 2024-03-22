@@ -201,18 +201,17 @@ public class PlayerController {
             throw new ResourceNotFoundException("球员不存在");
         }
         List<TeamPlayer> teamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("player_id", playerId));
-        List<Match> matchList = teamPlayers.stream()
+        return teamPlayers.stream()
                 .map(TeamPlayer::getTeamId)
                 .map(teamService::getMatches)
                 .flatMap(List::stream)
                 .distinct()
                 .sorted(Comparator.comparing(Match::getTime))
+                .peek(match -> {
+                    match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
+                    match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
+                })
                 .toList();
-        for (Match match : matchList) {
-            match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
-            match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
-        }
-        return matchList;
     }
 
     @GetMapping("/event/getAll")

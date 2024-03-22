@@ -78,4 +78,17 @@ public class Event {
     List<Match> matchList; // 所有比赛列表，按照时间顺序排列
     @TableField(exist = false)
     List<Stage> stageList; // 比赛阶段，包括阶段名称和二级目录“标签”，标签包括标签名称和比赛列表
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return eventId.equals(event.eventId);
+    }
+
+    @Override
+    public int hashCode() {
+        return eventId.hashCode();
+    }
 }

@@ -2,10 +2,7 @@
 package com.sustech.football.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.sustech.football.entity.Coach;
-import com.sustech.football.entity.Team;
-import com.sustech.football.entity.TeamCoach;
-import com.sustech.football.entity.TeamCoachRequest;
+import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ConflictException;
 import com.sustech.football.mapper.CoachMapper;
@@ -13,8 +10,10 @@ import com.sustech.football.service.CoachService;
 import com.sustech.football.service.TeamCoachRequestService;
 import com.sustech.football.service.TeamCoachService;
 
+import java.util.Comparator;
 import java.util.List;
 
+import com.sustech.football.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +26,9 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
 
     @Autowired
     private TeamCoachService teamCoachService;
+
+    @Autowired
+    private TeamService teamService;
 
     @Override
     @Transactional
@@ -55,5 +57,32 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
     public List<Team> getTeams(Long coachId) {
         List<TeamCoach> teamCoachList = teamCoachService.listWithTeam(coachId);
         return teamCoachList.stream().map(TeamCoach::getTeam).toList();
+    }
+
+    @Override
+    public List<Match> getMatches(Long coachId) {
+        List<TeamCoach> teamCoachList = teamCoachService.listWithTeam(coachId);
+        return teamCoachList.stream()
+                .map(TeamCoach::getTeamId)
+                .map(teamService::getMatches)
+                .flatMap(List::stream)
+                .distinct()
+                .sorted(Comparator.comparing(Match::getTime))
+                .peek(match -> {
+                    match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
+                    match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
+                })
+                .toList();
+    }
+
+    @Override
+    public List<Event> getEvents(Long coachId) {
+        List<TeamCoach> teamCoachList = teamCoachService.listWithTeam(coachId);
+        return teamCoachList.stream()
+                .map(TeamCoach::getTeamId)
+                .map(teamService::getEvents)
+                .flatMap(List::stream)
+                .distinct()
+                .toList();
     }
 }
