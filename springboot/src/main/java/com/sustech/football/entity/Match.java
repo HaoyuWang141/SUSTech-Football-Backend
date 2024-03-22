@@ -33,4 +33,17 @@ public class Match {
     private List<MatchPlayerAction> matchPlayerActionList;
     @TableField(exist = false)
     private MatchEvent matchEvent;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Match match = (Match) o;
+        return matchId.equals(match.matchId);
+    }
+
+    @Override
+    public int hashCode() {
+        return matchId.hashCode();
+    }
 }

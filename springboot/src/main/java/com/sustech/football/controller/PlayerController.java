@@ -1,11 +1,13 @@
 package com.sustech.football.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
 import com.sustech.football.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -178,7 +180,19 @@ public class PlayerController {
         }
     }
 
-    @GetMapping("/getMatches")
+    @GetMapping("/team/getAll")
+    public List<Team> getTeams(@RequestParam Long playerId) {
+        if (playerId == null) {
+            throw new BadRequestException("球员id不能为空");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        List<TeamPlayer> teamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("player_id", playerId));
+        return teamService.listByIds(teamPlayers.stream().map(TeamPlayer::getTeamId).toList());
+    }
+
+    @GetMapping("/match/getAll")
     public List<Match> getMatches(@RequestParam Long playerId) {
         if (playerId == null) {
             throw new BadRequestException("球员id不能为空");
@@ -186,9 +200,31 @@ public class PlayerController {
         if (playerService.getById(playerId) == null) {
             throw new ResourceNotFoundException("球员不存在");
         }
-        return null;
-        // TODO: 2024-3-2
-//        return playerService.getMatches(playerId);
+        List<TeamPlayer> teamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("player_id", playerId));
+        return teamPlayers.stream()
+                .map(TeamPlayer::getTeamId)
+                .map(teamService::getMatches)
+                .flatMap(List::stream)
+                .distinct()
+                .sorted(Comparator.comparing(Match::getTime))
+                .toList();
+    }
+
+    @GetMapping("/event/getAll")
+    public List<Event> getEvents(@RequestParam Long playerId) {
+        if (playerId == null) {
+            throw new BadRequestException("球员id不能为空");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        List<TeamPlayer> teamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("player_id", playerId));
+        return teamPlayers.stream()
+                .map(TeamPlayer::getTeamId)
+                .map(teamService::getEvents)
+                .flatMap(List::stream)
+                .distinct()
+                .toList();
     }
 
 }
