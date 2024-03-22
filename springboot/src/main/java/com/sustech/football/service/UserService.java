@@ -13,4 +13,9 @@ public interface UserService extends IService<User> {
 
     List<Team> getUserManageTeams(Long userId);
 
+    Long getPlayerId(Long userId);
+
+    Long getCoachId(Long userId);
+
+    Long getRefereeId(Long userId);
 }

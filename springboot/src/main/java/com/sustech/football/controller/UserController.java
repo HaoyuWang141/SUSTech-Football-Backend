@@ -151,4 +151,37 @@ public class UserController {
         return userService.getUserManageTeams(userId);
     }
 
+    @GetMapping("/getPlayerId")
+    public Long getPlayerId(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("用户ID不能为空");
+        }
+        if (userService.getById(userId) == null) {
+            throw new ResourceNotFoundException("用户不存在");
+        }
+        return userService.getPlayerId(userId);
+    }
+
+    @GetMapping("/getCoachId")
+    public Long getCoachId(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("用户ID不能为空");
+        }
+        if (userService.getById(userId) == null) {
+            throw new ResourceNotFoundException("用户不存在");
+        }
+        return userService.getCoachId(userId);
+    }
+    
+    @GetMapping("/getRefereeId")
+    public Long getRefereeId(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("用户ID不能为空");
+        }
+        if (userService.getById(userId) == null) {
+            throw new ResourceNotFoundException("用户不存在");
+        }
+        return userService.getRefereeId(userId);
+    }
+
 }
