@@ -164,7 +164,17 @@ public class MatchController {
         if (!matchService.inviteTeam(new MatchTeamRequest(matchId, teamId, type))) {
             throw new BadRequestException("邀请球队失败");
         }
+    }
 
+    @GetMapping("/team/getInvitations")
+    public List<MatchTeamRequest> getTeamInvitations(Long teamId) {
+        if (teamId == null) {
+            throw new BadRequestException("球队ID不能为空");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new BadRequestException("球队不存在");
+        }
+        return matchService.getTeamInvitations(teamId);
     }
 
     @DeleteMapping("/team/delete")
@@ -276,16 +286,14 @@ public class MatchController {
     }
 
     @GetMapping("/getEvent")
-    public Event getEvent(Long matchId, Long eventId) {
-        if (matchId == null || eventId == null) {
-            throw new BadRequestException("比赛ID和事件ID不能为空");
+    public Event getEvent(Long matchId) {
+        if (matchId == null) {
+            throw new BadRequestException("比赛ID不能为空");
         }
         if (matchService.getById(matchId) == null) {
-            throw new BadRequestException("比赛不存在");
+            throw new ResourceNotFoundException("比赛不存在");
         }
-        return null;
-        // TODO: 2024-3-2
-//        return matchService.getEvent(matchId, eventId);
+        return matchService.getEvent(matchId);
     }
 
     @PostMapping("/live/add")

@@ -112,6 +112,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
+    public List<TeamPlayerRequest> getPlayerInvitations(Long teamId) {
+        return teamPlayerRequestService.listWithPlayer(teamId, TeamPlayerRequest.TYPE_INVITATION);
+    }
+
+    @Override
     public List<TeamPlayerRequest> getPlayerApplications(Long teamId) {
         return teamPlayerRequestService.listWithPlayer(teamId, TeamPlayerRequest.TYPE_APPLICATION);
     }

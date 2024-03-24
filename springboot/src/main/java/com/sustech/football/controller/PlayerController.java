@@ -134,6 +134,17 @@ public class PlayerController {
         }
     }
 
+    @GetMapping("/team/getApplications")
+    public List<TeamPlayerRequest> getTeamApplications(@RequestParam Long playerId) {
+        if (playerId == null) {
+            throw new BadRequestException("球员id不能为空");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        return teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_APPLICATION);
+    }
+
     @GetMapping("/team/getInvitations")
     public List<TeamPlayerRequest> getTeamInvitations(@RequestParam Long playerId) {
         if (playerId == null) {

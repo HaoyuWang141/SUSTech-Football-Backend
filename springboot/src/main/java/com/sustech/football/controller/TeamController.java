@@ -153,6 +153,17 @@ public class TeamController {
         }
     }
 
+    @GetMapping("/player/getInvitations")
+    public List<TeamPlayerRequest> getPlayerInvitations(@RequestParam Long teamId) {
+        if (teamId == null) {
+            throw new BadRequestException("传入的队伍ID为空");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        return teamService.getPlayerInvitations(teamId);
+    }
+
     @GetMapping("/player/getApplications")
     public List<TeamPlayerRequest> getPlayerApplications(@RequestParam Long teamId) {
         if (teamId == null) {

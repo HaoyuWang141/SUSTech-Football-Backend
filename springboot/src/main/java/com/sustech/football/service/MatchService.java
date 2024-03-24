@@ -20,6 +20,8 @@ public interface MatchService extends IService<Match> {
 
     boolean inviteTeam(MatchTeamRequest matchTeamRequest);
 
+    List<MatchTeamRequest> getTeamInvitations(Long teamId);
+
     boolean deleteTeam(Long matchId, Boolean isHomeTeam);
 
     boolean inviteReferee(MatchReferee matchReferee);
@@ -31,5 +33,7 @@ public interface MatchService extends IService<Match> {
     boolean updateResult(Long refereeId, Match match);
 
     boolean addPlayerAction(Long refereeId, MatchPlayerAction matchPlayerAction);
+
+    Event getEvent(Long matchId);
 
 }

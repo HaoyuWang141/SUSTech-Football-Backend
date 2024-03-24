@@ -169,6 +169,17 @@ public class EventController {
         }
     }
 
+    @GetMapping("/team/getInvitations")
+    public List<EventTeamRequest> getTeamInvitations(Long eventId) {
+        if (eventId == null) {
+            throw new BadRequestException("传入的赛事ID为空");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        return eventService.getTeamInvitations(eventId);
+    }
+
     @GetMapping("/team/getApplications")
     public List<EventTeamRequest> getTeamApplications(Long eventId) {
         if (eventId == null) {

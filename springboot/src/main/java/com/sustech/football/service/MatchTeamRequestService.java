@@ -7,6 +7,8 @@ import com.sustech.football.entity.MatchTeamRequest;
 
 public interface MatchTeamRequestService extends IMppService<MatchTeamRequest> {
     List<MatchTeamRequest> listWithMatch(Long teamId);
+
     List<MatchTeamRequest> listWithTeam(Long matchId);
+
     boolean saveOrUpdateRequestWithTime(MatchTeamRequest matchTeamRequest);
 }

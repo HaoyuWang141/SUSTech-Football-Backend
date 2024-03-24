@@ -31,6 +31,10 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     private TeamService teamService;
     @Autowired
     private TeamPlayerService teamPlayerService;
+    @Autowired
+    private EventMatchService eventMatchService;
+    @Autowired
+    private EventService eventService;
 
     @Override
     public Match getMatch(Long matchId) {
@@ -118,6 +122,11 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
             throw new RuntimeException("邀请失败");
         }
         return true;
+    }
+
+    @Override
+    public List<MatchTeamRequest> getTeamInvitations(Long teamId) {
+        return matchTeamRequestService.listWithMatch(teamId);
     }
 
     @Override
@@ -209,5 +218,11 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
             throw new RuntimeException("增加本场比赛的球员行为失败");
         }
         return true;
+    }
+
+    @Override
+    public Event getEvent(Long matchId) {
+        EventMatch eventMatch = eventMatchService.getOne(new QueryWrapper<EventMatch>().eq("match_id", matchId));
+        return eventService.getDetailedEvent(eventMatch.getEventId());
     }
 }

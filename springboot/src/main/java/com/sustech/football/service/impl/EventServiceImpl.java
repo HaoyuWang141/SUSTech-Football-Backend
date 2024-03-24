@@ -146,6 +146,11 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     }
 
     @Override
+    public List<EventTeamRequest> getTeamInvitations(Long eventId) {
+        return eventTeamRequestService.listWithTeam(eventId, EventTeamRequest.TYPE_INVITATION);
+    }
+
+    @Override
     public List<EventTeamRequest> getTeamApplications(Long eventId) {
         return eventTeamRequestService.listWithTeam(eventId, EventTeamRequest.TYPE_APPLICATION);
     }
