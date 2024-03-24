@@ -39,6 +39,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     @Autowired
     private TeamUniformService teamUniformService;
     @Autowired
+    private EventMatchService eventMatchService;
+    @Autowired
     private UserService userService;
 
     @Override
@@ -249,6 +251,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         matchList = matchList.stream()
                 .sorted(Comparator.comparing(Match::getTime))
                 .peek(match -> {
+                    match.setMatchEvent(matchService.findMatchEvent(match));
                     match.setHomeTeam(getById(match.getHomeTeamId()));
                     match.setAwayTeam(getById(match.getAwayTeamId()));
                 })

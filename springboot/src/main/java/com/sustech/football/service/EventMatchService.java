@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface EventMatchService extends IMppService<EventMatch> {
     List<EventMatch> listWithMatch(Long eventId);
+
+    EventMatch getEventMatchByMatch(Long matchId);
 }

@@ -23,6 +23,8 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
     private EventRefereeRequestService eventRefereeRequestService;
     @Autowired
     private EventRefereeService eventRefereeService;
+    @Autowired
+    private MatchService matchService;
 
     @Override
     public List<MatchRefereeRequest> getMatchInvitations(Long refereeId) {
@@ -52,11 +54,15 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
 
     @Override
     public List<Match> getMatches(Long refereeId) {
-        return matchRefereeService
+        List<Match> refereeMatches = matchRefereeService
                 .listWithMatch(refereeId)
                 .stream()
                 .map(MatchReferee::getMatch)
+                .peek(match -> {
+                    match.setMatchEvent(matchService.findMatchEvent(match));
+                })
                 .toList();
+        return refereeMatches;
     }
 
     @Override

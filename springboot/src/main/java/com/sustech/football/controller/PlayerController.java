@@ -214,18 +214,7 @@ public class PlayerController {
         if (playerService.getById(playerId) == null) {
             throw new ResourceNotFoundException("球员不存在");
         }
-        List<TeamPlayer> teamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("player_id", playerId));
-        return teamPlayers.stream()
-                .map(TeamPlayer::getTeamId)
-                .map(teamService::getMatches)
-                .flatMap(List::stream)
-                .distinct()
-                .sorted(Comparator.comparing(Match::getTime))
-                .peek(match -> {
-                    match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
-                    match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
-                })
-                .toList();
+        return playerService.getPlayerMatches(playerId);
     }
 
     @GetMapping("/event/getAll")

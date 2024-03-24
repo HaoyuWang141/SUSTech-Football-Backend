@@ -69,6 +69,7 @@ public class MatchController {
     public List<Match> getAllMatches() {
         List<Match> matchList = matchService.list();
         matchList.forEach(match -> {
+            match.setMatchEvent(matchService.findMatchEvent(match));
             match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
             match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
         });

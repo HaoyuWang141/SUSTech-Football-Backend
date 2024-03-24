@@ -19,4 +19,12 @@ public interface EventMatchMapper extends MppBaseMapper<EventMatch> {
             @Result(column = "match_id", property = "match", one = @One(select = "com.sustech.football.mapper.MatchMapper.selectById"))
     })
     List<EventMatch> selectListWithMatch(Long eventId);
+
+    @Select("select * from event_match where match_id=#{matchId}")
+    @Results({
+            @Result(column = "event_id", property = "eventId"),
+            @Result(column = "match_id", property = "matchId"),
+            @Result(column = "event_id", property = "event", one = @One(select = "com.sustech.football.mapper.EventMapper.selectById"))
+    })
+    EventMatch selectEventMatchWithMatch(Long matchId);
 }

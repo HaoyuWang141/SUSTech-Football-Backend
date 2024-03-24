@@ -57,12 +57,18 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
                 .map(MatchReferee::getReferee)
                 .toList());
         match.setMatchPlayerActionList(matchPlayerActionService.list(new QueryWrapper<MatchPlayerAction>().eq("match_id", matchId)));
+        match.setMatchEvent(this.findMatchEvent(match));
         return match;
     }
 
     @Override
     public List<Match> getMatchByIdList(List<Long> matchIdList) {
         return matchIdList.stream().map(this::getMatch).toList();
+    }
+
+    @Override
+    public MatchEvent findMatchEvent(Match match) {
+        return new MatchEvent(eventMatchService.getEventMatchByMatch(match.getMatchId()));
     }
 
     public List<Match> getAllMatches() {

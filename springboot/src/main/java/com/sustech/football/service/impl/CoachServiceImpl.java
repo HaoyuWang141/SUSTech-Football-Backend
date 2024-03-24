@@ -6,14 +6,11 @@ import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ConflictException;
 import com.sustech.football.mapper.CoachMapper;
-import com.sustech.football.service.CoachService;
-import com.sustech.football.service.TeamCoachRequestService;
-import com.sustech.football.service.TeamCoachService;
+import com.sustech.football.service.*;
 
 import java.util.Comparator;
 import java.util.List;
 
-import com.sustech.football.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +26,9 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
 
     @Autowired
     private TeamService teamService;
+
+    @Autowired
+    private MatchService matchService;
 
     @Override
     @Transactional
@@ -72,6 +72,7 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
                 .distinct()
                 .sorted(Comparator.comparing(Match::getTime))
                 .peek(match -> {
+                    match.setMatchEvent(matchService.findMatchEvent(match));
                     match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
                     match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
                 })
