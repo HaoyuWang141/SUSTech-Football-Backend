@@ -48,10 +48,13 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         team.setCoachList(this.getCoaches(teamId));
         team.setManagerList(this.getManagers(teamId).stream().map(userService::getById).toList());
         List<Match> matchList = this.getMatches(teamId);
-        matchList = matchList.stream().peek(match -> {
-            match.setHomeTeam(getById(match.getHomeTeamId()));
-            match.setAwayTeam(getById(match.getAwayTeamId()));
-        }).toList();
+        matchList = matchList.stream()
+                .sorted(Comparator.comparing(Match::getTime))
+                .peek(match -> {
+                    match.setHomeTeam(getById(match.getHomeTeamId()));
+                    match.setAwayTeam(getById(match.getAwayTeamId()));
+                })
+                .toList();
         team.setMatchList(matchList);
         team.setEventList(this.getEvents(teamId));
         return team;
@@ -238,12 +241,13 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         QueryWrapper<Match> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("home_team_id", teamId).or().eq("away_team_id", teamId);
         List<Match> matchList = matchService.list(queryWrapper);
-        matchList.stream()
+        matchList = matchList.stream()
                 .sorted(Comparator.comparing(Match::getTime))
-                .forEach(match -> {
+                .peek(match -> {
                     match.setHomeTeam(getById(match.getHomeTeamId()));
                     match.setAwayTeam(getById(match.getAwayTeamId()));
-                });
+                })
+                .toList();
         return matchList;
     }
 
