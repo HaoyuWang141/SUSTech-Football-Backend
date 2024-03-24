@@ -28,4 +28,12 @@ public interface UserFavoriteService {
     boolean unfavoriteEvent(Long userId, Long eventId);
 
     List<Event> getFavoriteEvents(Long userId);
+
+    boolean isFavoriteTeam(Long userId, Long teamId);
+
+    boolean isFavoriteUser(Long userId, Long favoriteId);
+
+    boolean isFavoriteMatch(Long userId, Long matchId);
+
+    boolean isFavoriteEvent(Long userId, Long eventId);
 }

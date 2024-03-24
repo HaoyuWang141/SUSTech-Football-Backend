@@ -175,4 +175,24 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
     public List<Event> getFavoriteEvents(Long userId) {
         return favoriteEventMapper.selectFavoriteWithUser(userId).stream().map(FavoriteEvent::getEvent).toList();
     }
+
+    @Override
+    public boolean isFavoriteTeam(Long userId, Long teamId) {
+        return favoriteTeamMapper.selectByMultiId(new FavoriteTeam(userId, teamId)) != null;
+    }
+
+    @Override
+    public boolean isFavoriteUser(Long userId, Long favoriteId) {
+        return favoriteUserMapper.selectByMultiId(new FavoriteUser(userId, favoriteId)) != null;
+    }
+
+    @Override
+    public boolean isFavoriteMatch(Long userId, Long matchId) {
+        return favoriteMatchMapper.selectByMultiId(new FavoriteMatch(userId, matchId)) != null;
+    }
+
+    @Override
+    public boolean isFavoriteEvent(Long userId, Long eventId) {
+        return favoriteEventMapper.selectByMultiId(new FavoriteEvent(userId, eventId)) != null;
+    }
 }

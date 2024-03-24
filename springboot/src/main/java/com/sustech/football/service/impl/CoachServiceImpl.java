@@ -62,6 +62,9 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
     @Override
     public List<Match> getMatches(Long coachId) {
         List<TeamCoach> teamCoachList = teamCoachService.listWithTeam(coachId);
+        if (teamCoachList.isEmpty()) {
+            return List.of();
+        }
         return teamCoachList.stream()
                 .map(TeamCoach::getTeamId)
                 .map(teamService::getMatches)

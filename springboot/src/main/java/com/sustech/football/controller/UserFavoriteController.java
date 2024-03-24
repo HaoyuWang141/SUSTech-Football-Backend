@@ -76,4 +76,22 @@ public class UserFavoriteController {
             default -> throw new BadRequestException("参数错误");
         };
     }
+
+    @GetMapping("/isFavorite")
+    @Operation(summary = "是否收藏", description = "type类型可选：team, user, match, event")
+    public boolean isFavorite(Long userId, String type, Long id) {
+        if (userId == null || type == null || id == null) {
+            throw new BadRequestException("参数错误");
+        }
+        if (userService.getById(userId) == null) {
+            throw new BadRequestException("用户不存在");
+        }
+        return switch (type) {
+            case "team" -> userFavoriteService.isFavoriteTeam(userId, id);
+            case "user" -> userFavoriteService.isFavoriteUser(userId, id);
+            case "match" -> userFavoriteService.isFavoriteMatch(userId, id);
+            case "event" -> userFavoriteService.isFavoriteEvent(userId, id);
+            default -> throw new BadRequestException("参数错误");
+        };
+    }
 }

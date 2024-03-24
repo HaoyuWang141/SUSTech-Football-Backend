@@ -189,6 +189,9 @@ public class PlayerController {
             throw new ResourceNotFoundException("球员不存在");
         }
         List<TeamPlayer> teamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("player_id", playerId));
+        if (teamPlayers.isEmpty()) {
+            return List.of();
+        }
         return teamService.listByIds(teamPlayers.stream().map(TeamPlayer::getTeamId).toList());
     }
 
