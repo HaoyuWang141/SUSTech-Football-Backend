@@ -147,12 +147,39 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public List<Player> getPlayers(Long teamId) {
-        return teamPlayerService
-                .listWithPlayer(teamId)
-                .stream()
-                .map(TeamPlayer::getPlayer)
-                .toList();
+    public List<TeamPlayer> getPlayers(Long teamId) {
+        List<Match> matchList = this.getMatches(teamId);
+        List<TeamPlayer> teamPlayerList = teamPlayerService.listWithPlayer(teamId);
+        for (TeamPlayer teamPlayer : teamPlayerList) {
+            teamPlayer.setAppearances(matchList.size());
+            int goals = 0;
+            int assists = 0;
+            int yellowCards = 0;
+            int redCards = 0;
+            for (Match match : matchList) {
+                List<MatchPlayerAction> matchPlayerActionList = match.getMatchPlayerActionList()
+                        .stream()
+                        .filter(matchPlayerAction -> matchPlayerAction.getTeamId().equals(teamId))
+                        .filter(matchPlayerAction -> matchPlayerAction.getPlayerId().equals(teamPlayer.getPlayerId()))
+                        .toList();
+                for (MatchPlayerAction matchPlayerAction : matchPlayerActionList) {
+                    if (matchPlayerAction.getAction().equals(MatchPlayerAction.GOAL)) {
+                        goals++;
+                    } else if (matchPlayerAction.getAction().equals(MatchPlayerAction.ASSIST)) {
+                        assists++;
+                    } else if (matchPlayerAction.getAction().equals(MatchPlayerAction.YELLOW_CARD)) {
+                        yellowCards++;
+                    } else if (matchPlayerAction.getAction().equals(MatchPlayerAction.RED_CARD)) {
+                        redCards++;
+                    }
+                }
+            }
+            teamPlayer.setGoals(goals);
+            teamPlayer.setAssists(assists);
+            teamPlayer.setYellowCards(yellowCards);
+            teamPlayer.setRedCards(redCards);
+        }
+        return teamPlayerList;
     }
 
     @Override

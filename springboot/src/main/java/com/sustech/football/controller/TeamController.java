@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.sustech.football.service.*;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
+import com.sustech.football.model.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -52,12 +53,32 @@ public class TeamController {
     }
 
     @GetMapping("/get")
-    public Team getTeamById(Long id) {
+    public VoTeam getTeamById(Long id) {
         Team team = teamService.getTeamById(id);
         if (team == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        return team;
+        return new VoTeam(
+                team.getTeamId(),
+                team.getName(),
+                team.getLogoUrl(),
+                team.getCaptainId(),
+                team.getCoachList(),
+                team.getPlayerList().stream().map(teamPlayer -> new VoTeamPlayer(
+                        teamPlayer.getPlayerId(),
+                        teamPlayer.getPlayer().getName(),
+                        teamPlayer.getPlayer().getPhotoUrl(),
+                        teamPlayer.getNumber(),
+                        teamPlayer.getAppearances(),
+                        teamPlayer.getGoals(),
+                        teamPlayer.getAssists(),
+                        teamPlayer.getYellowCards(),
+                        teamPlayer.getRedCards()
+                )).collect(Collectors.toList()),
+                team.getEventList(),
+                team.getMatchList(),
+                team.getManagerList()
+        );
     }
 
     @GetMapping("/getAll")
@@ -195,7 +216,7 @@ public class TeamController {
     }
 
     @GetMapping("/player/getAll")
-    public List<Player> getPlayers(Long teamId) {
+    public List<TeamPlayer> getPlayers(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
         }

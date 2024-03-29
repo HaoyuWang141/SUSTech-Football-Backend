@@ -11,6 +11,13 @@ import java.sql.Time;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MatchPlayerAction {
+    public static final String GOAL = "GOAL";
+    public static final String ASSIST = "ASSIST";
+    public static final String YELLOW_CARD = "YELLOW_CARD";
+    public static final String RED_CARD = "RED_CARD";
+    public static final String ON = "ON";
+    public static final String OFF = "OFF";
+
     @MppMultiId
     private Long matchId;
     @MppMultiId
