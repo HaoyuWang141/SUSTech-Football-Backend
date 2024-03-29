@@ -76,6 +76,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         }).toList());
         List<EventMatch> eventMatches = eventMatchService.list(new QueryWrapper<EventMatch>().eq("event_id", eventId));
         eventMatches.forEach(em -> {
+            em.setEvent(event);
             Match match = matchService.getById(em.getMatchId());
             for (EventTeam et : eventTeams) {
                 if (et.getTeamId().equals(match.getHomeTeamId())) {

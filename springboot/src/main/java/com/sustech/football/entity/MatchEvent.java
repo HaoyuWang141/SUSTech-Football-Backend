@@ -21,6 +21,8 @@ public class MatchEvent {
         this.eventId = eventMatch.getEventId();
         this.matchStage = eventMatch.getStage();
         this.matchTag = eventMatch.getTag();
-        this.eventName = eventMatch.getEvent().getName();
+        if (eventMatch.getEvent() != null) {
+            this.eventName = eventMatch.getEvent().getName();
+        }
     }
 }
