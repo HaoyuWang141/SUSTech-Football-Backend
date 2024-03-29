@@ -64,7 +64,7 @@ public class TeamController {
                 team.getLogoUrl(),
                 team.getCaptainId(),
                 team.getCoachList(),
-                team.getPlayerList().stream().map(teamPlayer -> new VoTeamPlayer(
+                team.getTeamPlayerList().stream().map(teamPlayer -> new VoTeamPlayer(
                         teamPlayer.getPlayerId(),
                         teamPlayer.getPlayer().getName(),
                         teamPlayer.getPlayer().getPhotoUrl(),
@@ -216,14 +216,25 @@ public class TeamController {
     }
 
     @GetMapping("/player/getAll")
-    public List<TeamPlayer> getPlayers(Long teamId) {
+    public List<VoTeamPlayer> getPlayers(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
         }
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        return teamService.getPlayers(teamId);
+        List<TeamPlayer> teamPlayerList = teamService.getTeamPlayers(teamId);
+        return teamPlayerList.stream().map(teamPlayer -> new VoTeamPlayer(
+                teamPlayer.getPlayerId(),
+                teamPlayer.getPlayer().getName(),
+                teamPlayer.getPlayer().getPhotoUrl(),
+                teamPlayer.getNumber(),
+                teamPlayer.getAppearances(),
+                teamPlayer.getGoals(),
+                teamPlayer.getAssists(),
+                teamPlayer.getYellowCards(),
+                teamPlayer.getRedCards()
+        )).toList();
     }
 
     @DeleteMapping("/player/delete")

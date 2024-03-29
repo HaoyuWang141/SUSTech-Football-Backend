@@ -231,4 +231,9 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         EventMatch eventMatch = eventMatchService.getOne(new QueryWrapper<EventMatch>().eq("match_id", matchId));
         return eventService.getDetailedEvent(eventMatch.getEventId());
     }
+
+    @Override
+    public List<MatchPlayerAction> getMatchPlayerActions(Long matchId) {
+        return matchPlayerActionService.list(new QueryWrapper<MatchPlayerAction>().eq("match_id", matchId));
+    }
 }

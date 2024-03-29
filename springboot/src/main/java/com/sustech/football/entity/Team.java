@@ -21,7 +21,9 @@ public class Team {
     @TableField(exist = false)
     private List<Coach> coachList;
     @TableField(exist = false)
-    private List<TeamPlayer> playerList;
+    private List<TeamPlayer> teamPlayerList;
+    @TableField(exist = false)
+    private List<Player> playerList;
     @TableField(exist = false)
     private List<Event> eventList;
     @TableField(exist = false)

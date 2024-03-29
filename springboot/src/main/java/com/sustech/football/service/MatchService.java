@@ -38,4 +38,5 @@ public interface MatchService extends IService<Match> {
 
     Event getEvent(Long matchId);
 
+    List<MatchPlayerAction> getMatchPlayerActions(Long matchId);
 }

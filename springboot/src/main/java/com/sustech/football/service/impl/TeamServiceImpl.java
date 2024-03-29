@@ -46,6 +46,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     @Override
     public Team getTeamById(Long teamId) {
         Team team = getById(teamId);
+        team.setTeamPlayerList(this.getTeamPlayers(teamId));
         team.setPlayerList(this.getPlayers(teamId));
         team.setCoachList(this.getCoaches(teamId));
         team.setManagerList(this.getManagers(teamId).stream().map(userService::getById).toList());
@@ -147,7 +148,16 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public List<TeamPlayer> getPlayers(Long teamId) {
+    public List<Player> getPlayers(Long teamId) {
+        return teamPlayerService
+                .listWithPlayer(teamId)
+                .stream()
+                .map(TeamPlayer::getPlayer)
+                .toList();
+    }
+
+
+    public List<TeamPlayer> getTeamPlayers(Long teamId) {
         List<Match> matchList = this.getMatches(teamId);
         List<TeamPlayer> teamPlayerList = teamPlayerService.listWithPlayer(teamId);
         for (TeamPlayer teamPlayer : teamPlayerList) {
@@ -281,6 +291,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                     match.setMatchEvent(matchService.findMatchEvent(match));
                     match.setHomeTeam(getById(match.getHomeTeamId()));
                     match.setAwayTeam(getById(match.getAwayTeamId()));
+                    match.setMatchPlayerActionList(matchService.getMatchPlayerActions(match.getMatchId()));
                 })
                 .toList();
         return matchList;

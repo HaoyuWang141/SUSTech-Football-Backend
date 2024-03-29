@@ -25,7 +25,9 @@ public interface TeamService extends IService<Team> {
 
     boolean replyPlayerApplication(Long teamId, Long playerId, Boolean accept);
 
-    List<TeamPlayer> getPlayers(Long teamId);
+    List<TeamPlayer> getTeamPlayers(Long teamId);
+
+    List<Player> getPlayers(Long teamId);
 
     boolean deletePlayer(TeamPlayer teamPlayer);
 
