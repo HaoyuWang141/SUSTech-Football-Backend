@@ -128,6 +128,7 @@ public class MatchController {
         // 裁判
         List<Referee> refereeList = matchService.getReferees(id);
         List<Long> refereeIdList = refereeList.stream().map(Referee::getRefereeId).toList();
+        voMatch.setRefereeList(refereeIdList);
 
         // 比赛事件
         List<MatchPlayerAction> matchPlayerActions = matchService.getMatchPlayerActions(id);
