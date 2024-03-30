@@ -3,13 +3,17 @@ package com.sustech.football.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
+import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
+import com.sustech.football.model.match.*;
 import com.sustech.football.service.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @CrossOrigin
@@ -28,6 +32,8 @@ public class MatchController {
     private MatchLiveService matchLiveService;
     @Autowired
     private MatchVideoService matchVideoService;
+    @Autowired
+    private MatchPlayerService matchPlayerService;
 
     @PostMapping("/create")
     @Transactional
@@ -54,15 +60,108 @@ public class MatchController {
     }
 
     @GetMapping("/get")
-    public Match getMatch(Long id) {
+    public VoMatch getMatch(Long id) {
         if (id == null) {
             throw new BadRequestException("比赛ID不能为空");
         }
-        Match match = matchService.getMatch(id);
+        VoMatch voMatch = new VoMatch();
+        voMatch.setMatchId(id);
+
+        // 比赛基本信息
+        Match match = matchService.getById(id);
         if (match == null) {
             throw new BadRequestException("比赛不存在");
         }
-        return match;
+        voMatch.setTime(match.getTime());
+        voMatch.setStatus(match.getStatus());
+
+        // 主队
+        Team homeTeam = teamService.getById(match.getHomeTeamId());
+        List<MatchPlayer> homePlayers = matchPlayerService.list(new QueryWrapper<MatchPlayer>().eq("match_id", id).eq("team_id", match.getHomeTeamId()));
+        List<VoMatchPlayer> voHomePlayers = new ArrayList<>();
+        for (MatchPlayer matchPlayer : homePlayers) {
+            Player player = playerService.getById(matchPlayer.getPlayerId());
+            VoMatchPlayer voMatchPlayer = new VoMatchPlayer();
+            voMatchPlayer.setPlayerId(player.getPlayerId());
+            voMatchPlayer.setNumber(matchPlayer.getNumber());
+            voMatchPlayer.setName(player.getName());
+            voMatchPlayer.setPhotoUrl(player.getPhotoUrl());
+            voMatchPlayer.setIsStart(matchPlayer.getIsStart());
+            voHomePlayers.add(voMatchPlayer);
+        }
+        VoMatchTeam voHomeTeam = new VoMatchTeam();
+        voHomeTeam.setTeamId(homeTeam.getTeamId());
+        voHomeTeam.setName(homeTeam.getName());
+        voHomeTeam.setLogoUrl(homeTeam.getLogoUrl());
+        voHomeTeam.setScore(match.getHomeTeamScore());
+        voHomeTeam.setPenalty(match.getHomeTeamPenalty());
+        voHomeTeam.setPlayers(voHomePlayers);
+        voMatch.setHomeTeam(voHomeTeam);
+
+        // 客队
+        Team awayTeam = teamService.getById(match.getAwayTeamId());
+        List<MatchPlayer> awayPlayers = matchPlayerService.list(new QueryWrapper<MatchPlayer>().eq("match_id", id).eq("team_id", match.getAwayTeamId()));
+        List<VoMatchPlayer> voAwayPlayers = new ArrayList<>();
+        for (MatchPlayer matchPlayer : awayPlayers) {
+            Player player = playerService.getById(matchPlayer.getPlayerId());
+            VoMatchPlayer voMatchPlayer = new VoMatchPlayer();
+            voMatchPlayer.setPlayerId(player.getPlayerId());
+            voMatchPlayer.setNumber(matchPlayer.getNumber());
+            voMatchPlayer.setName(player.getName());
+            voMatchPlayer.setPhotoUrl(player.getPhotoUrl());
+            voMatchPlayer.setIsStart(matchPlayer.getIsStart());
+            voAwayPlayers.add(voMatchPlayer);
+        }
+        VoMatchTeam voAwayTeam = new VoMatchTeam();
+        voAwayTeam.setTeamId(awayTeam.getTeamId());
+        voAwayTeam.setName(awayTeam.getName());
+        voAwayTeam.setLogoUrl(awayTeam.getLogoUrl());
+        voAwayTeam.setScore(match.getAwayTeamScore());
+        voAwayTeam.setPenalty(match.getAwayTeamPenalty());
+        voAwayTeam.setPlayers(voAwayPlayers);
+        voMatch.setAwayTeam(voAwayTeam);
+
+        // 管理员
+        List<Long> managerList = matchService.getManagers(id);
+        voMatch.setManagerList(managerList);
+
+        // 裁判
+        List<Referee> refereeList = matchService.getReferees(id);
+        List<Long> refereeIdList = refereeList.stream().map(Referee::getRefereeId).toList();
+
+        // 比赛事件
+        List<MatchPlayerAction> matchPlayerActions = matchService.getMatchPlayerActions(id);
+        List<VoMatchPlayerAction> voMatchPlayerActions = new ArrayList<>();
+        for (MatchPlayerAction matchPlayerAction : matchPlayerActions) {
+            VoMatchPlayerAction voMatchPlayerAction = new VoMatchPlayerAction();
+            voMatchPlayerAction.setTeamId(matchPlayerAction.getTeamId());
+            VoMatchPlayer voMatchPlayer;
+            if (matchPlayerAction.getTeamId().equals(match.getHomeTeamId())) {
+                voMatchPlayer = voHomePlayers.stream().filter(voMatchPlayer1 -> voMatchPlayer1.getPlayerId().equals(matchPlayerAction.getPlayerId())).findFirst().orElse(null);
+            } else {
+                voMatchPlayer = voAwayPlayers.stream().filter(voMatchPlayer1 -> voMatchPlayer1.getPlayerId().equals(matchPlayerAction.getPlayerId())).findFirst().orElse(null);
+            }
+            if (voMatchPlayer == null) {
+                throw new InternalServerErrorException("比赛球员动作信息错误，未找到对应球员");
+            }
+            voMatchPlayerAction.setPlayer(voMatchPlayer);
+            voMatchPlayerAction.setTime(matchPlayerAction.getTime());
+            voMatchPlayerAction.setAction(matchPlayerAction.getAction());
+            voMatchPlayerActions.add(voMatchPlayerAction);
+        }
+        voMatchPlayerActions.sort(Comparator.comparing(VoMatchPlayerAction::getTime));
+        voMatch.setActions(voMatchPlayerActions);
+
+        // 所属赛事
+        MatchEvent matchEvent = matchService.findMatchEvent(match);
+        VoMatchEvent voMatchEvent = new VoMatchEvent();
+        voMatchEvent.setEventId(matchEvent.getEventId());
+        voMatchEvent.setEventName(matchEvent.getEventName());
+        voMatchEvent.setStage(matchEvent.getMatchStage());
+        voMatchEvent.setTag(matchEvent.getMatchTag());
+        voMatch.setEvent(voMatchEvent);
+
+        return voMatch;
     }
 
     @GetMapping("/getAll")

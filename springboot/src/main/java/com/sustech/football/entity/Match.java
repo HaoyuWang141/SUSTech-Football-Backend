@@ -14,11 +14,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Match {
+    public static final String STATUS_PENDING = "PENDING";
+    public static final String STATUS_ONGOING = "ONGOING";
+    public static final String STATUS_FINISHED = "FINISHED";
+
     @TableId(type = IdType.AUTO)
     private Long matchId;
     private Long homeTeamId;
     private Long awayTeamId;
     private Timestamp time;
+    private String status;
     private Integer homeTeamScore;
     private Integer awayTeamScore;
     private Integer homeTeamPenalty;
