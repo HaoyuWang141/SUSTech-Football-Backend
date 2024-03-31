@@ -21,5 +21,18 @@ public class Referee {
     private Long userId;
     @TableField(exist = false)
     private List<Match> matchList;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Referee referee = (Referee) o;
+        return refereeId.equals(referee.refereeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return refereeId.hashCode();
+    }
 }
 

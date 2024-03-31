@@ -8,6 +8,7 @@ import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.model.match.*;
 import com.sustech.football.service.*;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,8 @@ public class MatchController {
     private MatchVideoService matchVideoService;
     @Autowired
     private MatchPlayerService matchPlayerService;
+    @Autowired
+    private RefereeService refereeService;
 
     @PostMapping("/create")
     @Transactional
@@ -336,31 +339,135 @@ public class MatchController {
         }
     }
 
-    @PostMapping("/referee/updateResult")
-    public void updateResult(Long refereeId, Match match) {
-        if (refereeId == null || match == null) {
-            throw new BadRequestException("裁判ID和比赛信息不能为空");
+    @GetMapping("/referee/getPlayerList")
+    public List<VoMatchPlayer> getPlayerList(Long refereeId, Long matchId, Long teamId) {
+        if (refereeId == null || matchId == null || teamId == null) {
+            throw new BadRequestException("裁判ID和比赛ID和球队ID不能为空");
         }
-        if (userService.getById(refereeId) == null) {
-            throw new BadRequestException("裁判不存在");
-        }
-        if (match.getMatchId() == null) {
-            throw new BadRequestException("比赛ID不能为空");
-        }
-        if (matchService.getById(match.getMatchId()) == null) {
+        Match match = matchService.getById(matchId);
+        if (match == null) {
             throw new BadRequestException("比赛不存在");
         }
+        if (teamService.getById(teamId) == null) {
+            throw new BadRequestException("球队不存在");
+        }
+        // 球队存在于比赛中
+        if (!match.getHomeTeamId().equals(teamId) && !match.getAwayTeamId().equals(teamId)) {
+            throw new BadRequestException("球队不在比赛中");
+        }
+        // 裁判是比赛的裁判
+        Referee referee = refereeService.getById(refereeId);
+        if (referee == null) {
+            throw new BadRequestException("裁判不存在");
+        }
+        List<Referee> refereeList = matchService.getReferees(matchId);
+        if (!refereeList.contains(referee)) {
+            throw new BadRequestException("裁判不是比赛的裁判");
+        }
+
+        // 获取球员列表
+        List<MatchPlayer> homePlayers = matchPlayerService.list(new QueryWrapper<MatchPlayer>().eq("match_id", matchId).eq("team_id", match.getHomeTeamId()));
+        List<VoMatchPlayer> voMatchPlayerList = new ArrayList<>();
+        for (MatchPlayer matchPlayer : homePlayers) {
+            Player player = playerService.getById(matchPlayer.getPlayerId());
+            VoMatchPlayer voMatchPlayer = new VoMatchPlayer();
+            voMatchPlayer.setPlayerId(player.getPlayerId());
+            voMatchPlayer.setNumber(matchPlayer.getNumber());
+            voMatchPlayer.setName(player.getName());
+            voMatchPlayer.setPhotoUrl(player.getPhotoUrl());
+            voMatchPlayer.setIsStart(matchPlayer.getIsStart());
+            voMatchPlayerList.add(voMatchPlayer);
+        }
+        return voMatchPlayerList;
+    }
+
+    @PostMapping("/referee/setPlayerList")
+    @Transactional
+    @Operation(summary = "设置比赛球员列表", description = "将删除对应于该比赛、该球队的原有球员列表，然后插入新的球员列表")
+    public void setPlayerList(Long refereeId, Long matchId, Long teamId, @RequestBody List<VoMatchPlayer> voMatchPlayerList) {
+        if (refereeId == null || matchId == null || teamId == null) {
+            throw new BadRequestException("裁判ID和比赛ID和球队ID不能为空");
+        }
+        Match match = matchService.getById(matchId);
+        if (match == null) {
+            throw new BadRequestException("比赛不存在");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new BadRequestException("球队不存在");
+        }
+        // 球队存在于比赛中
+        if (!match.getHomeTeamId().equals(teamId) && !match.getAwayTeamId().equals(teamId)) {
+            throw new BadRequestException("球队不在比赛中");
+        }
+        // 裁判是比赛的裁判
+        Referee referee = refereeService.getById(refereeId);
+        if (referee == null) {
+            throw new BadRequestException("裁判不存在");
+        }
+        List<Referee> refereeList = matchService.getReferees(matchId);
+        if (!refereeList.contains(referee)) {
+            throw new BadRequestException("裁判不是比赛的裁判");
+        }
+
+        // 维护待插入的球员列表
+        List<MatchPlayer> matchPlayerList = new ArrayList<>();
+        for (VoMatchPlayer voMatchPlayer : voMatchPlayerList) {
+            MatchPlayer matchPlayer = new MatchPlayer();
+            matchPlayer.setMatchId(matchId);
+            matchPlayer.setTeamId(teamId);
+            matchPlayer.setPlayerId(voMatchPlayer.getPlayerId());
+            matchPlayer.setNumber(voMatchPlayer.getNumber());
+            matchPlayer.setIsStart(voMatchPlayer.getIsStart());
+            matchPlayerList.add(matchPlayer);
+        }
+
+        // 删除该match该team的原有球员列表
+        QueryWrapper<MatchPlayer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("match_id", matchId).eq("team_id", teamId);
+        if (!matchPlayerService.remove(queryWrapper)) {
+            throw new InternalServerErrorException("删除原有球员列表失败");
+        }
+
+        // 插入新的球员列表
+        if (!matchPlayerService.saveOrUpdateBatchByMultiId(matchPlayerList)) {
+            throw new InternalServerErrorException("插入新球员列表失败");
+        }
+    }
+
+    @PostMapping("/referee/updateResult")
+    public void updateResult(Long refereeId, @RequestBody VoMatchInfoForReferee voMatch) {
+        if (refereeId == null || voMatch == null) {
+            throw new BadRequestException("裁判ID和比赛信息不能为空");
+        }
+        if (refereeService.getById(refereeId) == null) {
+            throw new BadRequestException("裁判不存在");
+        }
+
+        // 获取比赛
+        Match match = matchService.getById(voMatch.getMatchId());
+        if (match == null) {
+            throw new BadRequestException("比赛不存在");
+        }
+
+        // 维护待更新的比赛信息
+        match.setHomeTeamScore(voMatch.getHomeTeamScore());
+        match.setAwayTeamScore(voMatch.getAwayTeamScore());
+        match.setHomeTeamPenalty(voMatch.getHomeTeamPenalty());
+        match.setAwayTeamPenalty(voMatch.getAwayTeamPenalty());
+        match.setStatus(voMatch.getStatus());
+
+        // 更新比赛结果
         if (!matchService.updateResult(refereeId, match)) {
-            throw new BadRequestException("更新比赛结果失败");
+            throw new InternalServerErrorException("更新比赛结果失败");
         }
     }
 
     @PostMapping("/referee/addPlayerAction")
     public void updatePlayerAction(Long refereeId, @RequestBody MatchPlayerAction matchPlayerAction) {
         if (refereeId == null || matchPlayerAction == null) {
-            throw new BadRequestException("裁判ID和比赛球员动作信息不能为空");
+            throw new BadRequestException("传参不能为空");
         }
-        if (userService.getById(refereeId) == null) {
+        if (refereeService.getById(refereeId) == null) {
             throw new BadRequestException("裁判不存在");
         }
         if (matchPlayerAction.getMatchId() == null) {
@@ -381,8 +488,28 @@ public class MatchController {
         if (playerService.getById(matchPlayerAction.getPlayerId()) == null) {
             throw new BadRequestException("球员不存在");
         }
+        if (matchPlayerAction.getAction() == null) {
+            throw new BadRequestException("动作不能为空");
+        }
+        if (matchPlayerAction.getTime() == null) {
+            throw new BadRequestException("时间不能为空");
+        }
+
         if (!matchService.addPlayerAction(refereeId, matchPlayerAction)) {
             throw new BadRequestException("更新比赛球员动作失败");
+        }
+    }
+
+    @DeleteMapping("/referee/deletePlayerAction")
+    public void deletePlayerAction(Long refereeId, @RequestBody MatchPlayerAction matchPlayerAction) {
+        if (refereeId == null || matchPlayerAction == null) {
+            throw new BadRequestException("传参不能为空");
+        }
+        if (refereeService.getById(refereeId) == null) {
+            throw new BadRequestException("裁判不存在");
+        }
+        if (!matchService.deletePlayerAction(refereeId, matchPlayerAction)) {
+            throw new BadRequestException("删除比赛球员动作失败");
         }
     }
 

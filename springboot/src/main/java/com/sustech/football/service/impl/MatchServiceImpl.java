@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -63,7 +64,10 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
 
     @Override
     public List<Match> getMatchByIdList(List<Long> matchIdList) {
-        return matchIdList.stream().map(this::getMatch).toList();
+        return matchIdList.stream()
+                .map(this::getMatch)
+                .sorted(Comparator.comparing(Match::getTime))
+                .toList();
     }
 
     @Override
@@ -235,5 +239,21 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     @Override
     public List<MatchPlayerAction> getMatchPlayerActions(Long matchId) {
         return matchPlayerActionService.list(new QueryWrapper<MatchPlayerAction>().eq("match_id", matchId));
+    }
+
+    @Override
+    public boolean deletePlayerAction(Long refereeId, MatchPlayerAction matchPlayerAction) {
+        List<Long> refereeList = matchRefereeService
+                .listWithReferee(matchPlayerAction.getMatchId())
+                .stream()
+                .map(MatchReferee::getRefereeId)
+                .toList();
+        if (!refereeList.contains(refereeId)) {
+            throw new BadRequestException("裁判不在本场比赛的执法队列中，无法修改结果");
+        }
+        if (!matchPlayerActionService.deleteByMultiId(matchPlayerAction)) {
+            throw new RuntimeException("增加本场比赛的球员行为失败");
+        }
+        return true;
     }
 }
