@@ -5,6 +5,7 @@ import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
+import com.sustech.football.model.VoTeam;
 import com.sustech.football.model.match.*;
 import com.sustech.football.service.*;
 
@@ -279,6 +280,46 @@ public class MatchController {
             throw new BadRequestException("球队不存在");
         }
         return matchService.getTeamInvitations(teamId);
+    }
+
+    @GetMapping("/team/get")
+    public VoMatchTeam getTeam(Long matchId, Boolean isHomeTeam) {
+        if (matchId == null || isHomeTeam == null) {
+            throw new BadRequestException("比赛ID和主客队标识不能为空");
+        }
+        Match match = matchService.getById(matchId);
+        if (match == null) {
+            throw new BadRequestException("比赛不存在");
+        }
+
+        Long teamId = isHomeTeam ? match.getHomeTeamId() : match.getAwayTeamId();
+        Team team = teamService.getById(teamId);
+        if (team == null) {
+            throw new BadRequestException("球队不存在");
+        }
+
+        List<MatchPlayer> players = matchPlayerService.list(new QueryWrapper<MatchPlayer>().eq("match_id", matchId).eq("team_id", teamId));
+        List<VoMatchPlayer> voPlayers = new ArrayList<>();
+        for (MatchPlayer matchPlayer : players) {
+            Player player = playerService.getById(matchPlayer.getPlayerId());
+            VoMatchPlayer voMatchPlayer = new VoMatchPlayer();
+            voMatchPlayer.setPlayerId(player.getPlayerId());
+            voMatchPlayer.setNumber(matchPlayer.getNumber());
+            voMatchPlayer.setName(player.getName());
+            voMatchPlayer.setPhotoUrl(player.getPhotoUrl());
+            voMatchPlayer.setIsStart(matchPlayer.getIsStart());
+            voPlayers.add(voMatchPlayer);
+        }
+
+        VoMatchTeam voTeam = new VoMatchTeam();
+        voTeam.setTeamId(team.getTeamId());
+        voTeam.setName(team.getName());
+        voTeam.setLogoUrl(team.getLogoUrl());
+        voTeam.setScore(match.getHomeTeamScore());
+        voTeam.setPenalty(match.getHomeTeamPenalty());
+        voTeam.setPlayers(voPlayers);
+
+        return voTeam;
     }
 
     @DeleteMapping("/team/delete")
