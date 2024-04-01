@@ -1,14 +1,20 @@
 package com.sustech.football.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ResourceNotFoundException;
+import com.sustech.football.model.referee.VoRefereeEvent;
+import com.sustech.football.model.referee.VoRefereeMatch_brief;
+import com.sustech.football.model.referee.VoRefereeTeam;
+import com.sustech.football.service.EventMatchService;
 import com.sustech.football.service.EventService;
 import com.sustech.football.service.MatchService;
 import com.sustech.football.service.RefereeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin
@@ -21,6 +27,8 @@ public class RefereeController {
     private MatchService matchService;
     @Autowired
     private EventService eventService;
+    @Autowired
+    private EventMatchService eventMatchService;
 
     @PostMapping("/create")
     public Referee createReferee(@RequestBody Referee referee) {
@@ -111,14 +119,53 @@ public class RefereeController {
     }
 
     @GetMapping("/match/getAll")
-    public List<Match> getMatches(Long refereeId) {
+    public List<VoRefereeMatch_brief> getMatches(Long refereeId) {
         if (refereeId == null) {
             throw new BadRequestException("传入的裁判id为空");
         }
         if (refereeService.getById(refereeId) == null) {
             throw new ResourceNotFoundException("裁判不存在");
         }
-        return refereeService.getMatches(refereeId);
+        List<Match> matchList = refereeService.getMatches(refereeId);
+
+        List<VoRefereeMatch_brief> voMatchList = new ArrayList<>();
+        for (Match match : matchList) {
+            VoRefereeMatch_brief voMatch = new VoRefereeMatch_brief();
+            voMatch.setMatchId(match.getMatchId());
+            voMatch.setTime(match.getTime());
+
+            VoRefereeTeam homeTeam = new VoRefereeTeam();
+            homeTeam.setTeamId(match.getHomeTeamId());
+            homeTeam.setName(match.getHomeTeam().getName());
+            homeTeam.setLogoUrl(match.getHomeTeam().getLogoUrl());
+            homeTeam.setScore(match.getHomeTeamScore());
+            homeTeam.setPenalty(match.getHomeTeamPenalty());
+            voMatch.setHomeTeam(homeTeam);
+
+            VoRefereeTeam awayTeam = new VoRefereeTeam();
+            awayTeam.setTeamId(match.getAwayTeamId());
+            awayTeam.setName(match.getAwayTeam().getName());
+            awayTeam.setLogoUrl(match.getAwayTeam().getLogoUrl());
+            awayTeam.setScore(match.getAwayTeamScore());
+            awayTeam.setPenalty(match.getAwayTeamPenalty());
+            voMatch.setAwayTeam(awayTeam);
+
+            QueryWrapper<EventMatch> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("match_id", match.getMatchId());
+            EventMatch eventMatch = eventMatchService.getOne(queryWrapper);
+            VoRefereeEvent event = new VoRefereeEvent();
+            if (eventMatch != null) {
+                event.setEventId(eventMatch.getEventId());
+                event.setEventName(eventMatch.getEvent().getName());
+                event.setStage(eventMatch.getStage());
+                event.setTag(eventMatch.getTag());
+            }
+            voMatch.setEvent(event);
+
+            voMatchList.add(voMatch);
+        }
+
+        return voMatchList;
     }
 
     @GetMapping("/event/getInvitations")
