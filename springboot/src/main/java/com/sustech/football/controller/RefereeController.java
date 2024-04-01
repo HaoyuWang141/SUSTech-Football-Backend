@@ -133,6 +133,7 @@ public class RefereeController {
             VoRefereeMatch_brief voMatch = new VoRefereeMatch_brief();
             voMatch.setMatchId(match.getMatchId());
             voMatch.setTime(match.getTime());
+            voMatch.setStatus(match.getStatus());
 
             VoRefereeTeam homeTeam = new VoRefereeTeam();
             homeTeam.setTeamId(match.getHomeTeamId());

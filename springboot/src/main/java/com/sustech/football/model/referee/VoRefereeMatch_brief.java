@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 public class VoRefereeMatch_brief {
     Long matchId;
     Timestamp time;
+    String status;
     VoRefereeTeam homeTeam;
     VoRefereeTeam awayTeam;
     VoRefereeEvent event;
