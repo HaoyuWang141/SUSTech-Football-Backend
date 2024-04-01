@@ -156,7 +156,7 @@ public class RefereeController {
             VoRefereeEvent event = new VoRefereeEvent();
             if (eventMatch != null) {
                 event.setEventId(eventMatch.getEventId());
-                event.setEventName(eventMatch.getEvent().getName());
+                event.setEventName(eventService.getById(eventMatch.getEventId()).getName());
                 event.setStage(eventMatch.getStage());
                 event.setTag(eventMatch.getTag());
             }
