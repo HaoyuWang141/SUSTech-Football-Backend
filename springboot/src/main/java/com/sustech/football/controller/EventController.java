@@ -8,6 +8,7 @@ import com.sustech.football.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,8 @@ public class EventController {
     private EventStageService eventStageService;
     @Autowired
     private EventStageTagService eventStageTagService;
+    @Autowired
+    private EventTeamService eventTeamService;
 
 
     @PostMapping("/create")
@@ -397,16 +400,31 @@ public class EventController {
     }
 
     @PostMapping("/match/add")
-    public void addMatch(Long eventId, Match match, String stage, String tag) {
-        if (eventId == null || match == null) {
-            throw new BadRequestException("传入的赛事ID或比赛为空");
+    public void addMatch(Long eventId, String stage, String tag, Timestamp time, Long homeTeamId, Long awayTeamId) {
+        if (eventId == null || stage == null || tag == null || time == null || homeTeamId == null || awayTeamId == null) {
+            throw new BadRequestException("传入的参数含有空值");
         }
         if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
         }
-        if (match.getMatchId() != null) {
-            throw new BadRequestException("传入的比赛已有ID");
+        if (teamService.getById(homeTeamId) == null) {
+            throw new ResourceNotFoundException("主队不存在");
         }
+        if (teamService.getById(awayTeamId) == null) {
+            throw new ResourceNotFoundException("客队不存在");
+        }
+        List<EventTeam> teams = eventTeamService.list(new QueryWrapper<EventTeam>().eq("event_id", eventId));
+        if (teams.stream().noneMatch(t -> t.getTeamId().equals(homeTeamId))) {
+            throw new BadRequestException("主队不在赛事中");
+        }
+        if (teams.stream().noneMatch(t -> t.getTeamId().equals(awayTeamId))) {
+            throw new BadRequestException("客队不在赛事中");
+        }
+        Match match = new Match();
+        match.setHomeTeamId(homeTeamId);
+        match.setAwayTeamId(awayTeamId);
+        match.setTime(time);
+
         if (!eventService.addMatch(eventId, match, stage, tag)) {
             throw new RuntimeException("添加比赛失败");
         }

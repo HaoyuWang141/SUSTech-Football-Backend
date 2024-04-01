@@ -1,5 +1,7 @@
 package com.sustech.football.controller;
 
+import com.sustech.football.model.team.VoTeam;
+import com.sustech.football.model.team.VoTeamPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -7,9 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.sustech.football.service.*;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
-import com.sustech.football.model.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

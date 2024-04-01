@@ -5,7 +5,6 @@ import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
-import com.sustech.football.model.VoTeam;
 import com.sustech.football.model.match.*;
 import com.sustech.football.service.*;
 

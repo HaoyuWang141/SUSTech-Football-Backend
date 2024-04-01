@@ -8,6 +8,7 @@ import com.sustech.football.exception.*;
 import com.sustech.football.mapper.TeamMapper;
 import com.sustech.football.service.*;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +43,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     private EventMatchService eventMatchService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private MatchPlayerService matchPlayerService;
 
     @Override
     public Team getTeamById(Long teamId) {
@@ -241,6 +244,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     @Override
     @Transactional
     public boolean replyMatchInvitation(Long teamId, Long matchId, Boolean accept) {
+
         Match match = matchService.getById(matchId);
         if (match.getHomeTeamId() != null && match.getHomeTeamId().equals(teamId)) {
             throw new ConflictException("该球队已经是主队");
@@ -251,13 +255,13 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (match.getHomeTeamId() != null && match.getAwayTeamId() != null) {
             throw new ConflictException("该比赛已经有两支球队参加");
         }
+
+
         String status = accept ? MatchTeamRequest.STATUS_ACCEPTED : MatchTeamRequest.STATUS_REJECTED;
-        MatchTeamRequest matchTeamRequest = new MatchTeamRequest(teamId, matchId, null, status);
-        if (matchTeamRequestService.selectByMultiId(matchTeamRequest) == null) {
+        MatchTeamRequest matchTeamRequest = new MatchTeamRequest(teamId, matchId, null, null);
+        matchTeamRequest = matchTeamRequestService.selectByMultiId(matchTeamRequest);
+        if (matchTeamRequest == null) {
             throw new BadRequestException("该球队没有收到该比赛的邀请");
-        }
-        if (!matchTeamRequestService.saveOrUpdateRequestWithTime(matchTeamRequest)) {
-            throw new RuntimeException("回复比赛邀请失败");
         }
         if (match.getHomeTeamId() != null && matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_HOME)) {
             throw new ConflictException("已经有另一只球队作为主队");
@@ -265,7 +269,14 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (match.getAwayTeamId() != null && matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_AWAY)) {
             throw new ConflictException("已经有另一只球队作为客队");
         }
+        matchTeamRequest.setStatus(status);
+        if (!matchTeamRequestService.saveOrUpdateRequestWithTime(matchTeamRequest)) {
+            throw new RuntimeException("回复比赛邀请失败");
+        }
+
+        // 接受邀请
         if (accept) {
+            // 更新比赛信息
             if (matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_HOME)) {
                 match.setHomeTeamId(teamId);
             } else if (matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_AWAY)) {
@@ -275,6 +286,24 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
             if (!matchService.updateById(match)) {
                 throw new RuntimeException("更新比赛失败");
+            }
+
+            // 更新比赛球员信息
+            QueryWrapper<TeamPlayer> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("team_id", teamId);
+            List<TeamPlayer> teamPlayerList = teamPlayerService.list(queryWrapper);
+            List<MatchPlayer> matchPlayerList = new ArrayList<>();
+            for (TeamPlayer teamPlayer : teamPlayerList) {
+                MatchPlayer matchPlayer = new MatchPlayer();
+                matchPlayer.setMatchId(matchId);
+                matchPlayer.setTeamId(teamId);
+                matchPlayer.setPlayerId(teamPlayer.getPlayerId());
+                matchPlayer.setNumber(teamPlayer.getNumber());
+                matchPlayer.setIsStart(false);
+                matchPlayerList.add(matchPlayer);
+            }
+            if (!matchPlayerService.saveOrUpdateBatchByMultiId(matchPlayerList)) {
+                throw new RuntimeException("更新比赛球员信息失败");
             }
         }
         return true;

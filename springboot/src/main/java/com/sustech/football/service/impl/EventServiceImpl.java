@@ -1,5 +1,6 @@
 package com.sustech.football.service.impl;
 
+import ch.qos.logback.core.joran.spi.EventPlayer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sustech.football.entity.*;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +37,8 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     private EventGroupTeamService eventGroupTeamService;
     @Autowired
     private TeamPlayerService teamPlayerService;
+    @Autowired
+    private MatchPlayerService matchPlayerService;
 
     @Override
     public Event getDetailedEvent(Long eventId) {
@@ -195,10 +199,50 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
 
     @Override
     public boolean addMatch(Long eventId, Match match, String stage, String tag) {
+        // 添加比赛
         if (!matchService.save(match)) {
             throw new RuntimeException("添加比赛失败");
         }
-        if (!eventMatchService.saveOrUpdateByMultiId(new EventMatch(eventId, match.getMatchId(), stage, tag))) {
+
+        // 添加主队比赛球员
+        List<TeamPlayer> homeTeamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", match.getHomeTeamId()));
+        List<MatchPlayer> homeTeamMatchPlayers = new ArrayList<>();
+        for (TeamPlayer tp : homeTeamPlayers) {
+            MatchPlayer matchPlayer = new MatchPlayer();
+            matchPlayer.setMatchId(match.getMatchId());
+            matchPlayer.setTeamId(match.getHomeTeamId());
+            matchPlayer.setPlayerId(tp.getPlayerId());
+            matchPlayer.setNumber(tp.getNumber());
+            matchPlayer.setIsStart(false);
+            homeTeamMatchPlayers.add(matchPlayer);
+        }
+        if (!matchPlayerService.saveOrUpdateBatchByMultiId(homeTeamMatchPlayers)) {
+            throw new RuntimeException("添加主队比赛球员失败");
+        }
+
+        // 添加客队比赛球员
+        List<TeamPlayer> awayTeamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", match.getAwayTeamId()));
+        List<MatchPlayer> awayTeamMatchPlayers = new ArrayList<>();
+        for (TeamPlayer tp : awayTeamPlayers) {
+            MatchPlayer matchPlayer = new MatchPlayer();
+            matchPlayer.setMatchId(match.getMatchId());
+            matchPlayer.setTeamId(match.getAwayTeamId());
+            matchPlayer.setPlayerId(tp.getPlayerId());
+            matchPlayer.setNumber(tp.getNumber());
+            matchPlayer.setIsStart(false);
+            awayTeamMatchPlayers.add(matchPlayer);
+        }
+        if (!matchPlayerService.saveOrUpdateBatchByMultiId(awayTeamMatchPlayers)) {
+            throw new RuntimeException("添加客队比赛球员失败");
+        }
+
+        // 添加赛事比赛
+        EventMatch eventMatch = new EventMatch();
+        eventMatch.setEventId(eventId);
+        eventMatch.setMatchId(match.getMatchId());
+        eventMatch.setStage(stage);
+        eventMatch.setTag(tag);
+        if (!eventMatchService.saveOrUpdateByMultiId(eventMatch)) {
             throw new RuntimeException("添加赛事比赛失败");
         }
         return true;

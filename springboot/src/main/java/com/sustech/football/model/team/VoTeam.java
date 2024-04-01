@@ -1,4 +1,4 @@
-package com.sustech.football.model;
+package com.sustech.football.model.team;
 
 import com.sustech.football.entity.Coach;
 import com.sustech.football.entity.Event;
