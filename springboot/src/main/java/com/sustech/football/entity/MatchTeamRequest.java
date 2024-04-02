@@ -25,7 +25,7 @@ public class MatchTeamRequest {
     private Long teamId;
     private String type;
     private String status;
-    private Timestamp lastUpdate;
+    private Timestamp lastUpdated;
     @TableField(exist = false)
     private Match match;
     @TableField(exist = false)

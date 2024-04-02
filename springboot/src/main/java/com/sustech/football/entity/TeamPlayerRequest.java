@@ -26,7 +26,7 @@ public class TeamPlayerRequest {
     @MppMultiId
     private String type;
     private String status;
-    private Timestamp lastUpdate;
+    private Timestamp lastUpdated;
     @TableField(exist = false)
     private Team team;
     @TableField(exist = false)

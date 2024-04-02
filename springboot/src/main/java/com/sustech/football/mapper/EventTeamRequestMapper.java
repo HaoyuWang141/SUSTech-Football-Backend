@@ -16,6 +16,7 @@ public interface EventTeamRequestMapper extends MppBaseMapper<EventTeamRequest> 
             @Result(property = "teamId", column = "team_id"),
             @Result(property = "type", column = "type"),
             @Result(property = "status", column = "status"),
+            @Result(column = "last_updated", property = "lastUpdated"),
             @Result(property = "event", column = "event_id", one = @One(select = "com.sustech.football.mapper.EventMapper.selectById")),
     })
     List<EventTeamRequest> selectListWithEvent(Long teamId, String type);
@@ -26,6 +27,7 @@ public interface EventTeamRequestMapper extends MppBaseMapper<EventTeamRequest> 
             @Result(property = "teamId", column = "team_id"),
             @Result(property = "type", column = "type"),
             @Result(property = "status", column = "status"),
+            @Result(column = "last_updated", property = "lastUpdated"),
             @Result(property = "team", column = "team_id", one = @One(select = "com.sustech.football.mapper.TeamMapper.selectById")),
     })
     List<EventTeamRequest> selectListWithTeam(Long eventId, String type);

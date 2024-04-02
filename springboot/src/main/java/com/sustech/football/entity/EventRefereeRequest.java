@@ -21,7 +21,7 @@ public class EventRefereeRequest {
     @MppMultiId
     private Long refereeId;
     private String status;
-    private Timestamp lastUpdate;
+    private Timestamp lastUpdated;
     @TableField(exist = false)
     private Event event;
     @TableField(exist = false)

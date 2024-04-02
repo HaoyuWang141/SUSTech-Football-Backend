@@ -17,6 +17,7 @@ public interface TeamPlayerRequestMapper extends MppBaseMapper<TeamPlayerRequest
             @Result(column = "player_id", property = "playerId"),
             @Result(column = "type", property = "type"),
             @Result(column = "status", property = "status"),
+            @Result(column = "last_updated", property = "lastUpdated"),
             @Result(column = "team_id", property = "team", one = @One(select = "com.sustech.football.mapper.TeamMapper.selectById")),
     })
     List<TeamPlayerRequest> selectListWithTeam(Long playerId, String type);
@@ -27,6 +28,7 @@ public interface TeamPlayerRequestMapper extends MppBaseMapper<TeamPlayerRequest
             @Result(column = "player_id", property = "playerId"),
             @Result(column = "type", property = "type"),
             @Result(column = "status", property = "status"),
+            @Result(column = "last_updated", property = "lastUpdated"),
             @Result(column = "player_id", property = "player", one = @One(select = "com.sustech.football.mapper.PlayerMapper.selectById")),
     })
     List<TeamPlayerRequest> selectListWithPlayer(Long teamId, String type);

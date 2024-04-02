@@ -173,7 +173,7 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         if (matchRefereeRequestService.selectByMultiId(matchRefereeRequest) != null) {
             throw new ConflictException("已经邀请过该裁判，请勿重复发送");
         }
-        if (!matchRefereeRequestService.saveOrUpdateRequestWithTime(matchRefereeRequest)) {
+        if (!matchRefereeRequestService.saveOrUpdateByMultiId(matchRefereeRequest)) {
             throw new RuntimeException("邀请裁判失败");
         }
         return true;

@@ -24,9 +24,4 @@ public class MatchTeamRequestServiceImpl extends MppServiceImpl<MatchTeamRequest
         return baseMapper.listWithTeam(matchId);
     }
 
-    @Override
-    public boolean saveOrUpdateRequestWithTime(MatchTeamRequest matchTeamRequest) {
-        matchTeamRequest.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        return this.saveOrUpdateByMultiId(matchTeamRequest);
-    }
 }

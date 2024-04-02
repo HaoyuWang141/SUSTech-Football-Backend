@@ -9,6 +9,4 @@ public interface EventRefereeRequestService extends IMppService<EventRefereeRequ
     List<EventRefereeRequest> listWithEvent(Long refereeId);
 
     List<EventRefereeRequest> listWithReferee(Long eventId);
-
-    boolean saveOrUpdateRequestWithTime(EventRefereeRequest eventRefereeRequest);
 }

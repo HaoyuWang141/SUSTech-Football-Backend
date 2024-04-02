@@ -31,9 +31,4 @@ public class TeamCoachRequestServiceImpl extends MppServiceImpl<TeamCoachRequest
         return teamCoachRequestMapper.selectListWithCoach(teamId);
     }
 
-    @Override
-    public boolean saveOrUpdateRequestWithTime(TeamCoachRequest teamCoachRequest) {
-        teamCoachRequest.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        return this.saveOrUpdateByMultiId(teamCoachRequest);
-    }
 }

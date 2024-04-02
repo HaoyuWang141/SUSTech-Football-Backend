@@ -20,10 +20,4 @@ public class EventTeamRequestServiceImpl extends MppServiceImpl<EventTeamRequest
         return baseMapper.selectListWithTeam(eventId, type);
     }
 
-    @Override
-    public boolean saveOrUpdateRequestWithTime(EventTeamRequest eventTeamRequest) {
-        eventTeamRequest.setLastUpdate(new java.sql.Timestamp(System.currentTimeMillis()));
-        return this.saveOrUpdateByMultiId(eventTeamRequest);
-    }
-
 }

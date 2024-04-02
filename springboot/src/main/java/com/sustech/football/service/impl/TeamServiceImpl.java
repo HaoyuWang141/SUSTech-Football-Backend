@@ -270,7 +270,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             throw new ConflictException("已经有另一只球队作为客队");
         }
         matchTeamRequest.setStatus(status);
-        if (!matchTeamRequestService.saveOrUpdateRequestWithTime(matchTeamRequest)) {
+        if (!matchTeamRequestService.saveOrUpdateByMultiId(matchTeamRequest)) {
             throw new RuntimeException("回复比赛邀请失败");
         }
 
@@ -336,7 +336,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) != null) {
             throw new ConflictException("曾经向该赛事发出过申请，请勿重复发送");
         }
-        if (!eventTeamRequestService.saveOrUpdateRequestWithTime(eventTeamRequest)) {
+        if (!eventTeamRequestService.saveOrUpdateByMultiId(eventTeamRequest)) {
             throw new RuntimeException("申请参加赛事失败");
         }
         return true;
@@ -360,7 +360,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) == null) {
             throw new BadRequestException("该球队没有收到该赛事的邀请");
         }
-        if (!eventTeamRequestService.saveOrUpdateRequestWithTime(eventTeamRequest)) {
+        if (!eventTeamRequestService.saveOrUpdateByMultiId(eventTeamRequest)) {
             throw new RuntimeException("回复赛事邀请失败");
         }
         if (accept) {

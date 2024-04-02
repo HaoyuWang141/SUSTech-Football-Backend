@@ -21,9 +21,4 @@ public class EventRefereeRequestServiceImpl extends MppServiceImpl<EventRefereeR
         return baseMapper.selectListWithReferee(eventId);
     }
 
-    @Override
-    public boolean saveOrUpdateRequestWithTime(EventRefereeRequest eventRefereeRequest) {
-        eventRefereeRequest.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        return this.saveOrUpdateByMultiId(eventRefereeRequest);
-    }
 }

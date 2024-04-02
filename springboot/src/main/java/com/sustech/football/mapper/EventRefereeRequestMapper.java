@@ -15,6 +15,7 @@ public interface EventRefereeRequestMapper extends MppBaseMapper<EventRefereeReq
             @Result(column = "event_id", property = "eventId"),
             @Result(column = "referee_id", property = "refereeId"),
             @Result(column = "status", property = "status"),
+            @Result(column = "last_updated", property = "lastUpdated"),
             @Result(column = "event_id", property = "event", one = @One(select = "com.sustech.football.mapper.EventMapper.selectById")),
     })
     List<EventRefereeRequest> selectListWithEvent(Long refereeId);
@@ -24,6 +25,7 @@ public interface EventRefereeRequestMapper extends MppBaseMapper<EventRefereeReq
             @Result(column = "event_id", property = "eventId"),
             @Result(column = "referee_id", property = "refereeId"),
             @Result(column = "status", property = "status"),
+            @Result(column = "last_updated", property = "lastUpdated"),
             @Result(column = "referee_id", property = "referee", one = @One(select = "com.sustech.football.mapper.RefereeMapper.selectById")),
     })
     List<EventRefereeRequest> selectListWithReferee(Long eventId);

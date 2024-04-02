@@ -33,7 +33,7 @@ public class TeamPlayerRequestServiceImpl extends MppServiceImpl<TeamPlayerReque
 
     @Override
     public boolean saveOrUpdateRequestWithTime(TeamPlayerRequest teamPlayerRequest) {
-        teamPlayerRequest.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        return this.saveOrUpdateByMultiId(teamPlayerRequest);
+        teamPlayerRequest.setLastUpdated(new Timestamp(System.currentTimeMillis()));
+        return saveOrUpdateByMultiId(teamPlayerRequest);
     }
 }

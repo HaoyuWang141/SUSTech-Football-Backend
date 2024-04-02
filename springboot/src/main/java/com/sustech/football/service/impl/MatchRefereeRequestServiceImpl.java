@@ -20,10 +20,4 @@ public class MatchRefereeRequestServiceImpl extends MppServiceImpl<MatchRefereeR
     public List<MatchRefereeRequest> listWithReferee(Long matchId) {
         return baseMapper.selectWithReferee(matchId);
     }
-
-    @Override
-    public boolean saveOrUpdateRequestWithTime(MatchRefereeRequest matchRefereeRequest) {
-        matchRefereeRequest.setLastUpdate(new java.sql.Timestamp(System.currentTimeMillis()));
-        return this.saveOrUpdateByMultiId(matchRefereeRequest);
-    }
 }

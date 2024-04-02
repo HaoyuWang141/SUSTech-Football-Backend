@@ -8,7 +8,4 @@ import java.util.List;
 public interface MatchRefereeRequestService extends IMppService<MatchRefereeRequest> {
     List<MatchRefereeRequest> listWithMatch(Long refereeId);
     List<MatchRefereeRequest> listWithReferee(Long matchId);
-
-    boolean saveOrUpdateRequestWithTime(MatchRefereeRequest matchRefereeRequest);
-
 }

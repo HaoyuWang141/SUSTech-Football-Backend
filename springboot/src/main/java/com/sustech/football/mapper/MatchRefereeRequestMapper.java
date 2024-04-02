@@ -14,6 +14,7 @@ public interface MatchRefereeRequestMapper extends MppBaseMapper<MatchRefereeReq
     @Results({
             @Result(column = "match_id", property = "matchId"),
             @Result(column = "referee_id", property = "refereeId"),
+            @Result(column = "last_updated", property = "lastUpdated"),
             @Result(column = "match_id", property = "match", one = @One(select = "com.sustech.football.mapper.matchMapper.selectById")),
     })
     List<MatchRefereeRequest> selectWithMatch(Long refereeId);
@@ -22,6 +23,7 @@ public interface MatchRefereeRequestMapper extends MppBaseMapper<MatchRefereeReq
     @Results({
             @Result(column = "match_id", property = "matchId"),
             @Result(column = "referee_id", property = "refereeId"),
+            @Result(column = "last_updated", property = "lastUpdated"),
             @Result(column = "referee_id", property = "referee", one = @One(select = "com.sustech.football.mapper.refereeMapper.selectById")),
     })
     List<MatchRefereeRequest> selectWithReferee(Long matchId);

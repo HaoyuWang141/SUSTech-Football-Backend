@@ -1,3 +1,13 @@
+-- last_updated函数
+CREATE OR REPLACE FUNCTION update_last_updated_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_updated = transaction_timestamp();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+
 -- 用户表
 CREATE TABLE t_user
 (
@@ -92,6 +102,12 @@ CREATE TABLE team_player_request
     PRIMARY KEY (team_id, player_id, type)
 );
 
+-- 更新last_updated触发器
+CREATE TRIGGER update_last_updated_trigger
+BEFORE INSERT or UPDATE ON team_player_request
+FOR EACH ROW
+EXECUTE FUNCTION update_last_updated_column();
+
 -- 球队-教练
 CREATE TABLE team_coach
 (
@@ -110,6 +126,13 @@ CREATE TABLE team_coach_request
     PRIMARY KEY (team_id, coach_id)
 );
 
+-- 更新last_updated触发器
+CREATE TRIGGER update_last_updated_trigger
+BEFORE INSERT or UPDATE ON team_coach_request
+FOR EACH ROW
+EXECUTE FUNCTION update_last_updated_column();
+
+
 -- 比赛表
 CREATE TABLE match
 (
@@ -120,7 +143,8 @@ CREATE TABLE match
     home_team_score   INT DEFAULT 0,
     away_team_score   INT DEFAULT 0,
     home_team_penalty INT DEFAULT 0,
-    away_team_penalty INT DEFAULT 0
+    away_team_penalty INT DEFAULT 0,
+    status            VARCHAR CHECK ( status IN ('PENDING', 'ONGOING', 'FINISHED') ) DEFAULT 'PENDING'
 );
 
 CREATE TABLE match_manager
@@ -142,6 +166,13 @@ CREATE TABLE match_team_request
     PRIMARY KEY (match_id, team_id)
 );
 
+-- 更新last_updated触发器
+CREATE TRIGGER update_last_updated_trigger
+BEFORE INSERT or UPDATE ON match_team_request
+FOR EACH ROW
+EXECUTE FUNCTION update_last_updated_column();
+
+
 -- 比赛-裁判
 CREATE TABLE match_referee
 (
@@ -160,13 +191,19 @@ CREATE TABLE match_referee_request
     PRIMARY KEY (match_id, referee_id)
 );
 
+-- 更新last_updated触发器
+CREATE TRIGGER update_last_updated_trigger
+BEFORE INSERT or UPDATE ON match_referee_request
+FOR EACH ROW
+EXECUTE FUNCTION update_last_updated_column();
+
 -- 比赛-球员行为（进球、红牌、黄牌）
 CREATE TABLE match_player_action
 (
     match_id  INT REFERENCES match,
     team_id   INT REFERENCES team,
     player_id INT REFERENCES player,
-    action    VARCHAR, -- GOAL, ASSIST, YELLOW_CARD, RED_CARD
+    action    VARCHAR CHECK ( action IN ('GOAL', 'ASSIST', 'YELLOW_CARD', 'RED_CARD', 'ON', 'OFF') ),
     time      INTEGER, -- 比赛开始的时间
     PRIMARY KEY (match_id, team_id, player_id, action, time)
 );
@@ -185,6 +222,16 @@ CREATE TABLE match_video
     match_id   INT REFERENCES match,
     video_name VARCHAR(255),
     video_url  VARCHAR(255)
+);
+
+CREATE TABLE match_player
+(
+    match_id INT REFERENCES match,
+    team_id INT REFERENCES team,
+    player_id INT REFERENCES player,
+    number INT,
+    is_start BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (match_id, team_id, player_id)
 );
 
 -- 赛事表
@@ -245,6 +292,13 @@ CREATE TABLE event_team_request
     PRIMARY KEY (event_id, team_id, type)
 );
 
+-- 更新last_updated触发器
+CREATE TRIGGER update_last_updated_trigger
+BEFORE INSERT or UPDATE ON event_team_request
+FOR EACH ROW
+EXECUTE FUNCTION update_last_updated_column();
+
+
 -- 赛事-裁判
 CREATE TABLE event_referee
 (
@@ -259,9 +313,16 @@ CREATE TABLE event_referee_request
     event_id    INT REFERENCES event,
     referee_id  INT REFERENCES referee,
     status      VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ),
-    last_update TIMESTAMP,
+    last_updated TIMESTAMP,
     PRIMARY KEY (event_id, referee_id)
 );
+
+-- 更新last_updated触发器
+CREATE TRIGGER update_last_updated_trigger
+BEFORE INSERT or UPDATE ON event_referee_request
+FOR EACH ROW
+EXECUTE FUNCTION update_last_updated_column();
+
 
 -- 赛事-比赛阶段：小组赛、淘汰赛、排位赛等
 CREATE TABLE event_stage
@@ -342,3 +403,22 @@ CREATE TABLE favorite_match
     match_id INT REFERENCES match (match_id),
     PRIMARY KEY (user_id, match_id)
 );
+
+-- 语法
+
+-- CREATE FUNCTION function_name (参数列表)
+-- RETURNS 返回类型 AS $$
+-- DECLARE
+--     -- 变量声明
+-- BEGIN
+--     -- 函数体，执行的SQL语句或逻辑
+--     RETURN 结果;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- CREATE TRIGGER trigger_name
+-- AFTER|BEFORE INSERT|UPDATE|DELETE
+-- ON table_name
+-- FOR EACH ROW
+-- EXECUTE FUNCTION function_name();
+

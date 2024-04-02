@@ -26,7 +26,7 @@ public class EventTeamRequest {
     @MppMultiId
     private String type;
     private String status;
-    private Timestamp lastUpdate;
+    private Timestamp lastUpdated;
     @TableField(exist = false)
     private Event event;
     @TableField(exist = false)
