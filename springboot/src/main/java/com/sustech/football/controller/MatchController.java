@@ -80,6 +80,9 @@ public class MatchController {
 
         // 主队
         Team homeTeam = teamService.getById(match.getHomeTeamId());
+        if (homeTeam == null) {
+            homeTeam = new Team();
+        }
         List<MatchPlayer> homePlayers = matchPlayerService.list(new QueryWrapper<MatchPlayer>().eq("match_id", id).eq("team_id", match.getHomeTeamId()));
         List<VoMatchPlayer> voHomePlayers = new ArrayList<>();
         for (MatchPlayer matchPlayer : homePlayers) {
@@ -103,6 +106,9 @@ public class MatchController {
 
         // 客队
         Team awayTeam = teamService.getById(match.getAwayTeamId());
+        if (awayTeam == null) {
+            awayTeam = new Team();
+        }
         List<MatchPlayer> awayPlayers = matchPlayerService.list(new QueryWrapper<MatchPlayer>().eq("match_id", id).eq("team_id", match.getAwayTeamId()));
         List<VoMatchPlayer> voAwayPlayers = new ArrayList<>();
         for (MatchPlayer matchPlayer : awayPlayers) {
@@ -141,9 +147,17 @@ public class MatchController {
             voMatchPlayerAction.setTeamId(matchPlayerAction.getTeamId());
             VoMatchPlayer voMatchPlayer;
             if (matchPlayerAction.getTeamId().equals(match.getHomeTeamId())) {
-                voMatchPlayer = voHomePlayers.stream().filter(voMatchPlayer1 -> voMatchPlayer1.getPlayerId().equals(matchPlayerAction.getPlayerId())).findFirst().orElse(null);
+                voMatchPlayer = voHomeTeam.getPlayers()
+                        .stream()
+                        .filter(voMatchPlayer1 -> voMatchPlayer1.getPlayerId().equals(matchPlayerAction.getPlayerId()))
+                        .findFirst()
+                        .orElse(null);
             } else {
-                voMatchPlayer = voAwayPlayers.stream().filter(voMatchPlayer1 -> voMatchPlayer1.getPlayerId().equals(matchPlayerAction.getPlayerId())).findFirst().orElse(null);
+                voMatchPlayer = voAwayTeam.getPlayers()
+                        .stream()
+                        .filter(voMatchPlayer1 -> voMatchPlayer1.getPlayerId().equals(matchPlayerAction.getPlayerId()))
+                        .findFirst()
+                        .orElse(null);
             }
             if (voMatchPlayer == null) {
                 throw new InternalServerErrorException("比赛球员动作信息错误，未找到对应球员");
@@ -201,6 +215,7 @@ public class MatchController {
     }
 
     @DeleteMapping("/delete")
+    @Deprecated
     public void deleteMatch(Long matchId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");

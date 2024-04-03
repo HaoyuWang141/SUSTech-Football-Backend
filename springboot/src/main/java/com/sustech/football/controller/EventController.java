@@ -102,6 +102,7 @@ public class EventController {
     }
 
     @DeleteMapping("/delete")
+    @Deprecated
     public void deleteEvent(Long eventId) {
         if (eventId == null) {
             throw new BadRequestException("传入的赛事ID为空");

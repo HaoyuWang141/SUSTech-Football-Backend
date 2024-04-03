@@ -109,6 +109,7 @@ public class TeamController {
     }
 
     @DeleteMapping("/delete")
+    @Deprecated
     public void deleteTeam(Long id) {
         if (!teamService.removeById(id)) {
             throw new ResourceNotFoundException("球队不存在");
