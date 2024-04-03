@@ -40,22 +40,39 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
 
     @Override
     @Transactional
-    public boolean replyMatchInvitation(MatchRefereeRequest matchRefereeRequest) {
-        MatchReferee matchReferee = new MatchReferee(matchRefereeRequest.getMatchId(), matchRefereeRequest.getRefereeId());
+    public boolean replyMatchInvitation(Long refereeId, Long matchId, Boolean accept) {
+        String status = accept ? MatchRefereeRequest.STATUS_ACCEPTED : MatchRefereeRequest.STATUS_REJECTED;
+        MatchRefereeRequest matchRefereeRequest = new MatchRefereeRequest();
+        matchRefereeRequest.setMatchId(matchId);
+        matchRefereeRequest.setRefereeId(refereeId);
+        matchRefereeRequest = matchRefereeRequestService.selectByMultiId(matchRefereeRequest);
+        if (matchRefereeRequest == null) {
+            throw new ConflictException("裁判未收到邀请");
+        }
+
+        MatchReferee matchReferee = new MatchReferee();
+        matchReferee.setMatchId(matchId);
+        matchReferee.setRefereeId(refereeId);
         if (matchRefereeService.selectByMultiId(matchReferee) != null) {
+            matchRefereeRequest.setStatus(MatchRefereeRequest.STATUS_ACCEPTED);
+            matchRefereeRequestService.updateByMultiId(matchRefereeRequest);
             throw new ConflictException("裁判已经加入执法该比赛");
         }
-        if (matchRefereeRequestService.selectByMultiId(matchRefereeRequest) == null) {
-            throw new BadRequestException("该比赛未邀请该裁判加入");
+
+        if (!matchRefereeRequest.getStatus().equals(MatchRefereeRequest.STATUS_PENDING)) {
+            throw new ConflictException("邀请已处理");
         }
-        if (!matchRefereeRequestService.saveOrUpdateByMultiId(matchRefereeRequest)) {
+
+        matchRefereeRequest.setStatus(status);
+        if (!matchRefereeRequestService.updateByMultiId(matchRefereeRequest)) {
             throw new RuntimeException("回复比赛邀请失败");
         }
-        if (matchRefereeRequest.getStatus().equals(MatchRefereeRequest.STATUS_ACCEPTED)) {
+        if (accept) {
             if (!matchRefereeService.saveOrUpdateByMultiId(matchReferee)) {
                 throw new RuntimeException("加入比赛失败");
             }
         }
+
         return true;
     }
 
@@ -77,22 +94,40 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
     }
 
     @Override
-    public boolean replyEventInvitation(EventRefereeRequest eventRefereeRequest) {
-        EventReferee eventReferee = new EventReferee(eventRefereeRequest.getEventId(), eventRefereeRequest.getRefereeId());
+    @Transactional
+    public boolean replyEventInvitation(Long refereeId, Long eventId, Boolean accept) {
+        String status = accept ? EventRefereeRequest.STATUS_ACCEPTED : EventRefereeRequest.STATUS_REJECTED;
+        EventRefereeRequest eventRefereeRequest = new EventRefereeRequest();
+        eventRefereeRequest.setEventId(eventId);
+        eventRefereeRequest.setRefereeId(refereeId);
+        eventRefereeRequest = eventRefereeRequestService.selectByMultiId(eventRefereeRequest);
+        if (eventRefereeRequest == null) {
+            throw new ConflictException("裁判未收到邀请");
+        }
+
+        EventReferee eventReferee = new EventReferee();
+        eventReferee.setEventId(eventId);
+        eventReferee.setRefereeId(refereeId);
         if (eventRefereeService.selectByMultiId(eventReferee) != null) {
+            eventRefereeRequest.setStatus(EventRefereeRequest.STATUS_ACCEPTED);
+            eventRefereeRequestService.updateByMultiId(eventRefereeRequest);
             throw new ConflictException("裁判已经加入执法该赛事");
         }
-        if (eventRefereeRequestService.selectByMultiId(eventRefereeRequest) == null) {
-            throw new BadRequestException("该赛事未邀请该裁判加入");
+
+        if (!eventRefereeRequest.getStatus().equals(EventRefereeRequest.STATUS_PENDING)) {
+            throw new ConflictException("邀请已处理");
         }
-        if (!eventRefereeRequestService.saveOrUpdateByMultiId(eventRefereeRequest)) {
+
+        eventRefereeRequest.setStatus(status);
+        if (!eventRefereeRequestService.updateByMultiId(eventRefereeRequest)) {
             throw new RuntimeException("回复赛事邀请失败");
         }
-        if (eventRefereeRequest.getStatus().equals(EventRefereeRequest.STATUS_ACCEPTED)) {
+        if (accept) {
             if (!eventRefereeService.saveOrUpdateByMultiId(eventReferee)) {
                 throw new RuntimeException("加入赛事失败");
             }
         }
+
         return true;
     }
 

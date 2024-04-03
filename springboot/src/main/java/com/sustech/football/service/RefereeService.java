@@ -9,13 +9,13 @@ import java.util.List;
 public interface RefereeService extends IService<Referee> {
     List<MatchRefereeRequest> getMatchInvitations(Long refereeId);
 
-    boolean replyMatchInvitation(MatchRefereeRequest matchRefereeRequest);
+    boolean replyMatchInvitation(Long refereeId, Long eventId, Boolean accept);
 
     List<Match> getMatches(Long refereeId);
 
     List<EventRefereeRequest> getEventInvitations(Long refereeId);
 
-    boolean replyEventInvitation(EventRefereeRequest eventRefereeRequest);
+    boolean replyEventInvitation(Long refereeId, Long eventId, Boolean accept);
 
     List<Event> getEvents(Long refereeId);
 }

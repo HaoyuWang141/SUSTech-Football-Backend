@@ -60,7 +60,7 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
             throw new RuntimeException("回应邀请失败");
         }
         if (accept) {
-            if (!teamCoachService.save(teamCoach)) {
+            if (!teamCoachService.saveOrUpdateByMultiId(teamCoach)) {
                 throw new RuntimeException("加入球队失败");
             }
         }

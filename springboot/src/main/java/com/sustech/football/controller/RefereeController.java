@@ -110,10 +110,7 @@ public class RefereeController {
         if (matchService.getById(matchId) == null) {
             throw new ResourceNotFoundException("比赛不存在");
         }
-        String status = accept ? MatchRefereeRequest.STATUS_ACCEPTED : MatchRefereeRequest.STATUS_REJECTED;
-        if (!refereeService.replyMatchInvitation(new MatchRefereeRequest(
-                matchId, refereeId, status
-        ))) {
+        if (!refereeService.replyMatchInvitation(refereeId, matchId, accept)) {
             throw new RuntimeException("回复比赛邀请失败");
         }
     }
@@ -191,11 +188,8 @@ public class RefereeController {
         if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
         }
-        String status = accept ? EventRefereeRequest.STATUS_ACCEPTED : EventRefereeRequest.STATUS_REJECTED;
-        if (!refereeService.replyEventInvitation(new EventRefereeRequest(
-                eventId, refereeId, status
-        ))) {
-            throw new RuntimeException("回复赛事邀请失败");
+        if (!refereeService.replyEventInvitation(refereeId, eventId, accept)) {
+            throw new RuntimeException("处理邀请失败");
         }
     }
 
