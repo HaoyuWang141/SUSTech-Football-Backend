@@ -32,7 +32,7 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
 
     @Override
     @Transactional
-    public boolean replyTeamInvitation(Long teamId, Long coachId, Boolean accept) {
+    public boolean replyTeamInvitation(Long coachId, Long teamId, Boolean accept) {
         String status = accept ? TeamCoachRequest.STATUS_ACCEPTED : TeamCoachRequest.STATUS_REJECTED;
         TeamCoachRequest teamCoachRequest = new TeamCoachRequest();
         teamCoachRequest.setTeamId(teamId);
