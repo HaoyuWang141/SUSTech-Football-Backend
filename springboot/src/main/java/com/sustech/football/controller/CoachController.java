@@ -2,6 +2,7 @@ package com.sustech.football.controller;
 
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
+import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.service.CoachService;
 import com.sustech.football.service.TeamCoachRequestService;
@@ -22,8 +23,8 @@ public class CoachController {
 
     @Autowired
     public CoachController(CoachService coachService,
-            TeamService teamService,
-            TeamCoachRequestService teamCoachRequestService) {
+                           TeamService teamService,
+                           TeamCoachRequestService teamCoachRequestService) {
         this.coachService = coachService;
         this.teamService = teamService;
         this.teamCoachRequestService = teamCoachRequestService;
@@ -107,7 +108,9 @@ public class CoachController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        coachService.replyTeamInvitation(coachId, teamId, accept);
+        if (!coachService.replyTeamInvitation(coachId, teamId, accept)) {
+            throw new InternalServerErrorException("处理邀请失败");
+        }
     }
 
     @GetMapping("/team/getAll")

@@ -162,8 +162,8 @@ public class PlayerController {
             @RequestParam Long playerId,
             @RequestParam Long teamId,
             @RequestParam Boolean accept) {
-        if (playerId == null || teamId == null) {
-            throw new BadRequestException("球员id和球队id不能为空");
+        if (playerId == null || teamId == null || accept == null) {
+            throw new BadRequestException("球员id、球队id和状态不能为空");
         }
         if (playerService.getById(playerId) == null) {
             throw new ResourceNotFoundException("球员不存在");
@@ -171,35 +171,8 @@ public class PlayerController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        TeamPlayer teamPlayer = new TeamPlayer();
-        teamPlayer.setTeamId(teamId);
-        teamPlayer.setPlayerId(playerId);
-        if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
-            throw new ConflictException("球员已经加入球队");
-        }
-
-        String status = accept ? TeamPlayerRequest.STATUS_ACCEPTED : TeamPlayerRequest.STATUS_REJECTED;
-        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest();
-        teamPlayerRequest.setTeamId(teamId);
-        teamPlayerRequest.setPlayerId(playerId);
-        teamPlayerRequest.setType(TeamPlayerRequest.TYPE_INVITATION);
-        teamPlayerRequest = teamPlayerRequestService.selectByMultiId(teamPlayerRequest);
-        if (teamPlayerRequest == null) {
-            throw new ConflictException("球员未收到邀请");
-        }
-        System.out.println(teamPlayerRequest.getStatus());
-        System.out.println(teamPlayerRequest.getStatus().equals(TeamPlayerRequest.STATUS_PENDING));
-        if (!teamPlayerRequest.getStatus().equals(TeamPlayerRequest.STATUS_PENDING)) {
-            throw new ConflictException("邀请已经回应过了");
-        }
-        teamPlayerRequest.setStatus(status);
-        if (!teamPlayerRequestService.updateByMultiId(teamPlayerRequest)) {
-            throw new RuntimeException("回应邀请失败");
-        }
-        if (accept) {
-            if (!teamPlayerService.save(teamPlayer)) {
-                throw new RuntimeException("加入球队失败");
-            }
+        if (!playerService.replyTeamInvitation(playerId, teamId, accept)) {
+            throw new InternalServerErrorException("处理邀请失败");
         }
     }
 

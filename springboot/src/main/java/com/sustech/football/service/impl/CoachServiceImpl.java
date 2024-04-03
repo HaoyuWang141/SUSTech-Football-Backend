@@ -32,25 +32,40 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
 
     @Override
     @Transactional
-    public void replyTeamInvitation(Long teamId, Long coachId, Boolean accept) {
-        TeamCoach teamCoach = new TeamCoach(teamId, coachId);
+    public boolean replyTeamInvitation(Long teamId, Long coachId, Boolean accept) {
+        String status = accept ? TeamCoachRequest.STATUS_ACCEPTED : TeamCoachRequest.STATUS_REJECTED;
+        TeamCoachRequest teamCoachRequest = new TeamCoachRequest();
+        teamCoachRequest.setTeamId(teamId);
+        teamCoachRequest.setCoachId(coachId);
+        teamCoachRequest = teamCoachRequestService.selectByMultiId(teamCoachRequest);
+        if (teamCoachRequest == null) {
+            throw new BadRequestException("教练未收到邀请");
+        }
+
+        TeamCoach teamCoach = new TeamCoach();
+        teamCoach.setTeamId(teamId);
+        teamCoach.setCoachId(coachId);
         if (teamCoachService.selectByMultiId(teamCoach) != null) {
+            teamCoachRequest.setStatus(TeamCoachRequest.STATUS_ACCEPTED);
+            teamCoachRequestService.updateByMultiId(teamCoachRequest);
             throw new ConflictException("教练已经在球队中");
         }
 
-        String status = accept ? TeamCoachRequest.STATUS_ACCEPTED : TeamCoachRequest.STATUS_REJECTED;
-        TeamCoachRequest teamCoachRequest = new TeamCoachRequest(coachId, teamId, status);
-        if (teamCoachRequestService.selectByMultiId(teamCoachRequest) == null) {
-            throw new BadRequestException("教练未收到邀请");
+        if (!teamCoachRequest.getStatus().equals(TeamCoachRequest.STATUS_PENDING)) {
+            throw new BadRequestException("邀请已处理");
         }
-        if (!teamCoachRequestService.updateById(teamCoachRequest)) {
-            throw new RuntimeException("更新邀请失败");
+
+        teamCoachRequest.setStatus(status);
+        if (!teamCoachRequestService.updateByMultiId(teamCoachRequest)) {
+            throw new RuntimeException("回应邀请失败");
         }
         if (accept) {
             if (!teamCoachService.save(teamCoach)) {
                 throw new RuntimeException("加入球队失败");
             }
         }
+
+        return true;
     }
 
     @Override
