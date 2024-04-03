@@ -162,7 +162,7 @@ public class EventController {
         if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
         }
-        if (userService.getById(teamId) == null) {
+        if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
         if (!eventService.inviteTeam(new EventTeamRequest(
