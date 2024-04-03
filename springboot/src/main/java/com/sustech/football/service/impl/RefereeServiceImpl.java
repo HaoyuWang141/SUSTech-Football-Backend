@@ -30,7 +30,12 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
 
     @Override
     public List<MatchRefereeRequest> getMatchInvitations(Long refereeId) {
-        return matchRefereeRequestService.listWithMatch(refereeId);
+        return matchRefereeRequestService
+                .listWithMatch(refereeId)
+                .stream()
+                .peek(request -> request.getMatch().setHomeTeam(teamService.getById(request.getMatch().getHomeTeamId())))
+                .peek(request -> request.getMatch().setAwayTeam(teamService.getById(request.getMatch().getAwayTeamId())))
+                .toList();
     }
 
     @Override
