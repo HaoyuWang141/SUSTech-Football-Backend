@@ -48,7 +48,7 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
         if (teamCoachService.selectByMultiId(teamCoach) != null) {
             teamCoachRequest.setStatus(TeamCoachRequest.STATUS_ACCEPTED);
             teamCoachRequestService.updateByMultiId(teamCoachRequest);
-            throw new ConflictException("教练已经在球队中");
+            return false;
         }
 
         if (!teamCoachRequest.getStatus().equals(TeamCoachRequest.STATUS_PENDING)) {

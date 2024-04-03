@@ -109,7 +109,7 @@ public class CoachController {
             throw new ResourceNotFoundException("球队不存在");
         }
         if (!coachService.replyTeamInvitation(coachId, teamId, accept)) {
-            throw new InternalServerErrorException("处理邀请失败");
+            throw new BadRequestException("处理邀请失败");
         }
     }
 

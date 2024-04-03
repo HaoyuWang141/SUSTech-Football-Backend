@@ -64,7 +64,7 @@ public class PlayerServiceImpl extends ServiceImpl<PlayerMapper, Player> impleme
         if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
             teamPlayerRequest.setStatus(TeamPlayerRequest.STATUS_ACCEPTED);
             teamPlayerRequestService.updateByMultiId(teamPlayerRequest);
-            throw new ConflictException("球员已经加入球队");
+            return false;
         }
 
         if (!teamPlayerRequest.getStatus().equals(TeamPlayerRequest.STATUS_PENDING)) {

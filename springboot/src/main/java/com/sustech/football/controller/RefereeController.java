@@ -111,7 +111,7 @@ public class RefereeController {
             throw new ResourceNotFoundException("比赛不存在");
         }
         if (!refereeService.replyMatchInvitation(refereeId, matchId, accept)) {
-            throw new RuntimeException("回复比赛邀请失败");
+            throw new BadRequestException("回复比赛邀请失败");
         }
     }
 
@@ -189,7 +189,7 @@ public class RefereeController {
             throw new ResourceNotFoundException("赛事不存在");
         }
         if (!refereeService.replyEventInvitation(refereeId, eventId, accept)) {
-            throw new RuntimeException("处理邀请失败");
+            throw new BadRequestException("处理邀请失败");
         }
     }
 

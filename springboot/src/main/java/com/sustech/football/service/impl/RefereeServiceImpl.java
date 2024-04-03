@@ -56,7 +56,7 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
         if (matchRefereeService.selectByMultiId(matchReferee) != null) {
             matchRefereeRequest.setStatus(MatchRefereeRequest.STATUS_ACCEPTED);
             matchRefereeRequestService.updateByMultiId(matchRefereeRequest);
-            throw new ConflictException("裁判已经加入执法该比赛");
+            return false;
         }
 
         if (!matchRefereeRequest.getStatus().equals(MatchRefereeRequest.STATUS_PENDING)) {
@@ -111,7 +111,7 @@ public class RefereeServiceImpl extends ServiceImpl<RefereeMapper, Referee> impl
         if (eventRefereeService.selectByMultiId(eventReferee) != null) {
             eventRefereeRequest.setStatus(EventRefereeRequest.STATUS_ACCEPTED);
             eventRefereeRequestService.updateByMultiId(eventRefereeRequest);
-            throw new ConflictException("裁判已经加入执法该赛事");
+            return false;
         }
 
         if (!eventRefereeRequest.getStatus().equals(EventRefereeRequest.STATUS_PENDING)) {
