@@ -1,6 +1,7 @@
 package com.sustech.football.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.mysql.cj.log.Log;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
 import com.sustech.football.service.*;
@@ -170,18 +171,29 @@ public class PlayerController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        TeamPlayer teamPlayer = new TeamPlayer(teamId, playerId);
+        TeamPlayer teamPlayer = new TeamPlayer();
+        teamPlayer.setTeamId(teamId);
+        teamPlayer.setPlayerId(playerId);
         if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
             throw new ConflictException("球员已经加入球队");
         }
 
         String status = accept ? TeamPlayerRequest.STATUS_ACCEPTED : TeamPlayerRequest.STATUS_REJECTED;
-        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest(playerId, teamId,
-                TeamPlayerRequest.TYPE_INVITATION, status);
-        if (teamPlayerRequestService.selectByMultiId(teamPlayerRequest) == null) {
+        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest();
+        teamPlayerRequest.setTeamId(teamId);
+        teamPlayerRequest.setPlayerId(playerId);
+        teamPlayerRequest.setType(TeamPlayerRequest.TYPE_INVITATION);
+        teamPlayerRequest = teamPlayerRequestService.selectByMultiId(teamPlayerRequest);
+        if (teamPlayerRequest == null) {
             throw new ConflictException("球员未收到邀请");
         }
-        if (!teamPlayerRequestService.updateById(teamPlayerRequest)) {
+        System.out.println(teamPlayerRequest.getStatus());
+        System.out.println(teamPlayerRequest.getStatus().equals(TeamPlayerRequest.STATUS_PENDING));
+        if (!teamPlayerRequest.getStatus().equals(TeamPlayerRequest.STATUS_PENDING)) {
+            throw new ConflictException("邀请已经回应过了");
+        }
+        teamPlayerRequest.setStatus(status);
+        if (!teamPlayerRequestService.updateByMultiId(teamPlayerRequest)) {
             throw new RuntimeException("回应邀请失败");
         }
         if (accept) {
