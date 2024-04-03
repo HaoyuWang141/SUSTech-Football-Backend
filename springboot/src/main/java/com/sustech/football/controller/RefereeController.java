@@ -100,8 +100,8 @@ public class RefereeController {
     }
 
     @PostMapping("/match/replyInvitation")
-    public void replyMatchInvitation(Long refereeId, Long matchId, Boolean accepted) {
-        if (refereeId == null || matchId == null || accepted == null) {
+    public void replyMatchInvitation(Long refereeId, Long matchId, Boolean accept) {
+        if (refereeId == null || matchId == null || accept == null) {
             throw new BadRequestException("传入的参数含有空值");
         }
         if (refereeService.getById(refereeId) == null) {
@@ -110,7 +110,7 @@ public class RefereeController {
         if (matchService.getById(matchId) == null) {
             throw new ResourceNotFoundException("比赛不存在");
         }
-        String status = accepted ? MatchRefereeRequest.STATUS_ACCEPTED : MatchRefereeRequest.STATUS_REJECTED;
+        String status = accept ? MatchRefereeRequest.STATUS_ACCEPTED : MatchRefereeRequest.STATUS_REJECTED;
         if (!refereeService.replyMatchInvitation(new MatchRefereeRequest(
                 matchId, refereeId, status
         ))) {
@@ -181,8 +181,8 @@ public class RefereeController {
     }
 
     @PostMapping("/event/replyInvitation")
-    public void replyEventInvitation(Long refereeId, Long eventId, Boolean accepted) {
-        if (refereeId == null || eventId == null || accepted == null) {
+    public void replyEventInvitation(Long refereeId, Long eventId, Boolean accept) {
+        if (refereeId == null || eventId == null || accept == null) {
             throw new BadRequestException("传入的参数含有空值");
         }
         if (refereeService.getById(refereeId) == null) {
@@ -191,7 +191,7 @@ public class RefereeController {
         if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
         }
-        String status = accepted ? EventRefereeRequest.STATUS_ACCEPTED : EventRefereeRequest.STATUS_REJECTED;
+        String status = accept ? EventRefereeRequest.STATUS_ACCEPTED : EventRefereeRequest.STATUS_REJECTED;
         if (!refereeService.replyEventInvitation(new EventRefereeRequest(
                 eventId, refereeId, status
         ))) {
