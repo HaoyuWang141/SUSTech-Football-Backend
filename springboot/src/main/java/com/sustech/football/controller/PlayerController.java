@@ -111,7 +111,7 @@ public class PlayerController {
     @PostMapping("/team/applyToJoin")
     public void applyJoinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
         if (playerId == null || teamId == null) {
-            throw new BadRequestException("球员id和球队id不能为空");
+            throw new BadRequestException("传参含空值");
         }
         if (playerService.getById(playerId) == null) {
             throw new ResourceNotFoundException("球员不存在");
@@ -121,17 +121,17 @@ public class PlayerController {
         }
         TeamPlayer teamPlayer = new TeamPlayer(playerId, teamId);
         if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
-            throw new ConflictException("球员已经加入球队");
+            throw new ConflictException("已加入球队");
         }
 
         TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest(playerId, teamId,
                 TeamPlayerRequest.TYPE_APPLICATION,
                 TeamPlayerRequest.STATUS_PENDING);
         if (teamPlayerRequestService.selectByMultiId(teamPlayerRequest) != null) {
-            throw new ConflictException("球员已经申请加入球队");
+            throw new ConflictException("曾经已申请");
         }
         if (!teamPlayerRequestService.save(teamPlayerRequest)) {
-            throw new RuntimeException("申请加入球队失败");
+            throw new RuntimeException("申请失败");
         }
     }
 
