@@ -124,9 +124,11 @@ public class PlayerController {
             throw new ConflictException("已加入球队");
         }
 
-        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest(playerId, teamId,
-                TeamPlayerRequest.TYPE_APPLICATION,
-                TeamPlayerRequest.STATUS_PENDING);
+        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest();
+        teamPlayerRequest.setTeamId(teamId);
+        teamPlayerRequest.setPlayerId(playerId);
+        teamPlayerRequest.setType(TeamPlayerRequest.TYPE_APPLICATION);
+        teamPlayerRequest.setStatus(TeamPlayerRequest.STATUS_PENDING);
         if (teamPlayerRequestService.selectByMultiId(teamPlayerRequest) != null) {
             throw new ConflictException("曾经已申请");
         }
