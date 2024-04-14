@@ -158,8 +158,8 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     }
 
     @Override
-    public List<MatchTeamRequest> getTeamInvitations(Long teamId) {
-        return matchTeamRequestService.listWithMatch(teamId);
+    public List<MatchTeamRequest> getTeamInvitations(Long matchId) {
+        return matchTeamRequestService.listWithTeam(matchId);
     }
 
     @Override

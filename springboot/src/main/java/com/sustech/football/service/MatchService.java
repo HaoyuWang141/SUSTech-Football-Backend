@@ -22,7 +22,7 @@ public interface MatchService extends IService<Match> {
 
     boolean inviteTeam(MatchTeamRequest matchTeamRequest);
 
-    List<MatchTeamRequest> getTeamInvitations(Long teamId);
+    List<MatchTeamRequest> getTeamInvitations(Long matchId);
 
     boolean deleteTeam(Long matchId, Boolean isHomeTeam);
 

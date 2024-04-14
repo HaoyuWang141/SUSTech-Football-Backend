@@ -286,14 +286,14 @@ public class MatchController {
     }
 
     @GetMapping("/team/getInvitations")
-    public List<MatchTeamRequest> getTeamInvitations(Long teamId) {
-        if (teamId == null) {
-            throw new BadRequestException("球队ID不能为空");
+    public List<MatchTeamRequest> getTeamInvitations(Long matchId) {
+        if (matchId == null) {
+            throw new BadRequestException("比赛ID不能为空");
         }
-        if (teamService.getById(teamId) == null) {
-            throw new BadRequestException("球队不存在");
+        if (matchService.getById(matchId) == null) {
+            throw new BadRequestException("比赛不存在");
         }
-        return matchService.getTeamInvitations(teamId);
+        return matchService.getTeamInvitations(matchId);
     }
 
     @GetMapping("/team/get")
