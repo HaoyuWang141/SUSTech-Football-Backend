@@ -271,7 +271,7 @@ public class MatchController {
     @PostMapping("/team/invite")
     public void inviteTeam(Long matchId, Long teamId, Boolean isHomeTeam) {
         if (matchId == null || teamId == null || isHomeTeam == null) {
-            throw new BadRequestException("传入的参数不能为空");
+            throw new BadRequestException("传参含空值");
         }
         if (matchService.getById(matchId) == null) {
             throw new BadRequestException("比赛不存在");
@@ -281,7 +281,7 @@ public class MatchController {
         }
         String type = isHomeTeam ? MatchTeamRequest.TYPE_HOME : MatchTeamRequest.TYPE_AWAY;
         if (!matchService.inviteTeam(new MatchTeamRequest(matchId, teamId, type))) {
-            throw new BadRequestException("邀请球队失败");
+            throw new BadRequestException("邀请失败");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.sustech.football.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.model.team.VoTeam;
 import com.sustech.football.model.team.VoTeamPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class TeamController {
     private CoachService coachService;
     @Autowired
     private MatchService matchService;
+    @Autowired
+    private TeamPlayerService teamPlayerService;
 
     @PostMapping("/create")
     @Transactional
@@ -94,18 +97,48 @@ public class TeamController {
         return teamService.getTeamsByIdList(idList);
     }
 
+    private record TeamRecord(Long teamId, String name, String logoUrl, Long captainId) {
+    }
+
     @PutMapping("/update")
-    public Team updateTeam(@RequestBody Team team) {
-        if (team == null) {
-            throw new BadRequestException("传入球队为空");
+    public void updateTeam(Long managerId, @RequestBody TeamRecord teamRecord) {
+        if (managerId == null || teamRecord == null) {
+            throw new BadRequestException("传参含空值");
         }
-        if (team.getTeamId() == null) {
-            throw new BadRequestException("传入球队的ID为空");
+        if (userService.getById(managerId) == null) {
+            throw new ResourceNotFoundException("管理员非法");
+        }
+        Long teamId = teamRecord.teamId();
+        if (teamId == null) {
+            throw new BadRequestException("球队id为空");
+        }
+        Team team = teamService.getById(teamId);
+        if (team == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        List<Long> managerIdList = teamService.getManagers(teamId);
+        if (managerIdList == null || !managerIdList.contains(managerId)) {
+            throw new BadRequestException("无权修改");
+        }
+        if (teamRecord.name() != null) {
+            team.setName(teamRecord.name());
+        }
+        if (teamRecord.logoUrl() != null) {
+            team.setLogoUrl(teamRecord.logoUrl());
+        }
+        if (teamRecord.captainId() != null) {
+            List<Long> playerIdList = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", teamId))
+                    .stream()
+                    .map(TeamPlayer::getPlayerId)
+                    .toList();
+            if (playerIdList == null || !playerIdList.contains(teamRecord.captainId())) {
+                throw new BadRequestException("队长非队员");
+            }
+            team.setCaptainId(teamRecord.captainId());
         }
         if (!teamService.updateById(team)) {
-            throw new BadRequestException("更新球队失败");
+            throw new BadRequestException("更新失败");
         }
-        return team;
     }
 
     @DeleteMapping("/delete")

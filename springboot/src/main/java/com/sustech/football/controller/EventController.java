@@ -403,7 +403,7 @@ public class EventController {
     @PostMapping("/match/add")
     public void addMatch(Long eventId, String stage, String tag, Timestamp time, Long homeTeamId, Long awayTeamId) {
         if (eventId == null || stage == null || tag == null || time == null || homeTeamId == null || awayTeamId == null) {
-            throw new BadRequestException("传入的参数含有空值");
+            throw new BadRequestException("传参含空值");
         }
         if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
@@ -427,7 +427,7 @@ public class EventController {
         match.setTime(time);
 
         if (!eventService.addMatch(eventId, match, stage, tag)) {
-            throw new RuntimeException("添加比赛失败");
+            throw new RuntimeException("新建失败");
         }
     }
 

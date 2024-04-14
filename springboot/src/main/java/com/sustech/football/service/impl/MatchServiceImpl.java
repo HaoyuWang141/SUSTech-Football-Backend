@@ -120,16 +120,39 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     @Override
     @Transactional
     public boolean inviteTeam(MatchTeamRequest matchTeamRequest) {
-        Match match = getById(matchTeamRequest.getMatchId());
-        if (match.getHomeTeamId().equals(matchTeamRequest.getTeamId())
-                || match.getAwayTeamId().equals(matchTeamRequest.getTeamId())) {
-            throw new ConflictException("该队伍已经是该比赛的队伍");
-        }
-        if (matchTeamRequestService.selectByMultiId(matchTeamRequest) != null) {
-            throw new ConflictException("该队伍已经被邀请");
-        }
-        if (!matchTeamRequestService.updateByMultiId(matchTeamRequest)) {
-            throw new RuntimeException("邀请失败");
+        Long matchId = matchTeamRequest.getMatchId();
+        Match match = getById(matchId);
+        List<MatchTeamRequest> matchTeamRequestList = matchTeamRequestService.listWithTeam(matchId);
+        if (matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_HOME)){
+            if (match.getHomeTeamId() != null) {
+                throw new ConflictException("主队已存在");
+            }
+            if (match.getAwayTeamId() != null && match.getAwayTeamId().equals(matchTeamRequest.getTeamId())) {
+                throw new ConflictException("球队是客队");
+            }
+            if (matchTeamRequestList.stream().anyMatch(request -> request.getTeamId().equals(matchTeamRequest.getTeamId()))) {
+                throw new ConflictException("球队已邀请");
+            }
+            if (matchTeamRequestList.stream().anyMatch(request -> request.getType().equals(MatchTeamRequest.TYPE_HOME) && request.getStatus().equals(MatchTeamRequest.STATUS_PENDING))) {
+                throw new ConflictException("已邀请主队");
+            }
+            matchTeamRequestService.saveOrUpdateByMultiId(matchTeamRequest);
+        } else if (matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_AWAY)) {
+            if (match.getAwayTeamId() != null) {
+                throw new ConflictException("客队已存在");
+            }
+            if (match.getHomeTeamId() != null && match.getHomeTeamId().equals(matchTeamRequest.getTeamId())) {
+                throw new ConflictException("球队是主队");
+            }
+            if (matchTeamRequestList.stream().anyMatch(request -> request.getTeamId().equals(matchTeamRequest.getTeamId()))) {
+                throw new ConflictException("球队已邀请");
+            }
+            if (matchTeamRequestList.stream().anyMatch(request -> request.getType().equals(MatchTeamRequest.TYPE_AWAY) && request.getStatus().equals(MatchTeamRequest.STATUS_PENDING))) {
+                throw new ConflictException("已邀请客队");
+            }
+            matchTeamRequestService.saveOrUpdateByMultiId(matchTeamRequest);
+        } else {
+            throw new BadRequestException("邀请类型错");
         }
         return true;
     }
