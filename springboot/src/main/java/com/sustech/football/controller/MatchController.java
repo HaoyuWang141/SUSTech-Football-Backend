@@ -202,16 +202,25 @@ public class MatchController {
     }
 
     @PutMapping("/update")
-    public void updateMatch(@RequestBody Match match) {
-        if (match == null) {
-            throw new BadRequestException("比赛信息不能为空");
+    @Operation(summary = "更新比赛信息", description = "只有比赛管理员才能更新比赛信息，更新时，request body 必须包含所有想要更改的属性和不想更改的属性！")
+    public void updateMatch(Long managerId, @RequestBody Match match) {
+        if (managerId == null || match == null) {
+            throw new BadRequestException("传参含空值");
         }
         if (match.getMatchId() == null) {
-            throw new BadRequestException("更新的比赛, 其ID不能为空");
+            throw new BadRequestException("比赛ID不能为空");
+        }
+        if (matchService.getById(match.getMatchId()) == null) {
+            throw new ResourceNotFoundException("比赛不存在");
+        }
+        List<Long> managerList = matchService.getManagers(match.getMatchId());
+        if (!managerList.contains(managerId)) {
+            throw new BadRequestException("管理员非法");
         }
         if (!matchService.updateById(match)) {
-            throw new BadRequestException("更新比赛失败");
+            throw new InternalServerErrorException("更新失败");
         }
+
     }
 
     @DeleteMapping("/delete")

@@ -5,6 +5,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.sustech.football.entity.Match;
 
 
-public interface MatchMapper extends BaseMapper<Match> 
-{
+public interface MatchMapper extends BaseMapper<Match> {
 }

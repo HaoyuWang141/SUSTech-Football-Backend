@@ -24,6 +24,7 @@ public class Match {
     private Long awayTeamId;
     private Timestamp time;
     private String status;
+    private String description;
     private Integer homeTeamScore;
     private Integer awayTeamScore;
     private Integer homeTeamPenalty;
