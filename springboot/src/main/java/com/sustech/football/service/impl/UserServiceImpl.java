@@ -15,6 +15,8 @@ import java.util.List;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Autowired
+    private UserRoleMapper userRoleMapper;
+    @Autowired
     private MatchManagerMapper matchManagerMapper;
     @Autowired
     private EventManagerMapper eventManagerMapper;
@@ -78,5 +80,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new ResourceNotFoundException("用户未注册裁判");
         }
         return referee.getRefereeId();
+    }
+
+    @Override
+    public List<UserRole> getAllRoleUsers() {
+        return userRoleMapper.selectRoleUser();
     }
 }

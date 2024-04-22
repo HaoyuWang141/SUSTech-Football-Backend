@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.sustech.football.entity.Match;
 import com.sustech.football.entity.User;
+import com.sustech.football.entity.UserRole;
 import com.sustech.football.exception.*;
 import com.sustech.football.service.UserService;
 import com.sustech.football.utils.WXBizDataCrypt;
@@ -172,7 +173,7 @@ public class UserController {
         }
         return userService.getCoachId(userId);
     }
-    
+
     @GetMapping("/getRefereeId")
     public Long getRefereeId(Long userId) {
         if (userId == null) {
@@ -182,6 +183,11 @@ public class UserController {
             throw new ResourceNotFoundException("用户不存在");
         }
         return userService.getRefereeId(userId);
+    }
+
+    @GetMapping("/getAllRoleUsers")
+    public List<UserRole> getAllRoleUsers() {
+        return userService.getAllRoleUsers();
     }
 
 }

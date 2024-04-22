@@ -18,4 +18,6 @@ public interface UserService extends IService<User> {
     Long getCoachId(Long userId);
 
     Long getRefereeId(Long userId);
+
+    List<UserRole> getAllRoleUsers();
 }
