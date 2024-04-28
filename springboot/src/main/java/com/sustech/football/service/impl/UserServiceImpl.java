@@ -86,4 +86,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public List<UserRole> getAllRoleUsers() {
         return userRoleMapper.selectRoleUser();
     }
+
+    @Override
+    public UserRole getRoleUserById(Long userId) {
+        return userRoleMapper.selectRoleUserById(userId);
+    }
 }

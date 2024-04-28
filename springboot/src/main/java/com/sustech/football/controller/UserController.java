@@ -188,4 +188,8 @@ public class UserController {
         return userService.getAllRoleUsers();
     }
 
+    @GetMapping("getRoleUserById")
+    public UserRole getRoleUserById(@RequestParam Long userId) {
+        return userService.getRoleUserById(userId);
+    }
 }
