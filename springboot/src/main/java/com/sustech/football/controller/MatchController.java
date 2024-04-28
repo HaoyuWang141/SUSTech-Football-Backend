@@ -168,7 +168,7 @@ public class MatchController {
             voMatchPlayerActions.add(voMatchPlayerAction);
         }
         voMatchPlayerActions.sort(Comparator.comparing(VoMatchPlayerAction::getTime));
-        voMatch.setActions(voMatchPlayerActions);
+        voMatch.setMatchPlayerActionList(voMatchPlayerActions);
 
         // 所属赛事
         MatchEvent matchEvent = matchService.findMatchEvent(match);
@@ -177,7 +177,7 @@ public class MatchController {
         voMatchEvent.setEventName(matchEvent.getEventName());
         voMatchEvent.setStage(matchEvent.getMatchStage());
         voMatchEvent.setTag(matchEvent.getMatchTag());
-        voMatch.setEvent(voMatchEvent);
+        voMatch.setMatchEvent(voMatchEvent);
 
         return voMatch;
     }

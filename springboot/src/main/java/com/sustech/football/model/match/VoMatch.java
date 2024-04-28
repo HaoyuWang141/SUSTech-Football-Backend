@@ -18,6 +18,6 @@ public class VoMatch {
     VoMatchTeam awayTeam;
     List<Long> managerList;
     List<Long> refereeList;
-    List<VoMatchPlayerAction> actions;
-    VoMatchEvent event;
+    List<VoMatchPlayerAction> matchPlayerActionList;
+    VoMatchEvent matchEvent;
 }
