@@ -100,6 +100,22 @@ public class TeamController {
     private record TeamRecord(Long teamId, String name, String logoUrl, Long captainId) {
     }
 
+    @PostMapping("captain/updateByPlayerId")
+    public void updateCaptain(@RequestParam Long teamId, @RequestParam Long captainId){
+        if (teamId == null || captainId == null) {
+            throw new BadRequestException("传入的队伍ID或队长ID为空");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        if (playerService.getById(captainId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        if (!teamService.updateCaptainByPlayerId(teamId, captainId)) {
+            throw new BadRequestException("更新队长失败");
+        }
+    }
+
     @PutMapping("/update")
     public void updateTeam(Long managerId, @RequestBody TeamRecord teamRecord) {
         if (managerId == null || teamRecord == null) {

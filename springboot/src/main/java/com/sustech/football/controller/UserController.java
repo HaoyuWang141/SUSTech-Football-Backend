@@ -15,10 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @CrossOrigin
@@ -93,10 +91,10 @@ public class UserController {
         if (user == null) {
             throw new ResourceNotFoundException("用户不存在");
         }
-        if (avatarUrl != null && !avatarUrl.isEmpty()) {
+        if (!avatarUrl.isEmpty()) {
             user.setAvatarUrl(avatarUrl);
         }
-        if (nickName != null && !nickName.isEmpty()) {
+        if (!nickName.isEmpty()) {
             user.setNickName(nickName);
         }
         if (!userService.updateById(user)) {

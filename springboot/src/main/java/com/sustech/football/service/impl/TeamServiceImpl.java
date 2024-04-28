@@ -402,4 +402,18 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         }
         return true;
     }
+
+    @Override
+    public boolean updateCaptainByPlayerId(Long teamId, Long playerId) {
+        TeamPlayer teamPlayer = new TeamPlayer(teamId, playerId);
+        if (teamPlayerService.selectByMultiId(teamPlayer) == null) {
+            throw new BadRequestException("该球员不在球队中");
+        }
+        Team team = getById(teamId);
+        team.setCaptainId(playerId);
+        if (!updateById(team)) {
+            throw new RuntimeException("更新队长失败");
+        }
+        return true;
+    }
 }
