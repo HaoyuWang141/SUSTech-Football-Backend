@@ -40,7 +40,7 @@ public class MatchController {
 
     @PostMapping("/create")
     @Transactional
-    public Match createMatch(Long ownerId, @RequestBody Match match) {
+    public String createMatch(Long ownerId, @RequestBody Match match) {
         if (ownerId == null) {
             throw new BadRequestException("比赛所有者ID不能为空");
         }
@@ -59,7 +59,7 @@ public class MatchController {
         if (!matchService.inviteManager(new MatchManager(match.getMatchId(), ownerId, true))) {
             throw new BadRequestException("创建比赛失败");
         }
-        return match;
+        return "创建比赛成功";
     }
 
     @GetMapping("/get")

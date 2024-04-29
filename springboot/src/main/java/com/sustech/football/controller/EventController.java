@@ -39,7 +39,7 @@ public class EventController {
 
 
     @PostMapping("/create")
-    public Event createEvent(Long ownerId, @RequestBody Event event) {
+    public String createEvent(Long ownerId, @RequestBody Event event) {
         if (ownerId == null) {
             throw new BadRequestException("赛事所有者ID不能为空");
         }
@@ -58,7 +58,7 @@ public class EventController {
         if (!eventService.inviteManager(new EventManager(event.getEventId(), ownerId, true))) {
             throw new BadRequestException("创建比赛失败");
         }
-        return event;
+        return "创建赛事成功";
     }
 
     @GetMapping("/get")

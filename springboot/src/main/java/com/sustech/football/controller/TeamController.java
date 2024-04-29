@@ -33,7 +33,7 @@ public class TeamController {
 
     @PostMapping("/create")
     @Transactional
-    public Team createTeam(Long ownerId, @RequestBody Team team) {
+    public String createTeam(Long ownerId, @RequestBody Team team) {
         if (ownerId == null) {
             throw new BadRequestException("传入的队伍管理员ID为空");
         }
@@ -52,7 +52,7 @@ public class TeamController {
         if (!teamService.inviteManager(new TeamManager(ownerId, team.getTeamId(), true))) {
             throw new BadRequestException("创建球队失败");
         }
-        return team;
+        return "创建球队成功";
     }
 
     @GetMapping("/get")
