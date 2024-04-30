@@ -1,11 +1,15 @@
 -- last_updated函数
-CREATE OR REPLACE FUNCTION update_last_updated_column()
-RETURNS TRIGGER AS $$
+CREATE
+    OR REPLACE FUNCTION update_last_updated_column()
+    RETURNS TRIGGER AS
+$$
 BEGIN
-    NEW.last_updated = transaction_timestamp();
+    NEW.last_updated
+        = transaction_timestamp();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$
+    language 'plpgsql';
 
 
 -- 用户表
@@ -104,8 +108,10 @@ CREATE TABLE team_player_request
 
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
-BEFORE INSERT or UPDATE ON team_player_request
-FOR EACH ROW
+    BEFORE INSERT or
+        UPDATE
+    ON team_player_request
+    FOR EACH ROW
 EXECUTE FUNCTION update_last_updated_column();
 
 -- 球队-教练
@@ -128,8 +134,10 @@ CREATE TABLE team_coach_request
 
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
-BEFORE INSERT or UPDATE ON team_coach_request
-FOR EACH ROW
+    BEFORE INSERT or
+        UPDATE
+    ON team_coach_request
+    FOR EACH ROW
 EXECUTE FUNCTION update_last_updated_column();
 
 
@@ -140,10 +148,10 @@ CREATE TABLE match
     home_team_id      INT REFERENCES team (team_id),
     away_team_id      INT REFERENCES team (team_id),
     time              TIMESTAMP,
-    home_team_score   INT DEFAULT 0,
-    away_team_score   INT DEFAULT 0,
-    home_team_penalty INT DEFAULT 0,
-    away_team_penalty INT DEFAULT 0,
+    home_team_score   INT                                                            DEFAULT 0,
+    away_team_score   INT                                                            DEFAULT 0,
+    home_team_penalty INT                                                            DEFAULT 0,
+    away_team_penalty INT                                                            DEFAULT 0,
     status            VARCHAR CHECK ( status IN ('PENDING', 'ONGOING', 'FINISHED') ) DEFAULT 'PENDING'
 );
 
@@ -168,8 +176,10 @@ CREATE TABLE match_team_request
 
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
-BEFORE INSERT or UPDATE ON match_team_request
-FOR EACH ROW
+    BEFORE INSERT or
+        UPDATE
+    ON match_team_request
+    FOR EACH ROW
 EXECUTE FUNCTION update_last_updated_column();
 
 
@@ -193,8 +203,10 @@ CREATE TABLE match_referee_request
 
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
-BEFORE INSERT or UPDATE ON match_referee_request
-FOR EACH ROW
+    BEFORE INSERT or
+        UPDATE
+    ON match_referee_request
+    FOR EACH ROW
 EXECUTE FUNCTION update_last_updated_column();
 
 -- 比赛-球员行为（进球、红牌、黄牌）
@@ -203,7 +215,8 @@ CREATE TABLE match_player_action
     match_id  INT REFERENCES match,
     team_id   INT REFERENCES team,
     player_id INT REFERENCES player,
-    action    VARCHAR CHECK ( action IN ('GOAL', 'ASSIST', 'YELLOW_CARD', 'RED_CARD', 'ON', 'OFF') ),
+    action    VARCHAR CHECK ( action IN ('GOAL', 'ASSIST', 'YELLOW_CARD', 'RED_CARD', 'ON', 'OFF')
+        ),
     time      INTEGER, -- 比赛开始的时间
     PRIMARY KEY (match_id, team_id, player_id, action, time)
 );
@@ -226,11 +239,11 @@ CREATE TABLE match_video
 
 CREATE TABLE match_player
 (
-    match_id INT REFERENCES match,
-    team_id INT REFERENCES team,
+    match_id  INT REFERENCES match,
+    team_id   INT REFERENCES team,
     player_id INT REFERENCES player,
-    number INT,
-    is_start BOOLEAN DEFAULT FALSE,
+    number    INT,
+    is_start  BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (match_id, team_id, player_id)
 );
 
@@ -294,8 +307,10 @@ CREATE TABLE event_team_request
 
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
-BEFORE INSERT or UPDATE ON event_team_request
-FOR EACH ROW
+    BEFORE INSERT or
+        UPDATE
+    ON event_team_request
+    FOR EACH ROW
 EXECUTE FUNCTION update_last_updated_column();
 
 
@@ -310,17 +325,19 @@ CREATE TABLE event_referee
 -- 赛事邀请裁判
 CREATE TABLE event_referee_request
 (
-    event_id    INT REFERENCES event,
-    referee_id  INT REFERENCES referee,
-    status      VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ) DEFAULT 'PENDING',
+    event_id     INT REFERENCES event,
+    referee_id   INT REFERENCES referee,
+    status       VARCHAR CHECK ( status IN ('PENDING', 'ACCEPTED', 'REJECTED') ) DEFAULT 'PENDING',
     last_updated TIMESTAMP,
     PRIMARY KEY (event_id, referee_id)
 );
 
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
-BEFORE INSERT or UPDATE ON event_referee_request
-FOR EACH ROW
+    BEFORE INSERT or
+        UPDATE
+    ON event_referee_request
+    FOR EACH ROW
 EXECUTE FUNCTION update_last_updated_column();
 
 
@@ -403,6 +420,27 @@ CREATE TABLE favorite_match
     match_id INT REFERENCES match (match_id),
     PRIMARY KEY (user_id, match_id)
 );
+
+-- 比赛评论表
+CREATE TABLE match_comment
+(
+    comment_id SERIAL PRIMARY KEY,
+    user_id    INT REFERENCES t_user (user_id),
+    match_id   INT REFERENCES match (match_id) ON DELETE CASCADE,
+    content    TEXT NOT NULL,
+    time       TIMESTAMP DEFAULT now()
+);
+
+-- 二级评论表
+CREATE TABLE match_comment_reply
+(
+    reply_id   SERIAL PRIMARY KEY,
+    user_id    INT REFERENCES t_user (user_id),
+    comment_id INT REFERENCES match_comment (comment_id) ON DELETE CASCADE,
+    content    TEXT NOT NULL,
+    time       TIMESTAMP DEFAULT now()
+);
+
 
 -- 语法
 
