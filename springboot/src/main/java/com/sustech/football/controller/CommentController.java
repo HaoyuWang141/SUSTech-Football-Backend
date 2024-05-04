@@ -5,6 +5,7 @@ import com.sustech.football.entity.MatchCommentReply;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.model.comment.VoMatchComment;
+import com.sustech.football.model.match.VoMatchCommentLike;
 import com.sustech.football.service.MatchCommentReplyService;
 import com.sustech.football.service.MatchCommentService;
 import com.sustech.football.service.MatchService;
@@ -105,5 +106,41 @@ public class CommentController {
     @Operation(summary = "列出一个比赛的评论和回复", description = "需要提供比赛id，返回该比赛的评论和回复列表，包括用户简要信息")
     public List<VoMatchComment> getCommentsWithReplyByMatchId(@RequestParam Long matchId) {
         return matchCommentService.getCommentsWithReplyByMatchId(matchId);
+    }
+
+    @GetMapping("/match/getCommentLikes")
+    @Operation(summary = "列出评论的点赞情况", description = "需要提供要获取的评论id和当前用户id，返回评论的点赞情况")
+    public List<VoMatchCommentLike> getCommentLikesByCommentIdList(@RequestParam Long userId, @RequestParam List<Long> commentIds) {
+        if (commentIds == null || commentIds.isEmpty()) {
+            throw new BadRequestException("未提供评论id");
+        }
+        if (userId == null) {
+            userId = -1L;
+        }
+        return matchCommentService.getCommentLikesByCommentIdList(userId, commentIds);
+    }
+
+    @PostMapping("/match/likeComment")
+    @Operation(summary = "点赞评论", description = "需要提供评论id和用户id，点赞成功返回true，失败返回false")
+    public boolean likeComment(@RequestParam Long commentId, @RequestParam Long userId) {
+        if (userId == null || commentId == null) {
+            throw new BadRequestException("未提供用户id或评论id");
+        }
+        if (matchCommentService.hasLiked(commentId, userId)) {
+            throw new BadRequestException("用户已经点赞该评论");
+        }
+        return matchCommentService.likeComment(commentId, userId);
+    }
+
+    @PostMapping("/match/cancelLikeComment")
+    @Operation(summary = "取消点赞评论", description = "需要提供评论id和用户id，取消点赞成功返回true，失败返回false")
+    public boolean cancelLikeComment(@RequestParam Long commentId, @RequestParam Long userId) {
+        if (userId == null || commentId == null) {
+            throw new BadRequestException("未提供用户id或评论id");
+        }
+        if (!matchCommentService.hasLiked(commentId, userId)) {
+            throw new BadRequestException("用户未点赞该评论");
+        }
+        return matchCommentService.cancelLikeComment(commentId, userId);
     }
 }

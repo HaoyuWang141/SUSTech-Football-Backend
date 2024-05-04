@@ -441,6 +441,14 @@ CREATE TABLE match_comment_reply
     time       TIMESTAMP DEFAULT now()
 );
 
+-- 评论点赞表
+CREATE TABLE match_comment_like
+(
+    user_id INT REFERENCES  t_user (user_id),
+    comment_id INT REFERENCES match_comment (comment_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, comment_id)
+);
+
 
 -- 语法
 
