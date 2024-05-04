@@ -108,9 +108,9 @@ public class CommentController {
         return matchCommentService.getCommentsWithReplyByMatchId(matchId);
     }
 
-    @GetMapping("/match/getCommentLikes")
+    @PostMapping("/match/like/getByIdList")
     @Operation(summary = "列出评论的点赞情况", description = "需要提供要获取的评论id和当前用户id，返回评论的点赞情况")
-    public List<VoMatchCommentLike> getCommentLikesByCommentIdList(@RequestParam Long userId, @RequestParam List<Long> commentIds) {
+    public List<VoMatchCommentLike> getCommentLikesByCommentIdList(@RequestParam Long userId, @RequestBody List<Long> commentIds) {
         if (commentIds == null || commentIds.isEmpty()) {
             throw new BadRequestException("未提供评论id");
         }
@@ -120,7 +120,7 @@ public class CommentController {
         return matchCommentService.getCommentLikesByCommentIdList(userId, commentIds);
     }
 
-    @PostMapping("/match/likeComment")
+    @PostMapping("/match/like/doLike")
     @Operation(summary = "点赞评论", description = "需要提供评论id和用户id，点赞成功返回true，失败返回false")
     public boolean likeComment(@RequestParam Long commentId, @RequestParam Long userId) {
         if (userId == null || commentId == null) {
@@ -132,7 +132,7 @@ public class CommentController {
         return matchCommentService.likeComment(commentId, userId);
     }
 
-    @PostMapping("/match/cancelLikeComment")
+    @PostMapping("/match/like/cancelLike")
     @Operation(summary = "取消点赞评论", description = "需要提供评论id和用户id，取消点赞成功返回true，失败返回false")
     public boolean cancelLikeComment(@RequestParam Long commentId, @RequestParam Long userId) {
         if (userId == null || commentId == null) {
