@@ -39,6 +39,23 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     private TeamPlayerService teamPlayerService;
     @Autowired
     private MatchPlayerService matchPlayerService;
+    @Autowired
+    private EventStageService eventStageService;
+
+    @Override
+    public boolean createEvent(Event event) {
+        boolean creatMain = save(event);
+        boolean creatStage = eventStageService.updateStageAndTage(event);
+        return creatMain && creatStage;
+    }
+
+    @Override
+    public boolean updateEvent(Event event) {
+        boolean updateMain = updateById(event);
+        boolean updateStage = eventStageService.updateStageAndTage(event);
+        return updateMain && updateStage;
+    }
+
 
     @Override
     public Event getDetailedEvent(Long eventId) {

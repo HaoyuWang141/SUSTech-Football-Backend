@@ -52,7 +52,7 @@ public class EventController {
         if (event.getEventId() != null) {
             throw new BadRequestException("传入的赛事已有ID");
         }
-        if (!eventService.save(event)) {
+        if (!eventService.createEvent(event)) {
             throw new BadRequestException("创建赛事失败");
         }
         if (!eventService.inviteManager(new EventManager(event.getEventId(), ownerId, true))) {
@@ -96,7 +96,7 @@ public class EventController {
         if (event.getEventId() == null) {
             throw new BadRequestException("传入的赛事ID为空");
         }
-        if (!eventService.updateById(event)) {
+        if (!eventService.updateEvent(event)) {
             throw new BadRequestException("更新赛事失败");
         }
     }
