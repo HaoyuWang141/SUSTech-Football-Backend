@@ -55,8 +55,8 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     @Override
     public boolean updateEvent(Event event) {
         boolean updateMain = updateById(event);
-        boolean updateStage = eventStageService.updateStageAndTage(event);
-        return updateMain && updateStage;
+//        boolean updateStage = eventStageService.updateStageAndTage(event);
+        return updateMain;
     }
 
 
