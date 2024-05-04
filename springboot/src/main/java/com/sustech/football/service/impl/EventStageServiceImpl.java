@@ -33,12 +33,12 @@ public class EventStageServiceImpl extends MppServiceImpl<EventStageMapper, Even
             if (tags == null) {
                 throw new RuntimeException("赛事标签为空");
             }
-            this.saveOrUpdate(new EventStage(event.getEventId(), s.getStageName()));
+            this.save(new EventStage(event.getEventId(), s.getStageName()));
             for (Event.Tag t : tags) {
                 if (t.getTagName() == null) {
                     throw new RuntimeException("赛事标签名为空");
                 }
-                eventStageTagService.saveOrUpdate(new EventStageTag(event.getEventId(), s.getStageName(), t.getTagName()));
+                eventStageTagService.save(new EventStageTag(event.getEventId(), s.getStageName(), t.getTagName()));
             }
         }
         return true;
