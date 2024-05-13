@@ -23,4 +23,9 @@ public class TeamManager {
         this.teamId = teamId;
         this.isOwner = isOwner;
     }
+
+    public TeamManager(Long userId, Long teamId) {
+        this.userId = userId;
+        this.teamId = teamId;
+    }
 }
