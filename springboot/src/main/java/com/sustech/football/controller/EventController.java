@@ -102,12 +102,17 @@ public class EventController {
     }
 
     @DeleteMapping("/delete")
-    @Deprecated
-    public void deleteEvent(Long eventId) {
-        if (eventId == null) {
-            throw new BadRequestException("传入的赛事ID为空");
+    public void deleteEvent(@RequestParam Long eventId, @RequestParam Long userId) {
+        if (eventId == null || userId == null) {
+            throw new BadRequestException("传入的赛事或删除者ID为空");
         }
-        if (!eventService.removeById(eventId)) {
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        if (userService.getById(userId) == null) {
+            throw new ResourceNotFoundException("删除者不存在");
+        }
+        if (!eventService.deleteEvent(eventId, userId)) {
             throw new BadRequestException("删除赛事失败");
         }
     }

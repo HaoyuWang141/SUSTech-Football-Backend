@@ -468,3 +468,363 @@ CREATE TABLE match_comment_like
 -- FOR EACH ROW
 -- EXECUTE FUNCTION function_name();
 
+
+/*
+
+Back Up tables
+
+meaning of zbak: z as the last letter of the alphabet, bak as backup
+
+*/
+
+-- 比赛表
+CREATE TABLE zbak_match
+(
+    LIKE match INCLUDING ALL
+);
+
+CREATE TABLE zbak_match_manager
+(
+    LIKE match_manager INCLUDING ALL
+);
+-- 比赛(友谊赛)邀请球队
+CREATE TABLE zbak_match_team_request
+(
+    LIKE match_team_request INCLUDING ALL
+);
+
+-- 比赛-裁判
+CREATE TABLE zbak_match_referee
+(
+    LIKE match_referee INCLUDING ALL
+);
+
+-- 比赛邀请裁判
+CREATE TABLE zbak_match_referee_request
+(
+    LIKE match_referee_request INCLUDING ALL
+);
+
+
+-- 比赛-球员行为（进球、红牌、黄牌）
+CREATE TABLE zbak_match_player_action
+(
+    LIKE match_player_action INCLUDING ALL
+);
+
+CREATE TABLE zbak_match_live
+(
+    LIKE match_live INCLUDING ALL
+);
+
+CREATE TABLE zbak_match_video
+(
+    LIKE match_video INCLUDING ALL
+);
+
+CREATE TABLE zbak_match_player
+(
+    LIKE match_player INCLUDING ALL
+);
+
+-- 赛事表
+CREATE TABLE zbak_event
+(
+    LIKE event INCLUDING ALL
+);
+
+-- 赛事管理者表
+CREATE TABLE zbak_event_manager
+(
+    LIKE event_manager INCLUDING ALL
+);
+
+-- 赛事-球队
+CREATE TABLE zbak_event_team
+(
+    LIKE event_team INCLUDING ALL
+);
+-- 小组
+CREATE TABLE zbak_event_group
+(
+    LIKE event_group INCLUDING ALL
+);
+
+-- 小组-球队
+CREATE TABLE zbak_event_group_team
+(
+    LIKE event_group_team INCLUDING ALL
+);
+
+-- 赛事邀请球队/球队申请加入赛事
+CREATE TABLE zbak_event_team_request
+(
+    LIKE event_team_request INCLUDING ALL
+);
+
+-- 赛事-裁判
+CREATE TABLE zbak_event_referee
+(
+    LIKE event_referee INCLUDING ALL
+);
+
+-- 赛事邀请裁判
+CREATE TABLE zbak_event_referee_request
+(
+    LIKE event_referee_request INCLUDING ALL
+);
+
+-- 赛事-比赛阶段：小组赛、淘汰赛、排位赛等
+CREATE TABLE zbak_event_stage
+(
+    LIKE event_stage INCLUDING ALL
+);
+
+-- 【赛事-比赛阶段】-标签：如stage=小组赛，tag=A组、B组等；stage=淘汰赛，tag=1/8决赛、1/4决赛等
+CREATE TABLE zbak_event_stage_tag
+(
+    LIKE event_stage_tag INCLUDING ALL
+);
+
+-- 赛事-比赛
+CREATE TABLE zbak_event_match
+(
+    LIKE event_match INCLUDING ALL
+);
+
+CREATE TABLE zbak_match_referee
+(
+    LIKE match_referee
+);
+
+CREATE TABLE zbak_match_live
+(
+    LIKE match_live
+);
+
+CREATE TABLE zbak_match_player
+(
+    LIKE match_player
+);
+
+CREATE TABLE zbak_match_video
+(
+    LIKE match_video
+);
+
+CREATE TABLE zbak_match_player_action
+(
+    LIKE match_player_action
+);
+
+
+
+
+
+
+CREATE
+OR REPLACE FUNCTION backup_and_delete_match()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- 复制表A的被删除行到备份表
+INSERT INTO zbak_match
+SELECT *
+FROM match
+WHERE match_id = OLD.match_id;
+
+INSERT INTO zbak_event_match
+SELECT *
+FROM event_match
+WHERE match_id = OLD.match_id;
+
+INSERT INTO zbak_match_manager
+SELECT *
+FROM match_manager
+WHERE match_id = OLD.match_id;
+
+INSERT INTO zbak_match_referee
+SELECT *
+FROM match_referee
+WHERE match_id = OLD.match_id;
+
+INSERT INTO zbak_match_player_action
+SELECT *
+FROM match_player_action
+WHERE match_id = OLD.match_id;
+
+INSERT INTO zbak_match_live
+SELECT *
+FROM match_live
+WHERE match_id = OLD.match_id;
+
+INSERT INTO zbak_match_video
+SELECT *
+FROM match_video
+WHERE match_id = OLD.match_id;
+
+INSERT INTO zbak_match_player
+SELECT *
+FROM match_player
+WHERE match_id = OLD.match_id;
+
+DELETE FROM match_player
+WHERE match_id = OLD.match_id;
+
+DELETE FROM match_video
+WHERE match_id = OLD.match_id;
+
+DELETE FROM match_live
+WHERE match_id = OLD.match_id;
+
+DELETE FROM match_player_action
+WHERE match_id = OLD.match_id;
+
+DELETE FROM match_referee_request
+WHERE match_id = OLD.match_id;
+
+DELETE FROM match_referee
+WHERE match_id = OLD.match_id;
+
+DELETE FROM match_team_request
+WHERE match_id = OLD.match_id;
+
+DELETE FROM match_manager
+WHERE match_id = OLD.match_id;
+
+DELETE FROM event_match
+WHERE match_id = OLD.match_id;
+
+-- 返回OLD以允许删除操作继续
+RETURN OLD;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_backup_and_delete
+    BEFORE DELETE
+    ON match
+    FOR EACH ROW
+    EXECUTE FUNCTION backup_and_delete_match();
+
+CREATE
+OR REPLACE FUNCTION backup_and_delete_event()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- 复制表A的被删除行到备份表
+INSERT INTO zbak_event
+SELECT *
+FROM event
+WHERE event_id = OLD.event_id;
+
+-- 查找表B中与表A相关联的行，复制到备份表B
+INSERT INTO zbak_event_manager
+SELECT *
+FROM event_manager
+WHERE event_id = OLD.event_id;
+
+INSERT INTO zbak_event_team
+SELECT *
+FROM event_team
+WHERE event_id = OLD.event_id;
+
+INSERT INTO zbak_event_group
+SELECT *
+FROM event_group
+WHERE event_id = OLD.event_id;
+
+INSERT INTO zbak_event_group_team
+SELECT event_group_team.*
+FROM event_group_team
+WHERE event_group_team.group_id IN (
+    SELECT event_id
+    FROM event_group
+    WHERE event_id = OLD.event_id
+);
+
+INSERT INTO zbak_event_team_request
+SELECT *
+FROM event_team_request
+WHERE event_id = OLD.event_id;
+
+INSERT INTO zbak_event_referee
+SELECT *
+FROM event_referee
+WHERE event_id = OLD.event_id;
+
+INSERT INTO zbak_event_referee_request
+SELECT *
+FROM event_referee_request
+WHERE event_id = OLD.event_id;
+
+INSERT INTO zbak_event_stage
+SELECT *
+FROM event_stage
+WHERE event_id = OLD.event_id;
+
+INSERT INTO zbak_event_stage_tag
+SELECT *
+FROM event_stage_tag
+WHERE event_id = OLD.event_id;
+
+INSERT INTO zbak_event_match
+SELECT *
+FROM event_match
+WHERE event_id = OLD.event_id;
+
+-- TODO:
+DELETE
+FROM event_match
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM event_stage_tag
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM event_stage
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM event_referee_request
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM event_referee
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM event_team_request
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM event_group_team
+WHERE event_group_team.group_id IN (
+    SELECT event_id
+    FROM event_group
+    WHERE event_id = OLD.event_id
+);
+
+DELETE
+FROM event_group
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM event_team
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM event_manager
+WHERE event_id = OLD.event_id;
+
+-- 返回OLD以允许删除操作继续
+RETURN OLD;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- 创建触发器
+CREATE TRIGGER trigger_backup_and_delete
+    BEFORE DELETE
+    ON event
+    FOR EACH ROW
+    EXECUTE FUNCTION backup_and_delete_event();

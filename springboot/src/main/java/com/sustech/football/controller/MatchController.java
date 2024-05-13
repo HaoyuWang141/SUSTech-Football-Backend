@@ -232,11 +232,11 @@ public class MatchController {
 
     @DeleteMapping("/delete")
     @Deprecated
-    public void deleteMatch(Long matchId) {
+    public void deleteMatch(Long matchId, Long userId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
         }
-        if (!matchService.removeById(matchId)) {
+        if (!matchService.deleteMatch(matchId, userId)) {
             throw new BadRequestException("删除比赛失败");
         }
     }
