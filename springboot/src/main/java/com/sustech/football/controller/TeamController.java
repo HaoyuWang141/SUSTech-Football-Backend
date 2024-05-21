@@ -29,6 +29,8 @@ public class TeamController {
     @Autowired
     private MatchService matchService;
     @Autowired
+    private EventService eventService;
+    @Autowired
     private TeamPlayerService teamPlayerService;
 
     @PostMapping("/create")
@@ -416,7 +418,7 @@ public class TeamController {
         if (eventId == null || teamId == null || accept == null) {
             throw new BadRequestException("传入的赛事ID或队伍ID或状态为空");
         }
-        if (matchService.getById(eventId) == null) {
+        if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
         }
         if (teamService.getById(teamId) == null) {
