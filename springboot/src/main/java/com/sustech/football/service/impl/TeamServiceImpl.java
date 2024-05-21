@@ -67,6 +67,27 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
+    public boolean deleteTeam(Long teamId, Long userId) {
+        if (teamManagerService.selectByMultiId(new TeamManager(userId, teamId, true)) == null) {
+            throw new BadRequestException("试图删除队伍的用户不是队伍拥有者");
+        }
+
+        QueryWrapper<TeamManager> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("team_id", teamId);
+        List<TeamManager> teamManagerList = teamManagerService.list(queryWrapper);
+        teamManagerService.remove(queryWrapper);
+
+        try {
+            this.removeById(teamId);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            teamManagerService.saveBatch(teamManagerList);
+            throw new ConflictException("删除队伍失败，队伍可能已有关联");
+        }
+        return true;
+    }
+
+    @Override
     public List<Team> getTeamsByIdList(List<Long> teamIdList) {
         return teamIdList.stream()
                 .map(this::getTeamById).toList();

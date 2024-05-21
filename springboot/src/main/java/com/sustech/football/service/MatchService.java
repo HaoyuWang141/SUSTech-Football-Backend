@@ -12,6 +12,8 @@ public interface MatchService extends IService<Match> {
 
     List<Match> getAllMatches();
 
+    boolean deleteMatch(Long matchId,Long userId);
+
     MatchEvent findMatchEvent(Match match);
 
     boolean inviteManager(MatchManager matchManager);

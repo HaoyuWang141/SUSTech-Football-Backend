@@ -92,6 +92,20 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     }
 
     @Override
+    public boolean deleteMatch(Long matchId, Long userId) {
+        QueryWrapper<MatchManager> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("match_id", matchId).eq("user_id", userId);
+        List<MatchManager> managers = matchManagerService.list(queryWrapper);
+        if (managers == null) {
+            throw new BadRequestException("用户不是该比赛的管理员，无法删除比赛");
+        }
+        if (!removeById(matchId)) {
+            throw new RuntimeException("删除比赛失败");
+        }
+        return true;
+    }
+
+    @Override
     public boolean inviteManager(MatchManager matchManager) {
         if (matchManagerService.selectByMultiId(matchManager) != null) {
             throw new ConflictException("该用户已经是该比赛的管理员");
@@ -123,7 +137,7 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         Long matchId = matchTeamRequest.getMatchId();
         Match match = getById(matchId);
         List<MatchTeamRequest> matchTeamRequestList = matchTeamRequestService.listWithTeam(matchId);
-        if (matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_HOME)){
+        if (matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_HOME)) {
             if (match.getHomeTeamId() != null) {
                 throw new ConflictException("主队已存在");
             }

@@ -39,7 +39,7 @@ public class EventController {
 
 
     @PostMapping("/create")
-    public Event createEvent(Long ownerId, @RequestBody Event event) {
+    public String createEvent(Long ownerId, @RequestBody Event event) {
         if (ownerId == null) {
             throw new BadRequestException("赛事所有者ID不能为空");
         }
@@ -52,13 +52,13 @@ public class EventController {
         if (event.getEventId() != null) {
             throw new BadRequestException("传入的赛事已有ID");
         }
-        if (!eventService.save(event)) {
+        if (!eventService.createEvent(event)) {
             throw new BadRequestException("创建赛事失败");
         }
         if (!eventService.inviteManager(new EventManager(event.getEventId(), ownerId, true))) {
             throw new BadRequestException("创建比赛失败");
         }
-        return event;
+        return "创建赛事成功";
     }
 
     @GetMapping("/get")
@@ -96,18 +96,23 @@ public class EventController {
         if (event.getEventId() == null) {
             throw new BadRequestException("传入的赛事ID为空");
         }
-        if (!eventService.updateById(event)) {
+        if (!eventService.updateEvent(event)) {
             throw new BadRequestException("更新赛事失败");
         }
     }
 
     @DeleteMapping("/delete")
-    @Deprecated
-    public void deleteEvent(Long eventId) {
-        if (eventId == null) {
-            throw new BadRequestException("传入的赛事ID为空");
+    public void deleteEvent(@RequestParam Long eventId, @RequestParam Long userId) {
+        if (eventId == null || userId == null) {
+            throw new BadRequestException("传入的赛事或删除者ID为空");
         }
-        if (!eventService.removeById(eventId)) {
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        if (userService.getById(userId) == null) {
+            throw new ResourceNotFoundException("删除者不存在");
+        }
+        if (!eventService.deleteEvent(eventId, userId)) {
             throw new BadRequestException("删除赛事失败");
         }
     }

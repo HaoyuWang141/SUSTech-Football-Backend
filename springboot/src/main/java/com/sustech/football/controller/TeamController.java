@@ -11,6 +11,7 @@ import com.sustech.football.service.*;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
 
+import javax.naming.ConfigurationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class TeamController {
 
     @PostMapping("/create")
     @Transactional
-    public Team createTeam(Long ownerId, @RequestBody Team team) {
+    public String createTeam(Long ownerId, @RequestBody Team team) {
         if (ownerId == null) {
             throw new BadRequestException("传入的队伍管理员ID为空");
         }
@@ -54,7 +55,7 @@ public class TeamController {
         if (!teamService.inviteManager(new TeamManager(ownerId, team.getTeamId(), true))) {
             throw new BadRequestException("创建球队失败");
         }
-        return team;
+        return "创建球队成功";
     }
 
     @GetMapping("/get")
@@ -103,7 +104,7 @@ public class TeamController {
     }
 
     @PostMapping("captain/updateByPlayerId")
-    public void updateCaptain(@RequestParam Long teamId, @RequestParam Long captainId){
+    public void updateCaptain(@RequestParam Long teamId, @RequestParam Long captainId) {
         if (teamId == null || captainId == null) {
             throw new BadRequestException("传入的队伍ID或队长ID为空");
         }
@@ -160,11 +161,23 @@ public class TeamController {
     }
 
     @DeleteMapping("/delete")
-    @Deprecated
-    public void deleteTeam(Long id) {
-        if (!teamService.removeById(id)) {
+    public void deleteTeam(Long teamId, Long userId) {
+//        if (!teamService.removeById(id)) {
+//            throw new ResourceNotFoundException("球队不存在");
+//        }
+        if (teamId == null || userId == null) {
+            throw new BadRequestException("传入的管理员ID或队伍ID为空");
+        }
+        if (userService.getById(userId) == null) {
+            throw new ResourceNotFoundException("删除的操作用户不存在");
+        }
+        if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
+        if (!teamService.deleteTeam(teamId, userId)) {
+            throw new ConflictException("删除失败，队伍已有关联");
+        }
+
     }
 
     @PostMapping("/manager/invite")

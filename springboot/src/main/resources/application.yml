@@ -3,11 +3,11 @@ spring:
     active: dev_why
   devtools:
     restart:
-      enabled: true  #设置开启热部署
-      additional-paths: src/main/java #重启目录
+      enabled: true  # Enable hot deployment
+      additional-paths: src/main/java # Restart directory
       exclude: WEB-INF/**
   freemarker:
-    cache: false    #页面不加载缓存，修改即时生效
+    cache: false  # Disable cache to allow immediate effect when modifying pages
   mvc:
     static-path-pattern: /**
   #    path match:
@@ -15,8 +15,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 10MB # 通过http上传单个文件最大大小
-      max-request-size: 10MB # 通过http一次性上传文件的总大小
+      max-file-size: 10MB # Maximum file size for HTTP uploads
+      max-request-size: 10MB # Maximum total size for HTTP uploads at once
 
   web:
     resources:

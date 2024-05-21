@@ -39,6 +39,38 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     private TeamPlayerService teamPlayerService;
     @Autowired
     private MatchPlayerService matchPlayerService;
+    @Autowired
+    private EventStageService eventStageService;
+    @Autowired
+    private EventStageTagService eventStageTagService;
+
+    @Override
+    public boolean createEvent(Event event) {
+        boolean creatMain = save(event);
+        System.out.println(event.getEventId());
+        boolean creatStage = eventStageService.updateStageAndTage(event);
+        return creatMain && creatStage;
+    }
+
+    @Override
+    public boolean updateEvent(Event event) {
+        boolean updateMain = updateById(event);
+//        boolean updateStage = eventStageService.updateStageAndTage(event);
+        return updateMain;
+    }
+
+    @Override
+    public boolean deleteEvent(Long eventId, Long userId) {
+        EventManager eventManager = eventManagerService.selectByMultiId(new EventManager(eventId, userId, true));
+        if (eventManager == null) {
+            throw new ResourceNotFoundException("用户不是该赛事的创建者");
+        }
+        if (!removeById(eventId)) {
+            throw new RuntimeException("删除赛事失败");
+        }
+        return true;
+    }
+
 
     @Override
     public Event getDetailedEvent(Long eventId) {
@@ -94,17 +126,29 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
             em.setMatch(match);
         });
         event.setMatchList(eventMatches.stream().map(EventMatch::getMatch).toList());
-        event.setStageList(eventMatches.stream().map(EventMatch::getStage).distinct().map(stage -> {
+        event.setStageList(eventStageService.list(new QueryWrapper<EventStage>().eq("event_id", eventId)).stream().map(EventStage::getStage).map(stage -> {
             Event.Stage eventStage = new Event.Stage();
             eventStage.setStageName(stage);
-            eventStage.setTags(eventMatches.stream().filter(em -> em.getStage().equals(stage)).map(EventMatch::getTag).distinct().map(tag -> {
+            eventStage.setTags(eventStageTagService.list(new QueryWrapper<EventStageTag>().eq("event_id", eventId).eq("stage", stage)).stream().map(EventStageTag::getTag).distinct().map(tag -> {
                 Event.Tag eventTag = new Event.Tag();
                 eventTag.setTagName(tag);
-                eventTag.setMatches(eventMatches.stream().filter(em2 -> em2.getStage().equals(stage) && em2.getTag().equals(tag)).map(EventMatch::getMatch).toList());
+                eventTag.setMatches(eventMatches.stream().filter(em -> em.getStage().equals(stage) && em.getTag().equals(tag)).map(EventMatch::getMatch).toList());
                 return eventTag;
             }).toList());
             return eventStage;
         }).toList());
+
+//        event.setStageList(eventMatches.stream().map(EventMatch::getStage).distinct().map(stage -> {
+//            Event.Stage eventStage = new Event.Stage();
+//            eventStage.setStageName(stage);
+//            eventStage.setTags(eventMatches.stream().filter(em -> em.getStage().equals(stage)).map(EventMatch::getTag).distinct().map(tag -> {
+//                Event.Tag eventTag = new Event.Tag();
+//                eventTag.setTagName(tag);
+//                eventTag.setMatches(eventMatches.stream().filter(em2 -> em2.getStage().equals(stage) && em2.getTag().equals(tag)).map(EventMatch::getMatch).toList());
+//                return eventTag;
+//            }).toList());
+//            return eventStage;
+//        }).toList());
         return event;
     }
 

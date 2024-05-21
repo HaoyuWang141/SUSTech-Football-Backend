@@ -40,7 +40,7 @@ public class MatchController {
 
     @PostMapping("/create")
     @Transactional
-    public Match createMatch(Long ownerId, @RequestBody Match match) {
+    public String createMatch(Long ownerId, @RequestBody Match match) {
         if (ownerId == null) {
             throw new BadRequestException("比赛所有者ID不能为空");
         }
@@ -59,7 +59,7 @@ public class MatchController {
         if (!matchService.inviteManager(new MatchManager(match.getMatchId(), ownerId, true))) {
             throw new BadRequestException("创建比赛失败");
         }
-        return match;
+        return "创建比赛成功";
     }
 
     @GetMapping("/get")
@@ -136,8 +136,15 @@ public class MatchController {
 
         // 裁判
         List<Referee> refereeList = matchService.getReferees(id);
-        List<Long> refereeIdList = refereeList.stream().map(Referee::getRefereeId).toList();
-        voMatch.setRefereeList(refereeIdList);
+        List<VoMatchReferee> voRefereeList = new ArrayList<>();
+        for (Referee referee : refereeList) {
+            VoMatchReferee voMatchReferee = new VoMatchReferee();
+            voMatchReferee.setRefereeId(referee.getRefereeId());
+            voMatchReferee.setName(referee.getName());
+            voMatchReferee.setPhotoUrl(referee.getPhotoUrl());
+            voRefereeList.add(voMatchReferee);
+        }
+        voMatch.setRefereeList(voRefereeList);
 
         // 比赛事件
         List<MatchPlayerAction> matchPlayerActions = matchService.getMatchPlayerActions(id);
@@ -168,7 +175,7 @@ public class MatchController {
             voMatchPlayerActions.add(voMatchPlayerAction);
         }
         voMatchPlayerActions.sort(Comparator.comparing(VoMatchPlayerAction::getTime));
-        voMatch.setActions(voMatchPlayerActions);
+        voMatch.setMatchPlayerActionList(voMatchPlayerActions);
 
         // 所属赛事
         MatchEvent matchEvent = matchService.findMatchEvent(match);
@@ -177,7 +184,7 @@ public class MatchController {
         voMatchEvent.setEventName(matchEvent.getEventName());
         voMatchEvent.setStage(matchEvent.getMatchStage());
         voMatchEvent.setTag(matchEvent.getMatchTag());
-        voMatch.setEvent(voMatchEvent);
+        voMatch.setMatchEvent(voMatchEvent);
 
         return voMatch;
     }
@@ -225,11 +232,11 @@ public class MatchController {
 
     @DeleteMapping("/delete")
     @Deprecated
-    public void deleteMatch(Long matchId) {
+    public void deleteMatch(Long matchId, Long userId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
         }
-        if (!matchService.removeById(matchId)) {
+        if (!matchService.deleteMatch(matchId, userId)) {
             throw new BadRequestException("删除比赛失败");
         }
     }

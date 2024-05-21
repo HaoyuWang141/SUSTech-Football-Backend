@@ -12,7 +12,7 @@ import java.util.List;
 
 
 public interface UserRoleMapper extends MppBaseMapper<UserRole> {
-    @Select("SELECT tu.user_id, tu.nick_name, referee_id, coach_id, player_id FROM t_user tu " +
+    @Select("SELECT tu.user_id, tu.nick_name, tu.avatar_url, referee_id, coach_id, player_id FROM t_user tu " +
             "LEFT JOIN coach c ON tu.user_id = c.user_id " +
             "LEFT JOIN player p ON tu.user_id = p.user_id " +
             "LEFT JOIN referee r ON tu.user_id = r.user_id " +
@@ -20,6 +20,7 @@ public interface UserRoleMapper extends MppBaseMapper<UserRole> {
     @Results({
             @Result(column = "user_id", property = "userId"),
             @Result(column = "nick_name", property = "nickName"),
+            @Result(column = "avatar_url", property = "avatarUrl"),
             @Result(column = "player_id", property = "playerRole", one = @One(select = "com.sustech.football.mapper.PlayerMapper.selectById")),
             @Result(column = "coach_id", property = "coachRole", one = @One(select = "com.sustech.football.mapper.CoachMapper.selectById")),
             @Result(column = "referee_id", property = "refereeRole", one = @One(select = "com.sustech.football.mapper.RefereeMapper.selectById"))
@@ -27,7 +28,7 @@ public interface UserRoleMapper extends MppBaseMapper<UserRole> {
     List<UserRole> selectRoleUser();
 
     @Select(
-            "SELECT tu.user_id, tu.nick_name, referee_id, coach_id, player_id FROM t_user tu " +
+            "SELECT tu.user_id, tu.nick_name, tu.avatar_url, referee_id, coach_id, player_id FROM t_user tu " +
                     "LEFT JOIN coach c ON tu.user_id = c.user_id " +
                     "LEFT JOIN player p ON tu.user_id = p.user_id " +
                     "LEFT JOIN referee r ON tu.user_id = r.user_id " +
@@ -36,6 +37,7 @@ public interface UserRoleMapper extends MppBaseMapper<UserRole> {
     @Results({
             @Result(column = "user_id", property = "userId"),
             @Result(column = "nick_name", property = "nickName"),
+            @Result(column = "avatar_url", property = "avatarUrl"),
             @Result(column = "player_id", property = "playerRole", one = @One(select = "com.sustech.football.mapper.PlayerMapper.selectById")),
             @Result(column = "coach_id", property = "coachRole", one = @One(select = "com.sustech.football.mapper.CoachMapper.selectById")),
             @Result(column = "referee_id", property = "refereeRole", one = @One(select = "com.sustech.football.mapper.RefereeMapper.selectById"))

@@ -7,6 +7,12 @@ import com.sustech.football.entity.*;
 import java.util.List;
 
 public interface EventService extends IService<Event> {
+    boolean createEvent(Event event);
+
+    boolean updateEvent(Event event);
+
+    boolean deleteEvent(Long eventId, Long userId);
+
     Event getDetailedEvent(Long eventId);
 
     boolean inviteManager(EventManager eventManager);

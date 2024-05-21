@@ -64,7 +64,7 @@ public class Event {
         List<Tag> tags;
     }
 
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "event_id", type = IdType.AUTO)
     private Long eventId;
     private String name;
     private String description;

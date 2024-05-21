@@ -100,16 +100,16 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
             user.setSessionKey(null);
             user.setOpenid(null);
         }
-        for (User user : users) {
-            QueryWrapper<Player> queryWrapper = new QueryWrapper<>();
-            queryWrapper.in("user_id", user.getUserId());
-            Player player = playerMapper.selectOne(queryWrapper);
-            if (player == null) {
-                continue;
-            }
-            user.setAvatarUrl(player.getPhotoUrl());
-            user.setNickName(player.getName());
-        }
+//        for (User user : users) {
+//            QueryWrapper<Player> queryWrapper = new QueryWrapper<>();
+//            queryWrapper.in("user_id", user.getUserId());
+//            Player player = playerMapper.selectOne(queryWrapper);
+//            if (player == null) {
+//                continue;
+//            }
+//            user.setAvatarUrl(player.getPhotoUrl());
+//            user.setNickName(player.getName());
+//        }
         return users;
     }
 
