@@ -144,7 +144,8 @@ CREATE TABLE match
     away_team_score   INT DEFAULT 0,
     home_team_penalty INT DEFAULT 0,
     away_team_penalty INT DEFAULT 0,
-    status            VARCHAR CHECK ( status IN ('PENDING', 'ONGOING', 'FINISHED') ) DEFAULT 'PENDING'
+    status            VARCHAR CHECK ( status IN ('PENDING', 'ONGOING', 'FINISHED') ) DEFAULT 'PENDING',
+    description       TEXT
 );
 
 CREATE TABLE match_manager
