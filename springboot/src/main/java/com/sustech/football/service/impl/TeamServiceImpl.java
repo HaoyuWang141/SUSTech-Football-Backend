@@ -279,7 +279,9 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
 
         String status = accept ? MatchTeamRequest.STATUS_ACCEPTED : MatchTeamRequest.STATUS_REJECTED;
-        MatchTeamRequest matchTeamRequest = new MatchTeamRequest(teamId, matchId, null, null);
+        MatchTeamRequest matchTeamRequest = new MatchTeamRequest();
+        matchTeamRequest.setMatchId(matchId);
+        matchTeamRequest.setTeamId(teamId);
         matchTeamRequest = matchTeamRequestService.selectByMultiId(matchTeamRequest);
         if (matchTeamRequest == null) {
             throw new BadRequestException("该球队没有收到该比赛的邀请");
