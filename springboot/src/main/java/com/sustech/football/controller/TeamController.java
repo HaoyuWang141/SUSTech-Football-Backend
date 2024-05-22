@@ -145,16 +145,16 @@ public class TeamController {
         if (teamRecord.logoUrl() != null) {
             team.setLogoUrl(teamRecord.logoUrl());
         }
-        if (teamRecord.captainId() != null) {
-            List<Long> playerIdList = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", teamId))
-                    .stream()
-                    .map(TeamPlayer::getPlayerId)
-                    .toList();
-            if (playerIdList == null || !playerIdList.contains(teamRecord.captainId())) {
-                throw new BadRequestException("队长非队员");
-            }
-            team.setCaptainId(teamRecord.captainId());
-        }
+//        if (teamRecord.captainId() != null) {
+//            List<Long> playerIdList = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", teamId))
+//                    .stream()
+//                    .map(TeamPlayer::getPlayerId)
+//                    .toList();
+//            if (playerIdList == null || !playerIdList.contains(teamRecord.captainId())) {
+//                throw new BadRequestException("队长非队员");
+//            }
+//            team.setCaptainId(teamRecord.captainId());
+//        }
         if (!teamService.updateById(team)) {
             throw new BadRequestException("更新失败");
         }
