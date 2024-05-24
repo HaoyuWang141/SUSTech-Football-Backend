@@ -30,6 +30,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private CoachMapper coachMapper;
     @Autowired
     private RefereeMapper refereeMapper;
+    @Autowired
+    private TeamPlayerMapper teamPlayerMapper;
 
 
     @Override
@@ -52,6 +54,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<Team> getUserManageTeams(Long userId) {
         List<Team> teams = teamManagerMapper.selectTeamWithManager(userId).stream().map(TeamManager::getTeam).toList();
+        for (Team team : teams) {
+            List<TeamPlayer> teamPlayers = teamPlayerMapper.selectListWithPlayer(team.getTeamId());
+            team.setPlayerList(teamPlayers.stream().map(TeamPlayer::getPlayer).toList());
+        }
         return teams;
     }
 

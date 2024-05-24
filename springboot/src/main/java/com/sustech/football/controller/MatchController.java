@@ -517,11 +517,11 @@ public class MatchController {
         if (teamService.getById(teamId) == null) {
             throw new BadRequestException("球队不存在");
         }
-        // 球队存在于比赛中
+        // 球队需存在于比赛中
         if (!match.getHomeTeamId().equals(teamId) && !match.getAwayTeamId().equals(teamId)) {
             throw new BadRequestException("球队不在比赛中");
         }
-        // 裁判是比赛的裁判
+        // 裁判需是比赛的裁判
         Referee referee = refereeService.getById(refereeId);
         if (referee == null) {
             throw new BadRequestException("裁判不存在");
