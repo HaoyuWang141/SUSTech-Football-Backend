@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -328,10 +330,59 @@ public class MatchController {
             throw new BadRequestException("球队不存在");
         }
 
-        List<MatchPlayer> players = matchPlayerService.list(new QueryWrapper<MatchPlayer>().eq("match_id", matchId).eq("team_id", teamId));
+        // 最终返回的球员列表
         List<VoMatchPlayer> voPlayers = new ArrayList<>();
-        for (MatchPlayer matchPlayer : players) {
+
+        // 目前储存在数据库中，该比赛对应的球员列表
+        List<MatchPlayer> matchPlayerList = matchPlayerService.list(new QueryWrapper<MatchPlayer>().eq("match_id", matchId).eq("team_id", teamId));
+        for (MatchPlayer matchPlayer : matchPlayerList) { // 填入matchPlayer.player字段
             Player player = playerService.getById(matchPlayer.getPlayerId());
+            matchPlayer.setPlayer(player);
+        }
+        if (match.getStatus().equals(Match.STATUS_PENDING)) { // 当比赛未开始的时候，可以更新比赛对应的球员列表及是否首发
+            // 获取球队当前的所有球员
+            List<TeamPlayer> teamCurrentPlayerList = teamService.getTeamPlayers(teamId);
+
+            // 球队当前的所有球员均需要加入到比赛的球员列表中，若之前已经加入的则更新信息并且isStart保持不变，若新加入的则填入信息且isStart字段设置为false
+            Set<Player> matchPlayerSet = matchPlayerList.stream().map(MatchPlayer::getPlayer).collect(Collectors.toSet());
+            for (TeamPlayer teamPlayer : teamCurrentPlayerList) {
+                Player player = teamPlayer.getPlayer();
+                Integer number = teamPlayer.getNumber();
+                if (matchPlayerSet.contains(player)) {
+                    MatchPlayer matchPlayer = matchPlayerList.stream().filter(mp -> mp.getPlayerId().equals(player.getPlayerId())).findFirst().orElse(null);
+                    if (matchPlayer == null) {
+                        throw new InternalServerErrorException("比赛球员信息错误");
+                    }
+                    matchPlayer.setPlayer(player);
+                    matchPlayer.setNumber(number);
+                    matchPlayer.setIsStart(matchPlayer.getIsStart()); // isStart保持不变
+                } else {
+                    MatchPlayer matchPlayer = new MatchPlayer();
+                    matchPlayer.setMatchId(matchId);
+                    matchPlayer.setTeamId(teamId);
+                    matchPlayer.setPlayerId(player.getPlayerId());
+                    matchPlayer.setPlayer(player);
+                    matchPlayer.setNumber(number);
+                    matchPlayer.setIsStart(false);
+                    matchPlayerList.add(matchPlayer);
+                }
+            }
+
+            // 检查是否有球员已经不在球队中，若不在则删除
+            Set<Player> teamCurrentPlayerSet = teamCurrentPlayerList.stream().map(TeamPlayer::getPlayer).collect(Collectors.toSet());
+            List<MatchPlayer> matchPlayerList_needToDelete = new ArrayList<>();
+            for (MatchPlayer matchPlayer : matchPlayerList) {
+                Player player = matchPlayer.getPlayer();
+                if (!teamCurrentPlayerSet.contains(player)) {
+                    matchPlayerList_needToDelete.add(matchPlayer);
+                }
+            }
+            for (MatchPlayer matchPlayer_needToDelete : matchPlayerList_needToDelete) {
+                matchPlayerList.remove((matchPlayer_needToDelete));
+            }
+        }
+        for (MatchPlayer matchPlayer : matchPlayerList) {
+            Player player = matchPlayer.getPlayer();
             VoMatchPlayer voMatchPlayer = new VoMatchPlayer();
             voMatchPlayer.setPlayerId(player.getPlayerId());
             voMatchPlayer.setNumber(matchPlayer.getNumber());
@@ -340,6 +391,7 @@ public class MatchController {
             voMatchPlayer.setIsStart(matchPlayer.getIsStart());
             voPlayers.add(voMatchPlayer);
         }
+
 
         VoMatchTeam voTeam = new VoMatchTeam();
         voTeam.setTeamId(team.getTeamId());
