@@ -231,7 +231,6 @@ public class MatchController {
     }
 
     @DeleteMapping("/delete")
-    @Deprecated
     public void deleteMatch(Long matchId, Long userId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
