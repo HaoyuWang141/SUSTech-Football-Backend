@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,7 +63,7 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
 
     @Override
     public List<Team> getFavoriteTeams(Long userId) {
-        return favoriteTeamMapper.selectFavoriteWithUser(userId).stream().map(FavoriteTeam::getTeam).toList();
+        return favoriteTeamMapper.selectFavoriteWithUser(userId).stream().map(FavoriteTeam::getTeam).sorted(Comparator.comparing(Team::getTeamId)).toList();
     }
 
     @Override
@@ -95,7 +96,7 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
     @Override
     public List<User> getFavoriteUsers(Long userId) {
         List<FavoriteUser> favoriteUsers = favoriteUserMapper.selectFavoriteWithUser(userId);
-        List<User> users = favoriteUsers.stream().map(FavoriteUser::getFavoriteUser).toList();
+        List<User> users = favoriteUsers.stream().map(FavoriteUser::getFavoriteUser).sorted(Comparator.comparing(User::getUserId)).toList();
         for (User user : users) {
             user.setSessionKey(null);
             user.setOpenid(null);
@@ -139,7 +140,7 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
 
     @Override
     public List<Match> getFavoriteMatches(Long userId) {
-        List<Match> matches = favoriteMatchMapper.selectFavoriteWithUser(userId).stream().map(FavoriteMatch::getMatch).toList();
+        List<Match> matches = favoriteMatchMapper.selectFavoriteWithUser(userId).stream().map(FavoriteMatch::getMatch).sorted(Comparator.comparing(Match::getTime)).toList();
         for (Match match : matches) {
             match.setHomeTeam(teamMapper.selectById(match.getHomeTeamId()));
             match.setAwayTeam(teamMapper.selectById(match.getAwayTeamId()));
@@ -173,7 +174,7 @@ public class UserFavoriteServiceImpl implements UserFavoriteService {
 
     @Override
     public List<Event> getFavoriteEvents(Long userId) {
-        return favoriteEventMapper.selectFavoriteWithUser(userId).stream().map(FavoriteEvent::getEvent).toList();
+        return favoriteEventMapper.selectFavoriteWithUser(userId).stream().map(FavoriteEvent::getEvent).sorted(Comparator.comparing(Event::getEventId)).toList();
     }
 
     @Override
