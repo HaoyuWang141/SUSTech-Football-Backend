@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -125,7 +126,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
             match.setMatchEvent(new MatchEvent(em));
             em.setMatch(match);
         });
-        event.setMatchList(eventMatches.stream().map(EventMatch::getMatch).toList());
+        event.setMatchList(eventMatches.stream().map(EventMatch::getMatch).sorted(Comparator.comparing(Match::getTime)).toList());
         event.setStageList(eventStageService.list(new QueryWrapper<EventStage>().eq("event_id", eventId)).stream().map(EventStage::getStage).map(stage -> {
             Event.Stage eventStage = new Event.Stage();
             eventStage.setStageName(stage);
