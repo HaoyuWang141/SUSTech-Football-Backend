@@ -66,7 +66,8 @@ CREATE TABLE team
     team_id    SERIAL PRIMARY KEY,
     name       VARCHAR(255) NOT NULL,
     logo_url   VARCHAR(255),
-    captain_id INT REFERENCES player (player_id)
+    captain_id INT REFERENCES player (player_id),
+    description        TEXT
 );
 
 -- 球队-队服

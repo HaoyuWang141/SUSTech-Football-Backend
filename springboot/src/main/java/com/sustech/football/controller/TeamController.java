@@ -100,7 +100,7 @@ public class TeamController {
         return teamService.getTeamsByIdList(idList);
     }
 
-    private record TeamRecord(Long teamId, String name, String logoUrl, Long captainId) {
+    private record TeamRecord(Long teamId, String name, String logoUrl, Long captainId, String description) {
     }
 
     @PostMapping("captain/updateByPlayerId")
@@ -144,6 +144,9 @@ public class TeamController {
         }
         if (teamRecord.logoUrl() != null) {
             team.setLogoUrl(teamRecord.logoUrl());
+        }
+        if(teamRecord.description()!=null){
+            team.setDescription(teamRecord.description());
         }
 //        if (teamRecord.captainId() != null) {
 //            List<Long> playerIdList = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", teamId))

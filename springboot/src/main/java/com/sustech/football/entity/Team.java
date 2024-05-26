@@ -18,6 +18,7 @@ public class Team {
     private String name;
     private String logoUrl;
     private Long captainId;
+    private String description;
     @TableField(exist = false)
     private List<Coach> coachList;
     @TableField(exist = false)
