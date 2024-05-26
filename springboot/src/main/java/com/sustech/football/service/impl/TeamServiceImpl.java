@@ -439,4 +439,15 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         }
         return true;
     }
+
+    @Override
+    public List<Team> getAllTeams() {
+        List<Team> teamList = this.list();
+        for (Team team : teamList) {
+            List<TeamPlayer> teamPlayerList = teamPlayerService.listWithPlayer(team.getTeamId());
+            team.setPlayerList(teamPlayerList.stream().map(TeamPlayer::getPlayer).toList());
+        }
+
+        return teamList;
+    }
 }

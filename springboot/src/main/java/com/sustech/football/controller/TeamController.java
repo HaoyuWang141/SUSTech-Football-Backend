@@ -89,7 +89,7 @@ public class TeamController {
 
     @GetMapping("/getAll")
     public List<Team> getAllTeams() {
-        return teamService.list();
+        return teamService.getAllTeams();
     }
 
     @GetMapping("/getByIdList")

@@ -60,4 +60,6 @@ public interface TeamService extends IService<Team> {
     boolean deleteUniform(TeamUniform teamUniform);
 
     boolean updateCaptainByPlayerId(Long teamId, Long playerId);
+
+    List<Team> getAllTeams();
 }
