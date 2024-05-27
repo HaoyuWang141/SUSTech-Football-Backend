@@ -180,6 +180,26 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 .toList();
     }
 
+    @Override
+    public boolean updatePlayerNumber(Long teamId, Long playerId, Integer number) {
+        QueryWrapper<TeamPlayer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("team_id", teamId).eq("number", number);
+        TeamPlayer numberPlayer = teamPlayerService.getOne(queryWrapper);
+        if (numberPlayer != null) {
+            throw new ConflictException("号码已被使用");
+        }
+        queryWrapper.eq("team_id", teamId).eq("player_id", playerId);
+        TeamPlayer teamPlayer = teamPlayerService.getOne(queryWrapper);
+        if (teamPlayer == null) {
+            throw new BadRequestException("球员不在球队中");
+        }
+        teamPlayer.setNumber(number);
+        if (!teamPlayerService.updateById(teamPlayer)) {
+            throw new RuntimeException("更新号码失败");
+        }
+        return true;
+    }
+
 
     public List<TeamPlayer> getTeamPlayers(Long teamId) {
         List<Match> matchList = this.getMatches(teamId);

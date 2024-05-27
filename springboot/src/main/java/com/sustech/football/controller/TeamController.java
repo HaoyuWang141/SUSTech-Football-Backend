@@ -145,7 +145,7 @@ public class TeamController {
         if (teamRecord.logoUrl() != null) {
             team.setLogoUrl(teamRecord.logoUrl());
         }
-        if(teamRecord.description()!=null){
+        if (teamRecord.description() != null) {
             team.setDescription(teamRecord.description());
         }
 //        if (teamRecord.captainId() != null) {
@@ -303,6 +303,25 @@ public class TeamController {
                 teamPlayer.getYellowCards(),
                 teamPlayer.getRedCards()
         )).toList();
+    }
+
+    @PostMapping("/player/updateNumber")
+    public void updatePlayerNumber(Long teamId, Long playerId, Integer number) {
+        if (playerId == null || teamId == null || number == null) {
+            throw new BadRequestException("传入的球员ID或队伍ID或号码为空");
+        }
+        if (number < 0 || number > 99) {
+            throw new BadRequestException("号码不合法");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        if (!teamService.updatePlayerNumber(teamId, playerId, number)) {
+            throw new BadRequestException("更新球员号码失败");
+        }
     }
 
     @DeleteMapping("/player/delete")
