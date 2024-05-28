@@ -320,7 +320,7 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        if (!teamService.updatePlayerNumber(teamId, playerId, number)) {
+        if (!teamPlayerService.updatePlayerNumber(teamId, playerId, number)) {
             throw new BadRequestException("更新球员号码失败");
         }
     }

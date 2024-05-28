@@ -181,25 +181,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public boolean updatePlayerNumber(Long teamId, Long playerId, Integer number) {
-        QueryWrapper<TeamPlayer> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("team_id", teamId).eq("number", number);
-        TeamPlayer numberPlayer = teamPlayerService.getOne(queryWrapper);
-        if (numberPlayer != null) {
-            throw new ConflictException("号码已被使用");
-        }
-        TeamPlayer teamPlayer = teamPlayerService.selectByMultiId(new TeamPlayer(teamId, playerId));
-        if (teamPlayer == null) {
-            throw new BadRequestException("球员不在球队中");
-        }
-        teamPlayer.setNumber(number);
-        if (!teamPlayerService.updateById(teamPlayer)) {
-            throw new RuntimeException("更新号码失败");
-        }
-        return true;
-    }
-
-    @Override
     public boolean deletePlayer(Long teamId, Long playerId) {
         Team team = getById(teamId);
         if (team.getCaptainId().equals(playerId)) {
