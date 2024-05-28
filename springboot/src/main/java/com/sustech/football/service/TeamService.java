@@ -33,7 +33,7 @@ public interface TeamService extends IService<Team> {
 
     boolean updatePlayerNumber(Long teamId, Long playerId, Integer number);
 
-    boolean deletePlayer(TeamPlayer teamPlayer);
+    boolean deletePlayer(Long teamId, Long playerId);
 
     boolean inviteCoach(TeamCoach teamCoach);
 

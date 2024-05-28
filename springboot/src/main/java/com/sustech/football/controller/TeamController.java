@@ -336,7 +336,7 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        if (!teamService.deletePlayer(new TeamPlayer(teamId, playerId))) {
+        if (!teamService.deletePlayer(teamId, playerId)) {
             throw new BadRequestException("删除球员失败");
         }
     }

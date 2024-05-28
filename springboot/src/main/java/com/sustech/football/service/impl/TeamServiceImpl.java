@@ -200,6 +200,18 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         return true;
     }
 
+    @Override
+    public boolean deletePlayer(Long teamId, Long playerId) {
+        Team team = getById(teamId);
+        if (team.getCaptainId().equals(playerId)) {
+            throw new ConflictException("队长不能被直接删除，请先转让");
+        }
+        if (!teamPlayerService.deleteByMultiId(new TeamPlayer(teamId, playerId))) {
+            throw new BadRequestException("删除球员失败");
+        }
+        return true;
+    }
+
 
     public List<TeamPlayer> getTeamPlayers(Long teamId) {
         List<Match> matchList = this.getMatches(teamId);
@@ -236,13 +248,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         return teamPlayerList;
     }
 
-    @Override
-    public boolean deletePlayer(TeamPlayer teamPlayer) {
-        if (!teamPlayerService.deleteByMultiId(teamPlayer)) {
-            throw new BadRequestException("删除球员失败");
-        }
-        return true;
-    }
 
     @Override
     public boolean inviteCoach(TeamCoach teamCoach) {
