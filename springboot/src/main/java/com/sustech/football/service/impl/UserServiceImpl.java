@@ -10,6 +10,7 @@ import com.sustech.football.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -41,14 +42,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             match.setAwayTeam(teamMapper.selectById(match.getAwayTeamId()));
             match.setHomeTeam(teamMapper.selectById(match.getHomeTeamId()));
         }
-
-        return matches;
+        return matches.stream().sorted(Comparator.comparing(Match::getTime)).toList();
     }
 
     @Override
     public List<Event> getUserManageEvents(Long userId) {
-        List<Event> events = eventManagerMapper.selectEventWithManager(userId).stream().map(EventManager::getEvent).toList();
-        return events;
+        return eventManagerMapper.selectEventWithManager(userId)
+                .stream()
+                .map(EventManager::getEvent)
+                .sorted(Comparator.comparing(Event::getEventId))
+                .toList();
     }
 
     @Override
@@ -58,7 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             List<TeamPlayer> teamPlayers = teamPlayerMapper.selectListWithPlayer(team.getTeamId());
             team.setPlayerList(teamPlayers.stream().map(TeamPlayer::getPlayer).toList());
         }
-        return teams;
+        return teams.stream().sorted(Comparator.comparing(Team::getTeamId)).toList();
     }
 
     @Override
