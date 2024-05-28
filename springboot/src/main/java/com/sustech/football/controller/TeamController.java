@@ -68,6 +68,7 @@ public class TeamController {
                 team.getTeamId(),
                 team.getName(),
                 team.getLogoUrl(),
+                team.getDescription(),
                 team.getCaptainId(),
                 team.getCoachList(),
                 team.getTeamPlayerList().stream().map(teamPlayer -> new VoTeamPlayer(

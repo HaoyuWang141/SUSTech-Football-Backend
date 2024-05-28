@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RequestMapping("/coach")
 public class CoachController {
-    private final CoachService coachService;
-    private final TeamService teamService;
-    private final TeamCoachRequestService teamCoachRequestService;
+    @Autowired
+    private CoachService coachService;
+    @Autowired
+    private TeamService teamService;
+    @Autowired
+    private TeamCoachRequestService teamCoachRequestService;
 
     @Autowired
     public CoachController(CoachService coachService,

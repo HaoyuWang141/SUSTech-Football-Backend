@@ -4,6 +4,7 @@ import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.service.UserFavoriteService;
 import com.sustech.football.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +15,9 @@ import java.util.List;
 @RestController
 @CrossOrigin
 public class UserFavoriteController {
+    @Autowired
     private UserService userService;
-
+    @Autowired
     private UserFavoriteService userFavoriteService;
 
     public UserFavoriteController(UserService userService, UserFavoriteService userFavoriteService) {
