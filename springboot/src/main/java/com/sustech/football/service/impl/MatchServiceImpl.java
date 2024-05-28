@@ -6,7 +6,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ConflictException;
+import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
+import com.sustech.football.mapper.EventGroupMapper;
+import com.sustech.football.mapper.EventGroupTeamMapper;
+import com.sustech.football.mapper.EventMatchMapper;
 import com.sustech.football.mapper.MatchMapper;
 import com.sustech.football.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements MatchService {
@@ -36,6 +41,13 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     private EventMatchService eventMatchService;
     @Autowired
     private EventService eventService;
+    @Autowired
+    private EventMatchMapper eventMatchMapper;
+    @Autowired
+    private EventGroupMapper eventGroupMapper;
+    @Autowired
+    private EventGroupTeamMapper eventGroupTeamMapper;
+
 
     @Override
     public Match getMatch(Long matchId) {
@@ -244,6 +256,7 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     }
 
     @Override
+    @Transactional
     public boolean updateResult(Long refereeId, Match match) {
         List<Long> refereeList = matchRefereeService
                 .listWithReferee(match.getMatchId())
@@ -255,6 +268,57 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         }
         if (!updateById(match)) {
             throw new RuntimeException("修改比赛结果失败");
+        }
+        // 需要先获取eventMatch
+        EventMatch eventMatch = eventMatchMapper.selectOne(new QueryWrapper<EventMatch>().eq("match_id", match.getMatchId()));
+        if (eventMatch != null && eventMatch.getStage().equals(EventMatch.STAGE_CUP_GROUP)) { // 若该match属于某个event，且是一场小组赛（CUP_GROUP)
+            List<EventGroup> eventGroupList = eventGroupMapper.selectList(new QueryWrapper<EventGroup>().eq("event_id", eventMatch.getEventId()));
+            EventGroupTeam eventGroupTeam_home = new EventGroupTeam();
+            EventGroupTeam eventGroupTeam_away = new EventGroupTeam();
+            for (EventGroup eventGroup : eventGroupList) {
+                Long groupId = eventGroup.getGroupId();
+                Long homeTeamId = match.getHomeTeamId();
+                eventGroupTeam_home = eventGroupTeamMapper.selectOne(new QueryWrapper<EventGroupTeam>().eq("group_id", groupId).eq("team_id", homeTeamId));
+                if (eventGroupTeam_home != null) {
+                    break;
+                }
+            }
+            for (EventGroup eventGroup : eventGroupList) {
+                Long groupId = eventGroup.getGroupId();
+                Long awayTeamId = match.getAwayTeamId();
+                eventGroupTeam_away = eventGroupTeamMapper.selectOne(new QueryWrapper<EventGroupTeam>().eq("group_id", groupId).eq("team_id", awayTeamId));
+                if (eventGroupTeam_away != null) {
+                    break;
+                }
+            }
+            if (eventGroupTeam_home == null || eventGroupTeam_away == null) {
+                throw new InternalServerErrorException("修改比赛结果失败，异常错误");
+            }
+            if (!Objects.equals(eventGroupTeam_home.getGroupId(), eventGroupTeam_away.getGroupId())) {
+                throw new BadRequestException("球队不在同一小组，无法修改比赛结果");
+            }
+
+            // 小组赛不考虑点球
+            // 更新小组赛胜/平/负场数
+            if (match.getHomeTeamScore() > match.getAwayTeamScore()) {
+                eventGroupTeam_home.setNumWins(eventGroupTeam_home.getNumWins() + 1);
+                eventGroupTeam_away.setNumLosses(eventGroupTeam_away.getNumLosses() + 1);
+            } else if (match.getHomeTeamScore() < match.getAwayTeamScore()) {
+                eventGroupTeam_home.setNumLosses(eventGroupTeam_home.getNumLosses() + 1);
+                eventGroupTeam_away.setNumWins(eventGroupTeam_away.getNumWins() + 1);
+            } else {
+                eventGroupTeam_home.setNumDraws(eventGroupTeam_home.getNumDraws() + 1);
+                eventGroupTeam_away.setNumDraws(eventGroupTeam_away.getNumDraws() + 1);
+            }
+
+            // 更新小组赛进/失球数
+            eventGroupTeam_home.setNumGoalsFor(eventGroupTeam_home.getNumGoalsFor() + match.getHomeTeamScore());
+            eventGroupTeam_home.setNumGoalsAgainst(eventGroupTeam_home.getNumGoalsAgainst() + match.getAwayTeamScore());
+            eventGroupTeam_away.setNumGoalsFor(eventGroupTeam_away.getNumGoalsFor() + match.getAwayTeamScore());
+            eventGroupTeam_away.setNumGoalsAgainst(eventGroupTeam_away.getNumGoalsAgainst() + match.getHomeTeamScore());
+
+            // 更新小组积分
+            eventGroupTeam_home.setScore(eventGroupTeam_home.getNumWins() * 3 + eventGroupTeam_home.getNumDraws());
         }
         return true;
     }
