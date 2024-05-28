@@ -188,8 +188,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (numberPlayer != null) {
             throw new ConflictException("号码已被使用");
         }
-        queryWrapper.eq("team_id", teamId).eq("player_id", playerId);
-        TeamPlayer teamPlayer = teamPlayerService.getOne(queryWrapper);
+        TeamPlayer teamPlayer = teamPlayerService.selectByMultiId(new TeamPlayer(teamId, playerId));
         if (teamPlayer == null) {
             throw new BadRequestException("球员不在球队中");
         }
