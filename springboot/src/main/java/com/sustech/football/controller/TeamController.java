@@ -68,6 +68,7 @@ public class TeamController {
                 team.getTeamId(),
                 team.getName(),
                 team.getLogoUrl(),
+                team.getDescription(),
                 team.getCaptainId(),
                 team.getCoachList(),
                 team.getTeamPlayerList().stream().map(teamPlayer -> new VoTeamPlayer(
@@ -319,7 +320,7 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        if (!teamService.updatePlayerNumber(teamId, playerId, number)) {
+        if (!teamPlayerService.updatePlayerNumber(teamId, playerId, number)) {
             throw new BadRequestException("更新球员号码失败");
         }
     }
@@ -335,7 +336,7 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        if (!teamService.deletePlayer(new TeamPlayer(teamId, playerId))) {
+        if (!teamService.deletePlayer(teamId, playerId)) {
             throw new BadRequestException("删除球员失败");
         }
     }

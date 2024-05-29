@@ -8,5 +8,8 @@ import com.sustech.football.entity.TeamPlayer;
 
 public interface TeamPlayerService extends IMppService<TeamPlayer> {
     List<TeamPlayer> listWithTeam(Long playerId);
+
     List<TeamPlayer> listWithPlayer(Long teamId);
+
+    boolean updatePlayerNumber(Long teamId, Long playerId, Integer number);
 }

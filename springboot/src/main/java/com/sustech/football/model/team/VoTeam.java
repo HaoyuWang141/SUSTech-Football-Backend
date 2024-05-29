@@ -17,6 +17,7 @@ public class VoTeam {
     private Long teamId;
     private String name;
     private String logoUrl;
+    private String description;
     private Long captainId;
     private List<Coach> coachList;
     private List<VoTeamPlayer> playerList;
