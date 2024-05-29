@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,23 +42,20 @@ public class EventController {
 
     @PostMapping("/create")
     public String createEvent(Long ownerId, @RequestBody Event event) {
-        if (ownerId == null) {
-            throw new BadRequestException("赛事所有者ID不能为空");
+        if (ownerId == null || event == null) {
+            throw new BadRequestException("传参为空");
         }
         if (userService.getById(ownerId) == null) {
             throw new BadRequestException("赛事所有者不存在");
         }
-        if (event == null) {
-            throw new BadRequestException("传入的赛事为空");
-        }
         if (event.getEventId() != null) {
-            throw new BadRequestException("传入的赛事已有ID");
+            throw new BadRequestException("赛事不能id");
         }
         if (!eventService.createEvent(event)) {
             throw new BadRequestException("创建赛事失败");
         }
         if (!eventService.inviteManager(new EventManager(event.getEventId(), ownerId, true))) {
-            throw new BadRequestException("创建比赛失败");
+            throw new BadRequestException("比赛管理员设置失败");
         }
         return "创建赛事成功";
     }
@@ -247,6 +246,7 @@ public class EventController {
     }
 
     @PostMapping("/group/new")
+    @Deprecated
     public EventGroup newGroup(Long eventId, String groupName) {
         if (eventId == null || groupName == null) {
             throw new BadRequestException("传入的赛事ID或组名为空");
@@ -308,7 +308,7 @@ public class EventController {
     @PostMapping("/group/addTeam")
     public void addTeamIntoGroup(Long groupId, Long teamId) {
         if (groupId == null || teamId == null) {
-            throw new BadRequestException("传入的分组ID或球队ID为空");
+            throw new BadRequestException("传参为空");
         }
         if (eventGroupService.getById(groupId) == null) {
             throw new ResourceNotFoundException("分组不存在");

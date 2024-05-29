@@ -12,11 +12,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @TableName("event_stage")
 public class EventStage {
-    @MppMultiId
-    @TableField(value = "event_id")
-    private Long eventId;
+    public static final String STAGE_CUP_GROUP = "小组赛";
+    public static final String STAGE_CUP_KNOCKOUT = "淘汰赛";
+    public static final String STAGE_LEAGUE = "联赛";
 
     @MppMultiId
-    @TableField(value = "stage")
+    private Long eventId;
+    @MppMultiId
     private String stage;
 }

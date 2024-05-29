@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventMatch {
-    public static String STAGE_CUP_GROUP = "小组赛";
-    public static String STAGE_CUP_KNOCKOUT = "淘汰赛";
-    public static String STAGE_LEAGUE = "联赛";
+    public static final String STAGE_CUP_GROUP = "小组赛";
+    public static final String STAGE_CUP_KNOCKOUT = "淘汰赛";
+    public static final String STAGE_LEAGUE = "联赛";
 
     @MppMultiId
     private Long eventId;

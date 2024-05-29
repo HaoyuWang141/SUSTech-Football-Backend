@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.ConflictException;
+import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.mapper.EventMapper;
 import com.sustech.football.service.*;
@@ -46,11 +47,29 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     private EventStageTagService eventStageTagService;
 
     @Override
+    @Transactional
     public boolean createEvent(Event event) {
-        boolean creatMain = save(event);
-        System.out.println(event.getEventId());
-        boolean creatStage = eventStageService.updateStageAndTage(event);
-        return creatMain && creatStage;
+        if (!save(event)) {
+            throw new InternalServerErrorException("创建赛事失败");
+        }
+        if (!eventStageService.updateStageAndTage(event)) {
+            throw new InternalServerErrorException("创建赛事失败");
+        }
+        if (event.getStageList().stream().map(Event.Stage::getStageName).toList().contains(EventStage.STAGE_CUP_GROUP)) {
+            for (Event.Stage stage : event.getStageList()) {
+                if (stage.getStageName().equals(EventStage.STAGE_CUP_GROUP)) {
+                    for (Event.Tag tag : stage.getTags()) {
+                        EventGroup eventGroup = new EventGroup();
+                        eventGroup.setEventId(event.getEventId());
+                        eventGroup.setName(tag.getTagName());
+                        if (!eventGroupService.save(eventGroup)) {
+                            throw new InternalServerErrorException("创建杯赛小组失败");
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override
