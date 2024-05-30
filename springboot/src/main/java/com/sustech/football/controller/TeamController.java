@@ -325,6 +325,41 @@ public class TeamController {
         }
     }
 
+    @PostMapping("/player/retire")
+    public void retirePlayer(Long teamId, Long playerId) {
+        if (playerId == null || teamId == null) {
+            throw new BadRequestException("传入的球员ID或队伍ID为空");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        if (!teamService.retirePlayer(teamId, playerId)) {
+            throw new BadRequestException("删除球员失败");
+        }
+    }
+
+    @PostMapping("/player/rehire")
+    public void rehirePlayer(Long teamId, Long playerId, Integer number) {
+        if (playerId == null || teamId == null || number == null) {
+            throw new BadRequestException("传入的球员ID或队伍ID或号码为空");
+        }
+        if (number < 0 || number > 99) {
+            throw new BadRequestException("号码不合法");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        if (!teamService.rehirePlayer(teamId, playerId, number)) {
+            throw new BadRequestException("重新雇佣球员失败");
+        }
+    }
+
     @DeleteMapping("/player/delete")
     public void deletePlayer(Long teamId, Long playerId) {
         if (playerId == null || teamId == null) {

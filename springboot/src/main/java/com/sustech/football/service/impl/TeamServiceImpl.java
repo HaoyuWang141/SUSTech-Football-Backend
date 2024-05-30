@@ -11,7 +11,6 @@ import com.sustech.football.service.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -178,6 +177,32 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 .stream()
                 .map(TeamPlayer::getPlayer)
                 .toList();
+    }
+
+    @Override
+    public boolean retirePlayer(Long teamId, Long playerId) {
+        TeamPlayer teamPlayer = teamPlayerService.selectByMultiId(new TeamPlayer(teamId, playerId));
+        if (teamPlayer == null) {
+            throw new BadRequestException("球员不在球队中");
+        }
+        teamPlayer.setNumber(-teamPlayer.getNumber());
+
+        return teamPlayerService.saveOrUpdateByMultiId(teamPlayer);
+    }
+
+    @Override
+    public boolean rehirePlayer(Long teamId, Long playerId, Integer number) {
+        TeamPlayer teamPlayer = teamPlayerService.selectByMultiId(new TeamPlayer(teamId, playerId));
+        if (teamPlayer == null) {
+            throw new BadRequestException("球员不在退役列表中");
+        }
+        QueryWrapper<TeamPlayer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("team_id", teamId).eq("number", number);
+        if (teamPlayerService.getOne(queryWrapper) != null) {
+            throw new BadRequestException("球员号码已被占用");
+        }
+        teamPlayer.setNumber(number);
+        return teamPlayerService.saveOrUpdateByMultiId(teamPlayer);
     }
 
     @Override

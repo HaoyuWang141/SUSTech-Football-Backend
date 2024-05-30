@@ -31,6 +31,10 @@ public interface TeamService extends IService<Team> {
 
     List<Player> getPlayers(Long teamId);
 
+    boolean retirePlayer(Long teamId, Long playerId);
+
+    boolean rehirePlayer(Long teamId, Long playerId, Integer number);
+
     boolean deletePlayer(Long teamId, Long playerId);
 
     boolean inviteCoach(TeamCoach teamCoach);
