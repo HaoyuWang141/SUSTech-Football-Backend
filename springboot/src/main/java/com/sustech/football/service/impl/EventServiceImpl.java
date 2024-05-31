@@ -1,6 +1,5 @@
 package com.sustech.football.service.impl;
 
-import ch.qos.logback.core.joran.spi.EventPlayer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sustech.football.entity.*;
@@ -99,7 +98,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
             throw new ResourceNotFoundException("赛事不存在");
         }
         List<EventManager> eventManagers = eventManagerService.list(new QueryWrapper<EventManager>().eq("event_id", eventId));
-        event.setManagerList(eventManagers.stream().map(EventManager::getUserId).toList());
+        event.setManagerIdList(eventManagers.stream().map(EventManager::getUserId).toList());
         List<EventTeam> eventTeams = eventTeamService.listWithTeam(eventId);
         for (EventTeam et : eventTeams) {
             List<TeamPlayer> teamPlayerList = teamPlayerService.listWithPlayer(et.getTeam().getTeamId());

@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -69,7 +68,7 @@ public class Event {
     private String name;
     private String description;
     @TableField(exist = false)
-    private List<Long> managerList;
+    private List<Long> managerIdList;
     @TableField(exist = false)
     List<Event.Team> teamList; // 参加的所有球队
     @TableField(exist = false)

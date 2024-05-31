@@ -1,8 +1,6 @@
 package com.sustech.football.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.model.team.VoTeam;
-import com.sustech.football.model.team.VoTeamPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +9,6 @@ import com.sustech.football.service.*;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
 
-import javax.naming.ConfigurationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,7 +68,7 @@ public class TeamController {
                 team.getDescription(),
                 team.getCaptainId(),
                 team.getCoachList(),
-                team.getTeamPlayerList().stream().map(teamPlayer -> new VoTeamPlayer(
+                team.getTeamPlayerList().stream().map(teamPlayer -> new VoTeam.VoPlayer(
                         teamPlayer.getPlayerId(),
                         teamPlayer.getPlayer().getName(),
                         teamPlayer.getPlayer().getPhotoUrl(),
@@ -84,7 +81,13 @@ public class TeamController {
                 )).collect(Collectors.toList()),
                 team.getEventList(),
                 team.getMatchList(),
-                team.getManagerList()
+                team.getManagerList().stream().map(user -> {
+                    VoTeam.VoUser voUser = new VoTeam.VoUser();
+                    voUser.setUserId(user.getUserId());
+                    voUser.setAvatarUrl(user.getAvatarUrl());
+                    voUser.setNickName(user.getNickName());
+                    return voUser;
+                }).toList()
         );
     }
 
@@ -285,7 +288,7 @@ public class TeamController {
     }
 
     @GetMapping("/player/getAll")
-    public List<VoTeamPlayer> getPlayers(Long teamId) {
+    public List<VoTeam.VoPlayer> getPlayers(Long teamId) {
         if (teamId == null) {
             throw new BadRequestException("传入的队伍ID为空");
         }
@@ -293,7 +296,7 @@ public class TeamController {
             throw new ResourceNotFoundException("球队不存在");
         }
         List<TeamPlayer> teamPlayerList = teamService.getTeamPlayers(teamId);
-        return teamPlayerList.stream().map(teamPlayer -> new VoTeamPlayer(
+        return teamPlayerList.stream().map(teamPlayer -> new VoTeam.VoPlayer(
                 teamPlayer.getPlayerId(),
                 teamPlayer.getPlayer().getName(),
                 teamPlayer.getPlayer().getPhotoUrl(),

@@ -4,15 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ResourceNotFoundException;
+import com.sustech.football.model.event.VoEvent;
 import com.sustech.football.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -61,7 +59,7 @@ public class EventController {
     }
 
     @GetMapping("/get")
-    public Event getEvent(Long id) {
+    public VoEvent getEvent(Long id) {
         if (id == null) {
             throw new BadRequestException("传入的赛事ID为空");
         }
@@ -70,11 +68,134 @@ public class EventController {
             event = eventService.getDetailedEvent(id);
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
         if (event == null) {
             throw new BadRequestException("传入的赛事ID不存在");
         }
-        return event;
+        VoEvent voEvent = new VoEvent();
+        voEvent.setEventId(event.getEventId());
+        voEvent.setName(event.getName());
+        voEvent.setDescription(event.getDescription());
+        voEvent.setManagerList(event.getManagerIdList()
+                .stream()
+                .map(userId -> {
+                    User user = userService.getById(userId);
+                    VoEvent.VoManager voManager = new VoEvent.VoManager();
+                    voManager.setId(user.getUserId());
+                    voManager.setNickName(user.getNickName());
+                    voManager.setAvatarUrl(user.getAvatarUrl());
+                    return voManager;
+                })
+                .toList());
+        voEvent.setTeamList(event.getTeamList()
+                .stream()
+                .map(team -> {
+                    VoEvent.VoTeamInfo voTeamInfo = new VoEvent.VoTeamInfo();
+                    voTeamInfo.setId(team.getId());
+                    voTeamInfo.setName(team.getName());
+                    voTeamInfo.setLogoUrl(team.getLogo());
+                    voTeamInfo.setPlayerCount(team.getPlayerCount());
+                    return voTeamInfo;
+                })
+                .toList());
+        voEvent.setGroupList(event.getGroupList()
+                .stream()
+                .map(group -> {
+                    VoEvent.VoGroup voGroup = new VoEvent.VoGroup();
+                    voGroup.setGroupId(group.getGroupId());
+                    voGroup.setName(group.getName());
+                    voGroup.setTeamList(group.getTeamList()
+                            .stream()
+                            .map(team -> {
+                                VoEvent.VoGroup.VoTeam voTeam = new VoEvent.VoGroup.VoTeam();
+                                VoEvent.VoTeamInfo voTeamInfo = new VoEvent.VoTeamInfo();
+                                voTeamInfo.setId(team.getTeam().getId());
+                                voTeamInfo.setName(team.getTeam().getName());
+                                voTeamInfo.setLogoUrl(team.getTeam().getLogo());
+                                voTeamInfo.setPlayerCount(team.getTeam().getPlayerCount());
+                                voTeam.setTeam(voTeamInfo);
+                                voTeam.setNumWins(team.getNumWins());
+                                voTeam.setNumDraws(team.getNumDraws());
+                                voTeam.setNumLosses(team.getNumLosses());
+                                voTeam.setNumGoalsFor(team.getNumGoalsFor());
+                                voTeam.setNumGoalsAgainst(team.getNumGoalsAgainst());
+                                voTeam.setScore(team.getScore());
+                                return voTeam;
+                            })
+                            .toList());
+                    return voGroup;
+                })
+                .toList());
+        voEvent.setMatchList(event.getMatchList()
+                .stream()
+                .map(match -> {
+                    VoEvent.VoMatch voMatch = new VoEvent.VoMatch();
+                    voMatch.setMatchId(match.getMatchId());
+                    VoEvent.VoTeamInfo homeTeam = new VoEvent.VoTeamInfo();
+                    homeTeam.setId(match.getHomeTeam().getTeamId());
+                    homeTeam.setName(match.getHomeTeam().getName());
+                    homeTeam.setLogoUrl(match.getHomeTeam().getLogoUrl());
+                    VoEvent.VoTeamInfo awayTeam = new VoEvent.VoTeamInfo();
+                    awayTeam.setId(match.getAwayTeam().getTeamId());
+                    awayTeam.setName(match.getAwayTeam().getName());
+                    awayTeam.setLogoUrl(match.getAwayTeam().getLogoUrl());
+                    voMatch.setHomeTeam(homeTeam);
+                    voMatch.setAwayTeam(awayTeam);
+                    voMatch.setTime(match.getTime());
+                    voMatch.setStatus(match.getStatus());
+                    voMatch.setDescription(match.getDescription());
+                    voMatch.setMatchLocation("暂无地点信息");
+                    voMatch.setHomeTeamScore(match.getHomeTeamScore());
+                    voMatch.setAwayTeamScore(match.getAwayTeamScore());
+                    voMatch.setHomeTeamPenalty(match.getHomeTeamPenalty());
+                    voMatch.setAwayTeamPenalty(match.getAwayTeamPenalty());
+                    return voMatch;
+                })
+                .toList());
+        voEvent.setStageList(event.getStageList()
+                .stream()
+                .map(stage -> {
+                    VoEvent.Stage voStage = new VoEvent.Stage();
+                    voStage.setStageName(stage.getStageName());
+                    voStage.setTags(stage.getTags()
+                            .stream()
+                            .map(tag -> {
+                                VoEvent.Tag voTag = new VoEvent.Tag();
+                                voTag.setTagName(tag.getTagName());
+                                voTag.setMatches(tag.getMatches()
+                                        .stream()
+                                        .map(match -> {
+                                            VoEvent.VoMatch voMatch = new VoEvent.VoMatch();
+                                            voMatch.setMatchId(match.getMatchId());
+                                            VoEvent.VoTeamInfo homeTeam = new VoEvent.VoTeamInfo();
+                                            homeTeam.setId(match.getHomeTeam().getTeamId());
+                                            homeTeam.setName(match.getHomeTeam().getName());
+                                            homeTeam.setLogoUrl(match.getHomeTeam().getLogoUrl());
+                                            VoEvent.VoTeamInfo awayTeam = new VoEvent.VoTeamInfo();
+                                            awayTeam.setId(match.getAwayTeam().getTeamId());
+                                            awayTeam.setName(match.getAwayTeam().getName());
+                                            awayTeam.setLogoUrl(match.getAwayTeam().getLogoUrl());
+                                            voMatch.setHomeTeam(homeTeam);
+                                            voMatch.setAwayTeam(awayTeam);
+                                            voMatch.setTime(match.getTime());
+                                            voMatch.setStatus(match.getStatus());
+                                            voMatch.setDescription(match.getDescription());
+                                            voMatch.setMatchLocation("暂无地点信息");
+                                            voMatch.setHomeTeamScore(match.getHomeTeamScore());
+                                            voMatch.setAwayTeamScore(match.getAwayTeamScore());
+                                            voMatch.setHomeTeamPenalty(match.getHomeTeamPenalty());
+                                            voMatch.setAwayTeamPenalty(match.getAwayTeamPenalty());
+                                            return voMatch;
+                                        })
+                                        .toList());
+                                return voTag;
+                            })
+                            .toList());
+                    return voStage;
+                })
+                .toList());
+        return voEvent;
     }
 
     @GetMapping("/getAll")
