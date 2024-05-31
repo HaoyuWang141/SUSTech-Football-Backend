@@ -58,6 +58,13 @@ public class VoEvent {
 
     @Data
     @NoArgsConstructor
+    public static class VoMatchEvent {
+        String matchStage;
+        String matchTag;
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class VoMatch {
         Long matchId;
         VoTeamInfo homeTeam;
@@ -70,6 +77,8 @@ public class VoEvent {
         Integer awayTeamScore;
         Integer homeTeamPenalty;
         Integer awayTeamPenalty;
+        String stage;
+        String tag;
     }
 
     @Data

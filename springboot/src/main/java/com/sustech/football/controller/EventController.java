@@ -150,6 +150,8 @@ public class EventController {
                     voMatch.setAwayTeamScore(match.getAwayTeamScore());
                     voMatch.setHomeTeamPenalty(match.getHomeTeamPenalty());
                     voMatch.setAwayTeamPenalty(match.getAwayTeamPenalty());
+                    voMatch.setStage(match.getMatchEvent().getMatchStage());
+                    voMatch.setTag(match.getMatchEvent().getMatchTag());
                     return voMatch;
                 })
                 .toList());
@@ -186,6 +188,8 @@ public class EventController {
                                             voMatch.setAwayTeamScore(match.getAwayTeamScore());
                                             voMatch.setHomeTeamPenalty(match.getHomeTeamPenalty());
                                             voMatch.setAwayTeamPenalty(match.getAwayTeamPenalty());
+                                            voMatch.setStage(match.getMatchEvent().getMatchStage());
+                                            voMatch.setTag(match.getMatchEvent().getMatchTag());
                                             return voMatch;
                                         })
                                         .toList());
