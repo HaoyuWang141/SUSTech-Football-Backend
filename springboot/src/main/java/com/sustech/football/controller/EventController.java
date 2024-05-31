@@ -82,7 +82,7 @@ public class EventController {
                 .map(userId -> {
                     User user = userService.getById(userId);
                     VoEvent.VoManager voManager = new VoEvent.VoManager();
-                    voManager.setId(user.getUserId());
+                    voManager.setUserId(user.getUserId());
                     voManager.setNickName(user.getNickName());
                     voManager.setAvatarUrl(user.getAvatarUrl());
                     return voManager;

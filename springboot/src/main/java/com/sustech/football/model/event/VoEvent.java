@@ -22,7 +22,7 @@ public class VoEvent {
     @Data
     @NoArgsConstructor
     public static class VoManager {
-        Long id;
+        Long userId;
         String nickName;
         String avatarUrl;
     }
