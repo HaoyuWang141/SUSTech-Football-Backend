@@ -261,43 +261,45 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     }
 
     @Override
+    @Transactional
     public boolean addMatch(Long eventId, Match match, String stage, String tag) {
         // 添加比赛
         if (!matchService.save(match)) {
             throw new RuntimeException("添加比赛失败");
         }
 
+        // 这一部分应该在比赛开始前添加，此处删除
         // 添加主队比赛球员
-        List<TeamPlayer> homeTeamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", match.getHomeTeamId()));
-        List<MatchPlayer> homeTeamMatchPlayers = new ArrayList<>();
-        for (TeamPlayer tp : homeTeamPlayers) {
-            MatchPlayer matchPlayer = new MatchPlayer();
-            matchPlayer.setMatchId(match.getMatchId());
-            matchPlayer.setTeamId(match.getHomeTeamId());
-            matchPlayer.setPlayerId(tp.getPlayerId());
-            matchPlayer.setNumber(tp.getNumber());
-            matchPlayer.setIsStart(false);
-            homeTeamMatchPlayers.add(matchPlayer);
-        }
-        if (!matchPlayerService.saveOrUpdateBatchByMultiId(homeTeamMatchPlayers)) {
-            throw new RuntimeException("添加主队比赛球员失败");
-        }
+//        List<TeamPlayer> homeTeamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", match.getHomeTeamId()));
+//        List<MatchPlayer> homeTeamMatchPlayers = new ArrayList<>();
+//        for (TeamPlayer tp : homeTeamPlayers) {
+//            MatchPlayer matchPlayer = new MatchPlayer();
+//            matchPlayer.setMatchId(match.getMatchId());
+//            matchPlayer.setTeamId(match.getHomeTeamId());
+//            matchPlayer.setPlayerId(tp.getPlayerId());
+//            matchPlayer.setNumber(tp.getNumber());
+//            matchPlayer.setIsStart(false);
+//            homeTeamMatchPlayers.add(matchPlayer);
+//        }
+//        if (!matchPlayerService.saveOrUpdateBatchByMultiId(homeTeamMatchPlayers)) {
+//            throw new RuntimeException("添加主队比赛球员失败");
+//        }
 
         // 添加客队比赛球员
-        List<TeamPlayer> awayTeamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", match.getAwayTeamId()));
-        List<MatchPlayer> awayTeamMatchPlayers = new ArrayList<>();
-        for (TeamPlayer tp : awayTeamPlayers) {
-            MatchPlayer matchPlayer = new MatchPlayer();
-            matchPlayer.setMatchId(match.getMatchId());
-            matchPlayer.setTeamId(match.getAwayTeamId());
-            matchPlayer.setPlayerId(tp.getPlayerId());
-            matchPlayer.setNumber(tp.getNumber());
-            matchPlayer.setIsStart(false);
-            awayTeamMatchPlayers.add(matchPlayer);
-        }
-        if (!matchPlayerService.saveOrUpdateBatchByMultiId(awayTeamMatchPlayers)) {
-            throw new RuntimeException("添加客队比赛球员失败");
-        }
+//        List<TeamPlayer> awayTeamPlayers = teamPlayerService.list(new QueryWrapper<TeamPlayer>().eq("team_id", match.getAwayTeamId()));
+//        List<MatchPlayer> awayTeamMatchPlayers = new ArrayList<>();
+//        for (TeamPlayer tp : awayTeamPlayers) {
+//            MatchPlayer matchPlayer = new MatchPlayer();
+//            matchPlayer.setMatchId(match.getMatchId());
+//            matchPlayer.setTeamId(match.getAwayTeamId());
+//            matchPlayer.setPlayerId(tp.getPlayerId());
+//            matchPlayer.setNumber(tp.getNumber());
+//            matchPlayer.setIsStart(false);
+//            awayTeamMatchPlayers.add(matchPlayer);
+//        }
+//        if (!matchPlayerService.saveOrUpdateBatchByMultiId(awayTeamMatchPlayers)) {
+//            throw new RuntimeException("添加客队比赛球员失败");
+//        }
 
         // 添加赛事比赛
         EventMatch eventMatch = new EventMatch();
