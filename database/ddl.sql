@@ -149,20 +149,12 @@ CREATE TABLE match
     home_team_id      INT REFERENCES team (team_id),
     away_team_id      INT REFERENCES team (team_id),
     time              TIMESTAMP,
-<<<<<<< HEAD
     home_team_score   INT DEFAULT 0,
     away_team_score   INT DEFAULT 0,
     home_team_penalty INT DEFAULT 0,
     away_team_penalty INT DEFAULT 0,
     status            VARCHAR CHECK ( status IN ('PENDING', 'ONGOING', 'FINISHED') ) DEFAULT 'PENDING',
     description       TEXT
-=======
-    home_team_score   INT                                                            DEFAULT 0,
-    away_team_score   INT                                                            DEFAULT 0,
-    home_team_penalty INT                                                            DEFAULT 0,
-    away_team_penalty INT                                                            DEFAULT 0,
-    status            VARCHAR CHECK ( status IN ('PENDING', 'ONGOING', 'FINISHED') ) DEFAULT 'PENDING'
->>>>>>> ea912fb8ef7fa5865d8ef165910cf665c5d37dc6
 );
 
 CREATE TABLE match_manager
@@ -457,6 +449,15 @@ CREATE TABLE match_comment_like
     user_id INT REFERENCES  t_user (user_id),
     comment_id INT REFERENCES match_comment (comment_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, comment_id)
+);
+
+CREATE TABLE wx_article
+(
+    article_id  SERIAL PRIMARY KEY,
+    url         VARCHAR(255) NOT NULL ,
+    cover_url   VARCHAR(255),
+    title       VARCHAR(255),
+    time        TIMESTAMP DEFAULT now()
 );
 
 
