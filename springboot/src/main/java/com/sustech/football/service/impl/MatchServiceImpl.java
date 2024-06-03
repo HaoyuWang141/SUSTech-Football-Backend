@@ -119,6 +119,11 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
             throw new BadRequestException("赛事比赛，无法删除");
         }
 
+        Match match = getById(matchId);
+        if (!match.getStatus().equals(Match.STATUS_PENDING)) {
+            throw new BadRequestException("比赛已开始，无法删除");
+        }
+
         if (!removeById(matchId)) {
             throw new RuntimeException("删除比赛失败");
         }
