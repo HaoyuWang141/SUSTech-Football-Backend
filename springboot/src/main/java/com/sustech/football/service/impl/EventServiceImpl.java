@@ -337,7 +337,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
             throw new ConflictException("该裁判已经执法该赛事");
         }
         EventRefereeRequest eventRefereeRes = eventRefereeRequestService.selectByMultiId(eventRefereeRequest);
-        if (eventRefereeRes != null && eventRefereeRes.getStatus().equals(EventRefereeRequest.PENDING)) {
+        if (eventRefereeRes != null && eventRefereeRes.getStatus().equals(EventRefereeRequest.STATUS_PENDING)) {
             throw new ConflictException("该裁判正在被邀请执法该赛事");
         }
         if (!eventRefereeRequestService.saveOrUpdateByMultiId(eventRefereeRequest)) {
