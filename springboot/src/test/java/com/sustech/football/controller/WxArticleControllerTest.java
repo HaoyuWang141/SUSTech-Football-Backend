@@ -18,6 +18,14 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * AI-generated-content
+ * tool: ChatGPT
+ * version: 3.5 turbo
+ * usage: I give it the class and method implementation it writes the tests for me.
+ */
+
+
 public class WxArticleControllerTest {
 
     @Mock
