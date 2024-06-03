@@ -2,7 +2,6 @@ package com.sustech.football.controller;
 
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
-import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.service.CoachService;
 import com.sustech.football.service.TeamCoachRequestService;
@@ -10,12 +9,15 @@ import com.sustech.football.service.TeamService;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/coach")
+@Tag(name = "Coach Controller", description = "管理教练的接口")
 public class CoachController {
     @Autowired
     private CoachService coachService;
@@ -34,6 +36,8 @@ public class CoachController {
     }
 
     @PostMapping("/create")
+    @Operation(summary = "创建教练", description = "创建一个新的教练")
+    @Parameter(name = "coach", description = "教练信息", required = true)
     public Coach createCoach(@RequestBody Coach coach) {
         if (coach == null) {
             throw new BadRequestException("传入教练为空");
@@ -48,6 +52,8 @@ public class CoachController {
     }
 
     @GetMapping("/get")
+    @Operation(summary = "获取教练", description = "根据ID获取教练")
+    @Parameter(name = "id", description = "教练ID", required = true)
     public Coach getCoachById(Long id) {
         if (id == null) {
             throw new BadRequestException("传入教练的ID为空");
@@ -60,11 +66,13 @@ public class CoachController {
     }
 
     @GetMapping("/getAll")
+    @Operation(summary = "获取所有教练", description = "获取所有教练")
     public List<Coach> getAllCoaches() {
         return coachService.list();
     }
 
     @PutMapping("/update")
+    @Operation(summary = "更新教练", description = "更新教练信息")
     public Coach updateCoach(@RequestBody Coach coach) {
         if (coach == null) {
             throw new BadRequestException("传入教练为空");
@@ -87,9 +95,11 @@ public class CoachController {
     }
 
     @GetMapping("/team/getInvitations")
-    public List<TeamCoachRequest> getTeamInvitations(@RequestParam Long coachId) {
+    @Operation(summary = "获取球队邀请", description = "获取教练的球队邀请")
+    @Parameter(name = "coachId", description = "教练 ID", required = true)
+    public List<TeamCoachRequest> getTeamInvitations(Long coachId) {
         if (coachId == null) {
-            throw new BadRequestException("教练id不能为空");
+            throw new BadRequestException("教练ID不能为空");
         }
         if (coachService.getById(coachId) == null) {
             throw new ResourceNotFoundException("教练不存在");
@@ -98,12 +108,15 @@ public class CoachController {
     }
 
     @PostMapping("/team/replyInvitation")
-    public void replyTeamInvitation(
-            @RequestParam Long coachId,
-            @RequestParam Long teamId,
-            @RequestParam Boolean accept) {
+    @Operation(summary = "回复球队邀请", description = "回复教练的球队邀请")
+    @Parameters({
+            @Parameter(name = "coachId", description = "教练 ID", required = true),
+            @Parameter(name = "teamId", description = "球队 ID", required = true),
+            @Parameter(name = "accept", description = "是否接受", required = true)
+    })
+    public void replyTeamInvitation(Long coachId, Long teamId, Boolean accept) {
         if (coachId == null || teamId == null || accept == null) {
-            throw new BadRequestException("教练id、球队id和状态不能为空");
+            throw new BadRequestException("教练ID、球队ID和状态不能为空");
         }
         if (coachService.getById(coachId) == null) {
             throw new ResourceNotFoundException("教练不存在");
@@ -117,9 +130,11 @@ public class CoachController {
     }
 
     @GetMapping("/team/getAll")
-    public List<Team> getTeams(@RequestParam Long coachId) {
+    @Operation(summary = "获取球队", description = "获取教练的球队")
+    @Parameter(name = "coachId", description = "教练 ID", required = true)
+    public List<Team> getTeams(Long coachId) {
         if (coachId == null) {
-            throw new BadRequestException("教练id不能为空");
+            throw new BadRequestException("教练ID不能为空");
         }
         if (coachService.getById(coachId) == null) {
             throw new ResourceNotFoundException("教练不存在");
@@ -128,9 +143,11 @@ public class CoachController {
     }
 
     @GetMapping("/match/getAll")
-    public List<Match> getMatches(@RequestParam Long coachId) {
+    @Operation(summary = "获取比赛", description = "获取教练队伍的比赛")
+    @Parameter(name = "coachId", description = "教练 ID", required = true)
+    public List<Match> getMatches(Long coachId) {
         if (coachId == null) {
-            throw new BadRequestException("教练id不能为空");
+            throw new BadRequestException("教练ID不能为空");
         }
         if (coachService.getById(coachId) == null) {
             throw new ResourceNotFoundException("教练不存在");
@@ -139,9 +156,11 @@ public class CoachController {
     }
 
     @GetMapping("/event/getAll")
+    @Operation(summary = "获取赛事", description = "获取教练队伍的赛事")
+    @Parameter(name = "coachId", description = "教练 ID", required = true)
     public List<Event> getEvents(@RequestParam Long coachId) {
         if (coachId == null) {
-            throw new BadRequestException("教练id不能为空");
+            throw new BadRequestException("教练ID不能为空");
         }
         if (coachService.getById(coachId) == null) {
             throw new ResourceNotFoundException("教练不存在");

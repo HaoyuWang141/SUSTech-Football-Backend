@@ -35,7 +35,7 @@ public class WxArticleController {
     }
 
     @GetMapping("/latestArticles")
-    @Operation(summary = "最新文章", description = "获取最新的 10 个微信文章")
+    @Operation(summary = "最新10文章", description = "获取最新的 10 个微信文章")
     public List<WxArticle> getLatestArticles() {
         return wxArticleService.getLatestArticles();
     }

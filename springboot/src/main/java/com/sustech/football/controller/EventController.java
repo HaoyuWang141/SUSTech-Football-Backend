@@ -6,6 +6,10 @@ import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.model.event.VoEvent;
 import com.sustech.football.service.*;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +19,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/event")
+@Tag(name = "Event Controller", description = "赛事管理接口")
 public class EventController {
     @Autowired
     private EventService eventService;
@@ -39,6 +44,7 @@ public class EventController {
 
 
     @PostMapping("/create")
+    @Operation(summary = "创建赛事", description = "创建一个新的赛事")
     public String createEvent(Long ownerId, @RequestBody Event event) {
         if (ownerId == null || event == null) {
             throw new BadRequestException("传参为空");
@@ -59,6 +65,8 @@ public class EventController {
     }
 
     @GetMapping("/get")
+    @Operation(summary = "获取赛事", description = "根据 ID 获取赛事详细信息")
+    @Parameter(name = "id", description = "赛事 ID", required = true)
     public VoEvent getEvent(Long id) {
         if (id == null) {
             throw new BadRequestException("传入的赛事ID为空");
@@ -203,16 +211,20 @@ public class EventController {
     }
 
     @GetMapping("/getAll")
+    @Operation(summary = "获取所有赛事", description = "获取所有赛事的详细信息")
     public List<Event> getAllEvents() {
         return eventService.list();
     }
 
     @GetMapping("/getByIdList")
+    @Operation(summary = "获取赛事", description = "根据 ID 列表获取赛事详细信息")
+    @Parameter(name = "idList", description = "赛事 ID 列表", required = true)
     public List<Event> getEventsByIdLists(List<Long> idList) {
         return eventService.listByIds(idList);
     }
 
     @PutMapping("/update")
+    @Operation(summary = "更新赛事", description = "更新赛事信息")
     public void updateEvent(@RequestBody Event event) {
         if (event == null) {
             throw new BadRequestException("传入的赛事为空");
@@ -226,7 +238,12 @@ public class EventController {
     }
 
     @DeleteMapping("/delete")
-    public void deleteEvent(@RequestParam Long eventId, @RequestParam Long userId) {
+    @Operation(summary = "删除赛事", description = "删除赛事")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "userId", description = "删除者 ID", required = true)
+    })
+    public void deleteEvent(Long eventId, Long userId) {
         if (eventId == null || userId == null) {
             throw new BadRequestException("传入的赛事或删除者ID为空");
         }
@@ -242,6 +259,11 @@ public class EventController {
     }
 
     @PostMapping("/manager/invite")
+    @Operation(summary = "邀请管理员", description = "邀请管理员")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "managerId", description = "管理员 ID", required = true)
+    })
     public void inviteManager(Long eventId, Long managerId) {
         if (eventId == null || managerId == null) {
             throw new BadRequestException("传入的赛事ID或管理员ID为空");
@@ -258,6 +280,8 @@ public class EventController {
     }
 
     @GetMapping("/manager/getAll")
+    @Operation(summary = "获取赛事所有管理员", description = "提供赛事 ID，获取其所有管理员")
+    @Parameter(name = "eventId", description = "赛事 ID", required = true)
     public List<Long> getManagers(Long eventId) {
         if (eventId == null) {
             throw new BadRequestException("传入的赛事ID为空");
@@ -269,6 +293,11 @@ public class EventController {
     }
 
     @DeleteMapping("/manager/delete")
+    @Operation(summary = "删除管理员", description = "删除管理员")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "managerId", description = "管理员 ID", required = true)
+    })
     public void deleteManager(Long eventId, Long managerId) {
         if (eventId == null || managerId == null) {
             throw new BadRequestException("传入的赛事ID或管理员ID为空");
@@ -285,6 +314,11 @@ public class EventController {
     }
 
     @PostMapping("/team/invite")
+    @Operation(summary = "邀请球队", description = "邀请球队参与赛事")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "teamId", description = "球队 ID", required = true)
+    })
     public void inviteTeam(Long eventId, Long teamId) {
         if (eventId == null || teamId == null) {
             throw new BadRequestException("传入的赛事ID或球队ID为空");
@@ -303,6 +337,8 @@ public class EventController {
     }
 
     @GetMapping("/team/getInvitations")
+    @Operation(summary = "获取球队邀请", description = "获取赛事的球队邀请")
+    @Parameter(name = "eventId", description = "赛事 ID", required = true)
     public List<EventTeamRequest> getTeamInvitations(Long eventId) {
         if (eventId == null) {
             throw new BadRequestException("传入的赛事ID为空");
@@ -314,6 +350,8 @@ public class EventController {
     }
 
     @GetMapping("/team/getApplications")
+    @Operation(summary = "获取球队申请", description = "获取赛事的球队申请")
+    @Parameter(name = "eventId", description = "赛事 ID", required = true)
     public List<EventTeamRequest> getTeamApplications(Long eventId) {
         if (eventId == null) {
             throw new BadRequestException("传入的赛事ID为空");
@@ -325,6 +363,12 @@ public class EventController {
     }
 
     @PostMapping("/team/replyApplication")
+    @Operation(summary = "回复球队申请", description = "回复赛事的球队申请")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "teamId", description = "球队 ID", required = true),
+            @Parameter(name = "accepted", description = "是否接受", required = true)
+    })
     public void replyTeamApplication(Long eventId, Long teamId, Boolean accepted) {
         if (eventId == null || teamId == null || accepted == null) {
             throw new BadRequestException("传入的参数含有空值");
@@ -344,6 +388,8 @@ public class EventController {
     }
 
     @GetMapping("/team/getAll")
+    @Operation(summary = "获取赛事所有球队", description = "提供赛事 ID，获取赛事的所有球队")
+    @Parameter(name = "eventId", description = "赛事 ID", required = true)
     public List<Team> getTeams(Long eventId) {
         if (eventId == null) {
             throw new BadRequestException("传入的赛事ID为空");
@@ -355,6 +401,11 @@ public class EventController {
     }
 
     @DeleteMapping("/team/delete")
+    @Operation(summary = "删除球队", description = "删除赛事的球队")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "teamId", description = "球队 ID", required = true)
+    })
     public void deleteTeam(Long eventId, Long teamId) {
         if (eventId == null || teamId == null) {
             throw new BadRequestException("传入的赛事ID或球队ID为空");
@@ -372,6 +423,11 @@ public class EventController {
 
     @PostMapping("/group/new")
     @Deprecated
+    @Operation(summary = "创建分组", description = "创建赛事的新分组")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "groupName", description = "组名", required = true)
+    })
     public EventGroup newGroup(Long eventId, String groupName) {
         if (eventId == null || groupName == null) {
             throw new BadRequestException("传入的赛事ID或组名为空");
@@ -387,6 +443,8 @@ public class EventController {
     }
 
     @GetMapping("/group/getByEventId")
+    @Operation(summary = "获取赛事所有分组", description = "提供赛事 ID，获取赛事的所有分组")
+    @Parameter(name = "eventId", description = "赛事 ID", required = true)
     public List<EventGroup> getGroups(Long eventId) {
         if (eventId == null) {
             throw new BadRequestException("传入的赛事ID为空");
@@ -400,6 +458,11 @@ public class EventController {
     }
 
     @PutMapping("/group/updateName")
+    @Operation(summary = "更新分组名", description = "更新分组名")
+    @Parameters({
+            @Parameter(name = "groupId", description = "分组 ID", required = true),
+            @Parameter(name = "name", description = "新组名", required = true)
+    })
     public void updateGroup(Integer groupId, String name) {
         if (groupId == null || name == null) {
             throw new BadRequestException("传入的分组ID或组名为空");
@@ -415,6 +478,8 @@ public class EventController {
     }
 
     @DeleteMapping("/group/delete")
+    @Operation(summary = "删除分组", description = "提供分组 ID，删除分组")
+    @Parameter(name = "groupId", description = "分组 ID", required = true)
     public void deleteGroup(Long groupId) {
         if (groupId == null) {
             throw new BadRequestException("传入的分组ID为空");
@@ -431,6 +496,11 @@ public class EventController {
     }
 
     @PostMapping("/group/addTeam")
+    @Operation(summary = "添加球队到分组", description = "提供分组和球队ID，添加球队到分组")
+    @Parameters({
+            @Parameter(name = "groupId", description = "分组 ID", required = true),
+            @Parameter(name = "teamId", description = "球队 ID", required = true)
+    })
     public void addTeamIntoGroup(Long groupId, Long teamId) {
         if (groupId == null || teamId == null) {
             throw new BadRequestException("传参为空");
@@ -447,6 +517,11 @@ public class EventController {
     }
 
     @DeleteMapping("/group/deleteTeam")
+    @Operation(summary = "删除分组内球队", description = "提供分组和球队ID，删除分组内球队")
+    @Parameters({
+            @Parameter(name = "groupId", description = "分组 ID", required = true),
+            @Parameter(name = "teamId", description = "球队 ID", required = true)
+    })
     public void deleteTeamFromGroup(Long groupId, Long teamId) {
         if (groupId == null || teamId == null) {
             throw new BadRequestException("传入的分组ID或球队ID为空");
@@ -463,6 +538,11 @@ public class EventController {
     }
 
     @PostMapping("/stage/new")
+    @Operation(summary = "创建阶段", description = "创建赛事的新阶段")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "stageName", description = "阶段名", required = true)
+    })
     public EventStage newStage(Long eventId, String stageName) {
         if (eventId == null || stageName == null) {
             throw new BadRequestException("传入的赛事ID或阶段名为空");
@@ -478,6 +558,11 @@ public class EventController {
     }
 
     @DeleteMapping("/stage/delete")
+    @Operation(summary = "删除阶段", description = "删除赛事的阶段")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "stageName", description = "阶段名", required = true)
+    })
     public void deleteStage(Long eventId, String stageName) {
         if (eventId == null || stageName == null) {
             throw new BadRequestException("传入的赛事ID或阶段名为空");
@@ -494,6 +579,12 @@ public class EventController {
     }
 
     @PostMapping("/tag/new")
+    @Operation(summary = "创建标签", description = "创建赛事的新标签")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "stageName", description = "阶段名", required = true),
+            @Parameter(name = "tagName", description = "标签名", required = true)
+    })
     public EventStageTag newTag(Long eventId, String stageName, String tagName) {
         if (eventId == null || stageName == null || tagName == null) {
             throw new BadRequestException("传入的赛事ID或阶段名或标签名为空");
@@ -512,6 +603,12 @@ public class EventController {
     }
 
     @DeleteMapping("/tag/delete")
+    @Operation(summary = "删除标签", description = "删除赛事的标签")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "stageName", description = "阶段名", required = true),
+            @Parameter(name = "tagName", description = "标签名", required = true)
+    })
     public void deleteTag(Long eventId, String stageName, String tagName) {
         if (eventId == null || stageName == null || tagName == null) {
             throw new BadRequestException("传入的赛事ID或阶段名或标签名为空");
@@ -531,6 +628,15 @@ public class EventController {
     }
 
     @PostMapping("/match/add")
+    @Operation(summary = "添加比赛", description = "添加赛事的新比赛")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "stage", description = "阶段名", required = true),
+            @Parameter(name = "tag", description = "标签名", required = true),
+            @Parameter(name = "time", description = "比赛时间", required = true),
+            @Parameter(name = "homeTeamId", description = "主队 ID", required = true),
+            @Parameter(name = "awayTeamId", description = "客队 ID", required = true)
+    })
     public void addMatch(Long eventId, String stage, String tag, Timestamp time, Long homeTeamId, Long awayTeamId) {
         if (eventId == null || stage == null || tag == null || time == null || homeTeamId == null || awayTeamId == null) {
             throw new BadRequestException("传参含空值");
@@ -562,6 +668,8 @@ public class EventController {
     }
 
     @GetMapping("/match/getAll")
+    @Operation(summary = "获取赛事所有比赛", description = "提供赛事 ID，获取赛事的所有比赛")
+    @Parameter(name = "eventId", description = "赛事 ID", required = true)
     public List<Match> getMatches(Long eventId) {
         if (eventId == null) {
             throw new BadRequestException("传入的赛事ID为空");
@@ -573,6 +681,11 @@ public class EventController {
     }
 
     @DeleteMapping("/match/delete")
+    @Operation(summary = "删除比赛", description = "删除赛事的比赛")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "matchId", description = "比赛 ID", required = true)
+    })
     public void deleteMatch(Long eventId, Long matchId) {
         if (eventId == null || matchId == null) {
             throw new BadRequestException("传入的赛事ID或比赛ID为空");
@@ -589,6 +702,11 @@ public class EventController {
     }
 
     @PostMapping("/referee/invite")
+    @Operation(summary = "邀请裁判", description = "邀请裁判参与赛事")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "refereeId", description = "裁判 ID", required = true)
+    })
     public void inviteReferee(Long eventId, Long refereeId) {
         if (eventId == null || refereeId == null) {
             throw new BadRequestException("传入的赛事ID或裁判ID为空");
@@ -605,6 +723,8 @@ public class EventController {
     }
 
     @GetMapping("/referee/getAll")
+    @Operation(summary = "获取赛事所有裁判", description = "提供赛事 ID，获取赛事的所有裁判")
+    @Parameter(name = "eventId", description = "赛事 ID", required = true)
     public List<Referee> getReferees(Long eventId) {
         if (eventId == null) {
             throw new BadRequestException("传入的赛事ID为空");
@@ -616,6 +736,11 @@ public class EventController {
     }
 
     @DeleteMapping("/referee/delete")
+    @Operation(summary = "删除裁判", description = "删除赛事的裁判")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "refereeId", description = "裁判 ID", required = true)
+    })
     public void deleteReferee(Long eventId, Long refereeId) {
         if (eventId == null || refereeId == null) {
             throw new BadRequestException("传入的赛事ID或裁判ID为空");

@@ -9,7 +9,10 @@ import com.sustech.football.model.match.VoMatchCommentLike;
 import com.sustech.football.service.MatchCommentReplyService;
 import com.sustech.football.service.MatchCommentService;
 import com.sustech.football.service.MatchService;
-import io.swagger.v3.oas.annotations.Operation;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/comment")
+@Tag(name = "Comment Controller", description = "评论比赛的接口")
 public class CommentController {
     @Autowired
     private MatchCommentService matchCommentService;
@@ -30,7 +34,7 @@ public class CommentController {
     private MatchService matchService;
 
     @PostMapping("/match/addComment")
-    @Operation(summary = "评论比赛", description = "需要提供比赛id，评论者id，评论内容")
+    @Operation(summary = "评论比赛", description = "提供比赛评论数据结构体")
     public String addMatchComment(@RequestBody MatchComment comment) {
         if (comment == null) {
             throw new BadRequestException("未提供评论参数");
@@ -51,8 +55,12 @@ public class CommentController {
     }
 
     @PostMapping("/match/deleteComment")
-    @Operation(summary = "删除比赛评论", description = "需要提供评论id，操作者id")
-    public String deleteMatchComment(@RequestParam Long commentId, @RequestParam Long userId) {
+    @Operation(summary = "删除比赛评论", description = "需要提供评论 ID，操作者 ID")
+    @Parameters({
+            @Parameter(name = "commentId", description = "评论 ID", required = true),
+            @Parameter(name = "userId", description = "操作者 ID", required = true)
+    })
+    public String deleteMatchComment(Long commentId, Long userId) {
         MatchComment comment = matchCommentService.getById(commentId);
         if (comment == null) {
             throw new BadRequestException("要删除的比赛评论不存在");
@@ -67,7 +75,7 @@ public class CommentController {
     }
 
     @PostMapping("/match/addReply")
-    @Operation(summary = "回复比赛评论", description = "需要提供评论id，回复者id，回复内容")
+    @Operation(summary = "回复比赛评论", description = "提供比赛评论回复数据结构体")
     public String addMatchCommentReply(@RequestBody MatchCommentReply reply) {
         if (reply == null) {
             throw new BadRequestException("未提供回复参数");
@@ -87,8 +95,12 @@ public class CommentController {
     }
 
     @PostMapping("/match/deleteReply")
-    @Operation(summary = "删除比赛评论", description = "需要提供回复id，操作者id")
-    public String deleteMatchCommentReply(@RequestParam Long replyId, @RequestParam Long userId) {
+    @Operation(summary = "删除比赛评论", description = "需要提供回复 ID，操作者 ID")
+    @Parameters({
+            @Parameter(name = "replyId", description = "回复 ID", required = true),
+            @Parameter(name = "userId", description = "操作者 ID", required = true)
+    })
+    public String deleteMatchCommentReply(Long replyId, Long userId) {
         MatchCommentReply reply = matchCommentReplyService.getById(replyId);
         if (reply == null) {
             throw new BadRequestException("要删除的比赛评论回复不存在");
@@ -103,16 +115,20 @@ public class CommentController {
     }
 
     @GetMapping("/match/getCommentWithReply")
-    @Operation(summary = "列出一个比赛的评论和回复", description = "需要提供比赛id，返回该比赛的评论和回复列表，包括用户简要信息")
+    @Operation(summary = "列出一个比赛的评论和回复", description = "需要提供比赛 ID，返回该比赛的评论和回复列表，包括用户简要信息")
     public List<VoMatchComment> getCommentsWithReplyByMatchId(@RequestParam Long matchId) {
         return matchCommentService.getCommentsWithReplyByMatchId(matchId);
     }
 
     @PostMapping("/match/like/getByIdList")
-    @Operation(summary = "列出评论的点赞情况", description = "需要提供要获取的评论id和当前用户id，返回评论的点赞情况")
-    public List<VoMatchCommentLike> getCommentLikesByCommentIdList(@RequestParam Long userId, @RequestBody List<Long> commentIds) {
+    @Operation(summary = "列出评论的点赞情况", description = "需要提供要获取的评论 ID 和当前用户 ID，返回评论的点赞情况")
+    @Parameters({
+            @Parameter(name = "userId", description = "当前用户 ID", required = true),
+            @Parameter(name = "commentIds", description = "需要获取的评论 ID 的列表", required = true)
+    })
+    public List<VoMatchCommentLike> getCommentLikesByCommentIdList(Long userId, List<Long> commentIds) {
         if (commentIds == null || commentIds.isEmpty()) {
-            throw new BadRequestException("未提供评论id");
+            throw new BadRequestException("未提供评论ID");
         }
         if (userId == null) {
             userId = -1L;
@@ -121,10 +137,14 @@ public class CommentController {
     }
 
     @PostMapping("/match/like/doLike")
-    @Operation(summary = "点赞评论", description = "需要提供评论id和用户id，点赞成功返回true，失败返回false")
-    public boolean likeComment(@RequestParam Long commentId, @RequestParam Long userId) {
+    @Operation(summary = "点赞评论", description = "需要提供评论 ID 和用户 ID，点赞成功返回true，失败返回false")
+    @Parameters({
+            @Parameter(name = "commentId", description = "评论 ID", required = true),
+            @Parameter(name = "userId", description = "用户 ID", required = true)
+    })
+    public boolean likeComment(Long commentId, Long userId) {
         if (userId == null || commentId == null) {
-            throw new BadRequestException("未提供用户id或评论id");
+            throw new BadRequestException("未提供用户ID或评论ID");
         }
         if (matchCommentService.hasLiked(commentId, userId)) {
             throw new BadRequestException("用户已经点赞该评论");
@@ -133,10 +153,14 @@ public class CommentController {
     }
 
     @PostMapping("/match/like/cancelLike")
-    @Operation(summary = "取消点赞评论", description = "需要提供评论id和用户id，取消点赞成功返回true，失败返回false")
+    @Operation(summary = "取消点赞评论", description = "需要提供评论 ID 和用户 ID ，取消点赞成功返回true，失败返回false")
+    @Parameters({
+            @Parameter(name = "commentId", description = "评论 ID", required = true),
+            @Parameter(name = "userId", description = "用户 ID", required = true)
+    })
     public boolean cancelLikeComment(@RequestParam Long commentId, @RequestParam Long userId) {
         if (userId == null || commentId == null) {
-            throw new BadRequestException("未提供用户id或评论id");
+            throw new BadRequestException("未提供用户ID或评论ID");
         }
         if (!matchCommentService.hasLiked(commentId, userId)) {
             throw new BadRequestException("用户未点赞该评论");

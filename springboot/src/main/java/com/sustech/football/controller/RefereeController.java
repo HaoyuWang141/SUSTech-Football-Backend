@@ -7,10 +7,11 @@ import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.model.referee.VoRefereeEvent;
 import com.sustech.football.model.referee.VoRefereeMatch_brief;
 import com.sustech.football.model.referee.VoRefereeTeam;
-import com.sustech.football.service.EventMatchService;
-import com.sustech.football.service.EventService;
-import com.sustech.football.service.MatchService;
-import com.sustech.football.service.RefereeService;
+import com.sustech.football.service.*;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/referee")
+@Tag(name = "Referee Controller", description = "裁判管理接口")
 public class RefereeController {
     @Autowired
     private RefereeService refereeService;
@@ -31,6 +33,7 @@ public class RefereeController {
     private EventMatchService eventMatchService;
 
     @PostMapping("/create")
+    @Operation(summary = "创建裁判", description = "创建一个新的裁判")
     public Referee createReferee(@RequestBody Referee referee) {
         if (referee == null) {
             throw new BadRequestException("传入的裁判为空");
@@ -45,6 +48,8 @@ public class RefereeController {
     }
 
     @GetMapping("/get")
+    @Operation(summary = "获取裁判", description = "根据裁判 ID 获取裁判信息")
+    @Parameter(name = "id", description = "裁判 ID", required = true)
     public Referee getReferee(Long id) {
         if (id == null) {
             throw new BadRequestException("传入裁判id为空");
@@ -57,11 +62,13 @@ public class RefereeController {
     }
 
     @GetMapping("/getAll")
+    @Operation(summary = "获取所有裁判", description = "获取所有裁判信息")
     public List<Referee> getAllReferees() {
         return refereeService.list();
     }
 
     @PutMapping("/update")
+    @Operation(summary = "更新裁判", description = "更新裁判信息")
     public void updateReferee(@RequestBody Referee referee) {
         if (referee == null) {
             throw new BadRequestException("传入的裁判为空");
@@ -89,6 +96,8 @@ public class RefereeController {
     }
 
     @GetMapping("/match/getInvitations")
+    @Operation(summary = "获取比赛邀请", description = "根据裁判 ID，获取裁判的比赛邀请")
+    @Parameter(name = "refereeId", description = "裁判 ID", required = true)
     public List<MatchRefereeRequest> getMatchInvitations(Long refereeId) {
         if (refereeId == null) {
             throw new BadRequestException("传入的id为空");
@@ -100,6 +109,12 @@ public class RefereeController {
     }
 
     @PostMapping("/match/replyInvitation")
+    @Operation(summary = "回复比赛邀请", description = "根据裁判 ID，比赛 ID，回复比赛邀请")
+    @Parameters({
+            @Parameter(name = "refereeId", description = "裁判 ID", required = true),
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "accept", description = "是否接受邀请", required = true)
+    })
     public void replyMatchInvitation(Long refereeId, Long matchId, Boolean accept) {
         if (refereeId == null || matchId == null || accept == null) {
             throw new BadRequestException("传入的参数含有空值");
@@ -116,6 +131,8 @@ public class RefereeController {
     }
 
     @GetMapping("/match/getAll")
+    @Operation(summary = "获取裁判比赛", description = "根据裁判 ID，获取裁判的所有比赛")
+    @Parameter(name = "refereeId", description = "裁判 ID", required = true)
     public List<VoRefereeMatch_brief> getMatches(Long refereeId) {
         if (refereeId == null) {
             throw new BadRequestException("传入的裁判id为空");
@@ -167,6 +184,8 @@ public class RefereeController {
     }
 
     @GetMapping("/event/getInvitations")
+    @Operation(summary = "获取赛事邀请", description = "根据裁判 ID，获取裁判的赛事邀请")
+    @Parameter(name = "refereeId", description = "裁判 ID", required = true)
     public List<EventRefereeRequest> getEventInvitations(Long refereeId) {
         if (refereeId == null) {
             throw new BadRequestException("传入的裁判id为空");
@@ -178,6 +197,12 @@ public class RefereeController {
     }
 
     @PostMapping("/event/replyInvitation")
+    @Operation(summary = "回复赛事邀请", description = "根据裁判 ID，赛事 ID，回复赛事邀请")
+    @Parameters({
+            @Parameter(name = "refereeId", description = "裁判 ID", required = true),
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "accept", description = "是否接受邀请", required = true)
+    })
     public void replyEventInvitation(Long refereeId, Long eventId, Boolean accept) {
         if (refereeId == null || eventId == null || accept == null) {
             throw new BadRequestException("传入的参数含有空值");
@@ -194,6 +219,8 @@ public class RefereeController {
     }
 
     @GetMapping("/event/getAll")
+    @Operation(summary = "获取裁判赛事", description = "根据裁判 ID，获取裁判的所有赛事")
+    @Parameter(name = "refereeId", description = "裁判 ID", required = true)
     public List<Event> getEvents(Long refereeId) {
         if (refereeId == null) {
             throw new BadRequestException("传入的裁判id为空");
