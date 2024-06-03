@@ -1,10 +1,8 @@
 package com.sustech.football.controller;
 
 import com.sustech.football.model.team.VoTeam;
-import com.sustech.football.model.team.VoTeamPlayer;
 
 import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
