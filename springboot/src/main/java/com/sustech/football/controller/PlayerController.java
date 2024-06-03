@@ -89,34 +89,34 @@ public class PlayerController {
         return player;
     }
 
-    @Deprecated
-    @DeleteMapping("/delete")
-    public void deletePlayer(Long id) {
-        if (!playerService.removeById(id)) {
-            throw new BadRequestException("删除球员失败");
-        }
-    }
-
-    @Deprecated
-    @PostMapping("/joinTeam")
-    public void joinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
-        if (playerId == null || teamId == null) {
-            throw new BadRequestException("球员id和球队id不能为空");
-        }
-        if (playerService.getById(playerId) == null) {
-            throw new ResourceNotFoundException("球员不存在");
-        }
-        if (teamService.getById(teamId) == null) {
-            throw new ResourceNotFoundException("球队不存在");
-        }
-        TeamPlayer teamPlayer = new TeamPlayer(playerId, teamId);
-        if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
-            throw new ConflictException("球员已经加入该球队");
-        }
-        if (!teamPlayerService.save(teamPlayer)) {
-            throw new RuntimeException("加入球队失败");
-        }
-    }
+//    @Deprecated
+//    @DeleteMapping("/delete")
+//    public void deletePlayer(Long id) {
+//        if (!playerService.removeById(id)) {
+//            throw new BadRequestException("删除球员失败");
+//        }
+//    }
+//
+//    @Deprecated
+//    @PostMapping("/joinTeam")
+//    public void joinTeam(@RequestParam Long playerId, @RequestParam Long teamId) {
+//        if (playerId == null || teamId == null) {
+//            throw new BadRequestException("球员id和球队id不能为空");
+//        }
+//        if (playerService.getById(playerId) == null) {
+//            throw new ResourceNotFoundException("球员不存在");
+//        }
+//        if (teamService.getById(teamId) == null) {
+//            throw new ResourceNotFoundException("球队不存在");
+//        }
+//        TeamPlayer teamPlayer = new TeamPlayer(playerId, teamId);
+//        if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
+//            throw new ConflictException("球员已经加入该球队");
+//        }
+//        if (!teamPlayerService.save(teamPlayer)) {
+//            throw new RuntimeException("加入球队失败");
+//        }
+//    }
 
     @PostMapping("/team/applyToJoin")
     @Operation(summary = "申请加入球队", description = "提供球员 ID 和球队 ID，申请加入球队")

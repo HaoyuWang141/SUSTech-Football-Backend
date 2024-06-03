@@ -60,7 +60,7 @@ public class CoachController {
         }
         Coach coach = coachService.getById(id);
         if (coach == null) {
-            throw new BadRequestException("教练不存在");
+            throw new ResourceNotFoundException("教练不存在");
         }
         return coach;
     }

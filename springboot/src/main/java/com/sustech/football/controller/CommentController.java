@@ -117,6 +117,9 @@ public class CommentController {
     @GetMapping("/match/getCommentWithReply")
     @Operation(summary = "列出一个比赛的评论和回复", description = "需要提供比赛 ID，返回该比赛的评论和回复列表，包括用户简要信息")
     public List<VoMatchComment> getCommentsWithReplyByMatchId(@RequestParam Long matchId) {
+        if (matchId == null) {
+            throw new BadRequestException("未提供比赛id");
+        }
         return matchCommentService.getCommentsWithReplyByMatchId(matchId);
     }
 

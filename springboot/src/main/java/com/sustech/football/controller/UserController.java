@@ -223,6 +223,9 @@ public class UserController {
     @Operation(summary = "获取用户职责", description = "根据用户 ID，获取用户职责")
     @Parameter(name = "userId", description = "用户 ID", required = true)
     public UserRole getRoleUserById(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("用户ID不能为空");
+        }
         return userService.getRoleUserById(userId);
     }
 }

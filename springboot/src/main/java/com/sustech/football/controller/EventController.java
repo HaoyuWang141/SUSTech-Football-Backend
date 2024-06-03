@@ -463,7 +463,7 @@ public class EventController {
             @Parameter(name = "groupId", description = "分组 ID", required = true),
             @Parameter(name = "name", description = "新组名", required = true)
     })
-    public void updateGroup(Integer groupId, String name) {
+    public void updateGroup(Long groupId, String name) {
         if (groupId == null || name == null) {
             throw new BadRequestException("传入的分组ID或组名为空");
         }
