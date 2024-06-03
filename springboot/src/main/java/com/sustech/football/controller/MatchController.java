@@ -8,7 +8,9 @@ import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.model.match.*;
 import com.sustech.football.service.*;
 
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 @CrossOrigin
 @RestController
 @RequestMapping("/match")
+@Tag(name = "Match Controller", description = "管理比赛的接口")
 public class MatchController {
     @Autowired
     private MatchService matchService;
@@ -42,6 +45,10 @@ public class MatchController {
 
     @PostMapping("/create")
     @Transactional
+    @Operation(summary = "创建比赛", description = "创建一个新的比赛")
+    @Parameters(
+            @Parameter(name = "ownerId", description = "比赛所有者 ID", required = true)
+    )
     public Long createMatch(Long ownerId, @RequestBody Match match) {
         if (ownerId == null) {
             throw new BadRequestException("比赛所有者ID不能为空");
@@ -65,6 +72,9 @@ public class MatchController {
     }
 
     @GetMapping("/get")
+    @Operation(summary = "获取比赛信息", description = "根据比赛ID获取比赛信息")
+    @Parameter(name = "id", description = "比赛 ID", required = true)
+
     public VoMatch getMatch(Long id) {
         if (id == null) {
             throw new BadRequestException("比赛ID不能为空");
@@ -192,6 +202,7 @@ public class MatchController {
     }
 
     @GetMapping("/getAll")
+    @Operation(summary = "获取所有比赛", description = "获取所有比赛信息")
     public List<Match> getAllMatches() {
         List<Match> matchList = matchService.list();
         matchList.forEach(match -> {
@@ -203,6 +214,8 @@ public class MatchController {
     }
 
     @GetMapping("/getByIdList")
+    @Operation(summary = "获取比赛信息", description = "根据比赛ID列表获取比赛信息")
+    @Parameter(name = "idList", description = "比赛 ID 列表", required = true)
     public List<Match> getMatchByIdList(@RequestParam List<Long> idList) {
         if (idList == null) {
             throw new BadRequestException("比赛ID列表不能为空");
@@ -233,6 +246,11 @@ public class MatchController {
     }
 
     @DeleteMapping("/delete")
+    @Operation(summary = "删除比赛", description = "只有比赛管理员才能删除比赛")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "userId", description = "用户 ID", required = true)
+    })
     public void deleteMatch(Long matchId, Long userId) {
         if (matchId == null || userId == null){
             throw new BadRequestException("传参含空");
@@ -249,6 +267,11 @@ public class MatchController {
     }
 
     @PostMapping("/manager/invite")
+    @Operation(summary = "邀请管理员", description = "提供比赛 ID 和管理员ID，邀请管理员")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "managerId", description = "管理员 ID", required = true)
+    })
     public void inviteManager(Long matchId, Long managerId) {
         if (matchId == null || managerId == null) {
             throw new BadRequestException("比赛ID和管理员ID不能为空");
@@ -265,6 +288,8 @@ public class MatchController {
     }
 
     @GetMapping("/manager/getAll")
+    @Operation(summary = "获取所有管理员", description = "提供比赛 ID，获取比赛的所有管理员")
+    @Parameter(name = "matchId", description = "比赛 ID", required = true)
     public List<Long> getManagers(Long matchId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
@@ -276,6 +301,11 @@ public class MatchController {
     }
 
     @DeleteMapping("/manager/delete")
+    @Operation(summary = "删除管理员", description = "提供比赛 ID 和管理员ID，删除管理员")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "managerId", description = "管理员 ID", required = true)
+    })
     public void deleteManager(Long matchId, Long managerId) {
         if (matchId == null || managerId == null) {
             throw new BadRequestException("比赛ID和管理员ID不能为空");
@@ -292,6 +322,12 @@ public class MatchController {
     }
 
     @PostMapping("/team/invite")
+    @Operation(summary = "邀请球队", description = "提供比赛 ID 和球队ID，邀请球队")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "teamId", description = "球队 ID", required = true),
+            @Parameter(name = "isHomeTeam", description = "是否主队", required = true)
+    })
     public void inviteTeam(Long matchId, Long teamId, Boolean isHomeTeam) {
         if (matchId == null || teamId == null || isHomeTeam == null) {
             throw new BadRequestException("传参含空值");
@@ -309,6 +345,8 @@ public class MatchController {
     }
 
     @GetMapping("/team/getInvitations")
+    @Operation(summary = "获取球队邀请", description = "提供比赛 ID，获取比赛的所有球队邀请")
+    @Parameter(name = "matchId", description = "比赛 ID", required = true)
     public List<MatchTeamRequest> getTeamInvitations(Long matchId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
@@ -320,6 +358,11 @@ public class MatchController {
     }
 
     @GetMapping("/team/get")
+    @Operation(summary = "获取球队", description = "提供比赛 ID 和主客队标识，获取比赛的球队信息")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "isHomeTeam", description = "是否主队", required = true)
+    })
     public VoMatchTeam getTeam(Long matchId, Boolean isHomeTeam) {
         if (matchId == null || isHomeTeam == null) {
             throw new BadRequestException("比赛ID和主客队标识不能为空");
@@ -410,6 +453,11 @@ public class MatchController {
     }
 
     @DeleteMapping("/team/delete")
+    @Operation(summary = "删除球队", description = "提供比赛 ID 和主客队标识，删除比赛的球队")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "isHomeTeam", description = "是否主队", required = true)
+    })
     public void deleteTeam(Long matchId, Boolean isHomeTeam) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
@@ -424,6 +472,11 @@ public class MatchController {
     }
 
     @PostMapping("/referee/invite")
+    @Operation(summary = "邀请裁判", description = "提供比赛 ID 和裁判 ID，邀请裁判")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "refereeId", description = "裁判 ID", required = true)
+    })
     public void inviteReferee(Long matchId, Long refereeId) {
         if (matchId == null || refereeId == null) {
             throw new BadRequestException("比赛ID和裁判ID不能为空");
@@ -441,6 +494,8 @@ public class MatchController {
     }
 
     @GetMapping("/referee/getAll")
+    @Operation(summary = "获取所有裁判", description = "提供比赛 ID，获取比赛的所有裁判")
+    @Parameter(name = "matchId", description = "比赛 ID", required = true)
     public List<Referee> getReferees(Long matchId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
@@ -452,6 +507,11 @@ public class MatchController {
     }
 
     @DeleteMapping("/referee/delete")
+    @Operation(summary = "删除裁判", description = "提供比赛 ID 和裁判 ID，删除裁判")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "refereeId", description = "裁判 ID", required = true)
+    })
     public void deleteReferee(Long matchId, Long refereeId) {
         if (matchId == null || refereeId == null) {
             throw new BadRequestException("比赛ID和裁判ID不能为空");
@@ -468,6 +528,12 @@ public class MatchController {
     }
 
     @GetMapping("/referee/getPlayerList")
+    @Operation(summary = "获取比赛球员列表", description = "提供裁判 ID、比赛 ID 和球队 ID，获取比赛的球员列表")
+    @Parameters({
+            @Parameter(name = "refereeId", description = "裁判 ID", required = true),
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "teamId", description = "球队 ID", required = true)
+    })
     public List<VoMatchPlayer> getPlayerList(Long refereeId, Long matchId, Long teamId) {
         if (refereeId == null || matchId == null || teamId == null) {
             throw new BadRequestException("裁判ID和比赛ID和球队ID不能为空");
@@ -563,6 +629,7 @@ public class MatchController {
     }
 
     @PostMapping("/referee/updateResult")
+    @Operation(summary = "更新比赛结果", description = "提供裁判 ID 和比赛信息，更新比赛结果")
     public void updateResult(Long refereeId, @RequestBody VoMatchInfoForReferee voMatch) {
         if (refereeId == null || voMatch == null) {
             throw new BadRequestException("裁判ID和比赛信息不能为空");
@@ -591,6 +658,7 @@ public class MatchController {
     }
 
     @PostMapping("/referee/addPlayerAction")
+    @Operation(summary = "添加比赛球员动作", description = "提供裁判 ID 和比赛球员动作信息，添加比赛球员动作")
     public void updatePlayerAction(Long refereeId, @RequestBody MatchPlayerAction matchPlayerAction) {
         if (refereeId == null || matchPlayerAction == null) {
             throw new BadRequestException("传参不能为空");
@@ -629,6 +697,7 @@ public class MatchController {
     }
 
     @DeleteMapping("/referee/deletePlayerAction")
+    @Operation(summary = "删除比赛球员动作", description = "提供裁判 ID 和比赛球员动作信息，删除比赛球员动作")
     public void deletePlayerAction(Long refereeId, @RequestBody MatchPlayerAction matchPlayerAction) {
         if (refereeId == null || matchPlayerAction == null) {
             throw new BadRequestException("传参不能为空");
@@ -642,6 +711,7 @@ public class MatchController {
     }
 
     @GetMapping("/getEvent")
+    @Operation(summary = "获取比赛所属赛事", description = "提供比赛 ID，获取比赛所属赛事")
     public Event getEvent(Long matchId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
@@ -653,6 +723,12 @@ public class MatchController {
     }
 
     @PostMapping("/live/add")
+    @Operation(summary = "添加直播", description = "提供比赛 ID 和直播名称和直播地址，添加直播信息（链接）")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "liveName", description = "直播名称", required = true),
+            @Parameter(name = "liveUrl", description = "直播地址", required = true)
+    })
     public MatchLive addLive(Long matchId, String liveName, String liveUrl) {
         if (matchId == null || liveName == null || liveUrl == null) {
             throw new BadRequestException("比赛ID和直播名称和直播地址不能为空");
@@ -666,6 +742,8 @@ public class MatchController {
     }
 
     @PutMapping("/live/update")
+    @Operation(summary = "更新直播信息", description = "提供直播信息，更新直播信息（链接）")
+    @Parameter(name = "matchLive", description = "直播信息", required = true)
     public void updateLive(@RequestBody MatchLive matchLive) {
         if (matchLive == null) {
             throw new BadRequestException("直播信息不能为空");
@@ -679,6 +757,8 @@ public class MatchController {
     }
 
     @DeleteMapping("/live/delete")
+    @Operation(summary = "删除直播", description = "提供直播 ID，删除直播信息（链接）")
+    @Parameter(name = "liveId", description = "直播 ID", required = true)
     public void deleteLive(Long liveId) {
         if (liveId == null) {
             throw new BadRequestException("直播ID不能为空");
@@ -689,6 +769,7 @@ public class MatchController {
     }
 
     @GetMapping("/live/get")
+
     public MatchLive getLive(Long liveId) {
         if (liveId == null) {
             throw new BadRequestException("ID不能为空");
@@ -701,6 +782,8 @@ public class MatchController {
     }
 
     @GetMapping("/live/getAll")
+    @Operation(summary = "获取所有直播", description = "提供比赛 ID，获取比赛的所有直播信息")
+    @Parameter(name = "matchId", description = "比赛 ID", required = true)
     public List<MatchLive> getAllLives(Long matchId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");
@@ -714,6 +797,12 @@ public class MatchController {
     }
 
     @PostMapping("/video/add")
+    @Operation(summary = "添加视频", description = "提供比赛 ID 和视频名称和视频地址，添加视频信息（链接）")
+    @Parameters({
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "videoName", description = "视频名称", required = true),
+            @Parameter(name = "videoUrl", description = "视频地址", required = true)
+    })
     public MatchVideo addVideo(Long matchId, String videoName, String videoUrl) {
         if (matchId == null || videoName == null || videoUrl == null) {
             throw new BadRequestException("比赛ID和视频名称和视频地址不能为空");
@@ -727,6 +816,8 @@ public class MatchController {
     }
 
     @PutMapping("/video/update")
+    @Operation(summary = "更新视频信息", description = "提供视频信息，更新视频信息（链接）")
+    @Parameter(name = "matchVideo", description = "视频信息", required = true)
     public void updateVideo(@RequestBody MatchVideo matchVideo) {
         if (matchVideo == null) {
             throw new BadRequestException("视频信息不能为空");
@@ -740,6 +831,8 @@ public class MatchController {
     }
 
     @DeleteMapping("/video/delete")
+    @Operation(summary = "删除视频", description = "提供视频 ID，删除视频信息（链接）")
+    @Parameter(name = "videoId", description = "视频 ID", required = true)
     public void deleteVideo(Long videoId) {
         if (videoId == null) {
             throw new BadRequestException("视频ID不能为空");
@@ -750,6 +843,8 @@ public class MatchController {
     }
 
     @GetMapping("/video/get")
+    @Operation(summary = "获取视频", description = "提供视频 ID，获取视频信息（链接）")
+    @Parameter(name = "videoId", description = "视频 ID", required = true)
     public MatchVideo getVideo(Long videoId) {
         if (videoId == null) {
             throw new BadRequestException("ID不能为空");
@@ -762,6 +857,8 @@ public class MatchController {
     }
 
     @GetMapping("/video/getAll")
+    @Operation(summary = "获取所有视频", description = "提供比赛 ID，获取比赛的所有视频信息")
+    @Parameter(name = "matchId", description = "比赛 ID", required = true)
     public List<MatchVideo> getAllVideos(Long matchId) {
         if (matchId == null) {
             throw new BadRequestException("比赛ID不能为空");

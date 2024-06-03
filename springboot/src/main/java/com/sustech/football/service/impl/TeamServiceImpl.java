@@ -128,7 +128,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 teamPlayer.getTeamId(), teamPlayer.getPlayerId(),
                 TeamPlayerRequest.TYPE_INVITATION,
                 TeamPlayerRequest.STATUS_PENDING);
-        if (teamPlayerRequestService.selectByMultiId(teamPlayerRequest) != null) {
+        TeamPlayerRequest teamPlayerRequestRes = teamPlayerRequestService.selectByMultiId(teamPlayerRequest);
+        if (teamPlayerRequestRes != null && teamPlayerRequestRes.getStatus().equals(TeamPlayerRequest.STATUS_PENDING)) {
             throw new BadRequestException("曾经向该球员发出过邀请，请勿重复发送");
         }
         if (!teamPlayerRequestService.saveOrUpdateByMultiId(teamPlayerRequest)) {
@@ -208,7 +209,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     @Override
     public boolean deletePlayer(Long teamId, Long playerId) {
         Team team = getById(teamId);
-        if (team.getCaptainId().equals(playerId)) {
+        if (team.getCaptainId() != null && team.getCaptainId().equals(playerId)) {
             throw new ConflictException("队长不能被直接删除，请先转让");
         }
         if (!teamPlayerService.deleteByMultiId(new TeamPlayer(teamId, playerId))) {
@@ -260,8 +261,9 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             throw new ConflictException("该教练已经在球队中");
         }
         TeamCoachRequest teamCoachRequest = new TeamCoachRequest(
-                teamCoach.getTeamId(), teamCoach.getCoachId());
-        if (teamCoachRequestService.selectByMultiId(teamCoachRequest) != null) {
+                teamCoach.getTeamId(), teamCoach.getCoachId(), TeamCoachRequest.STATUS_PENDING);
+        TeamCoachRequest teamCoachRequestRes = teamCoachRequestService.selectByMultiId(teamCoachRequest);
+        if (teamCoachRequestRes != null && teamCoachRequestRes.getStatus().equals(TeamCoachRequest.STATUS_PENDING)) {
             throw new ConflictException("曾经向该教练发出过邀请，请勿重复发送");
         }
         if (!teamCoachRequestService.saveOrUpdateByMultiId(teamCoachRequest)) {

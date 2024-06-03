@@ -226,8 +226,10 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         }
         MatchRefereeRequest matchRefereeRequest = new MatchRefereeRequest(
                 matchReferee.getMatchId(),
-                matchReferee.getRefereeId());
-        if (matchRefereeRequestService.selectByMultiId(matchRefereeRequest) != null) {
+                matchReferee.getRefereeId(),
+                MatchRefereeRequest.STATUS_PENDING);
+        MatchRefereeRequest requestRes = matchRefereeRequestService.selectByMultiId(matchRefereeRequest);
+        if (requestRes != null && requestRes.getStatus().equals(MatchRefereeRequest.STATUS_PENDING)) {
             throw new ConflictException("已经邀请过该裁判，请勿重复发送");
         }
         if (!matchRefereeRequestService.saveOrUpdateByMultiId(matchRefereeRequest)) {

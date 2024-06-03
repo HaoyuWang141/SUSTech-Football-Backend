@@ -3,6 +3,10 @@ package com.sustech.football.controller;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +23,14 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @RestController
+@Tag(name = "File Upload Controller", description = "文件上传下载接口")
 public class FileUploadController {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
     @PostMapping("/upload")
+    @Operation(summary = "上传文件", description = "上传文件到服务器")
     public String uploadFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             throw new BadRequestException("文件为空，请选择一个文件上传。");
@@ -48,6 +54,7 @@ public class FileUploadController {
     }
 
     @GetMapping("/download")
+    @Operation(summary = "下载文件", description = "下载服务器上的文件")
     public void download(String filename, HttpServletResponse response) {
         try {
             // path是指想要下载的文件的路径
@@ -87,6 +94,7 @@ public class FileUploadController {
     }
 
     @GetMapping("/download/{fileName:.+}")
+    @Operation(summary = "下载文件", description = "下载服务器上的文件")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) throws MalformedURLException {
         Path file = Paths.get(uploadDir).resolve(fileName);
         Resource resource = new UrlResource(file.toUri());

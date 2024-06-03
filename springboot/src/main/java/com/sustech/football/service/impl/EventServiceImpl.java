@@ -204,7 +204,8 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         if (eventTeamService.selectByMultiId(eventTeam) != null) {
             throw new ConflictException("该队伍已经是该赛事的参赛队伍");
         }
-        if (eventTeamRequestService.selectByMultiId(eventTeamRequest) != null) {
+        EventTeamRequest requestRes = eventTeamRequestService.selectByMultiId(eventTeamRequest);
+        if (requestRes != null && requestRes.getStatus().equals(EventTeamRequest.STATUS_PENDING)) {
             throw new ConflictException("该队伍已经被邀请参加赛事");
         }
         if (!eventTeamRequestService.saveOrUpdateByMultiId(eventTeamRequest)) {
@@ -335,8 +336,9 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         if (eventRefereeService.selectByMultiId(eventReferee) != null) {
             throw new ConflictException("该裁判已经执法该赛事");
         }
-        if (eventRefereeRequestService.selectByMultiId(eventRefereeRequest) != null) {
-            throw new ConflictException("该裁判已经被邀请执法该赛事");
+        EventRefereeRequest eventRefereeRes = eventRefereeRequestService.selectByMultiId(eventRefereeRequest);
+        if (eventRefereeRes != null && eventRefereeRes.getStatus().equals(EventRefereeRequest.STATUS_PENDING)) {
+            throw new ConflictException("该裁判正在被邀请执法该赛事");
         }
         if (!eventRefereeRequestService.saveOrUpdateByMultiId(eventRefereeRequest)) {
             throw new RuntimeException("邀请失败");
