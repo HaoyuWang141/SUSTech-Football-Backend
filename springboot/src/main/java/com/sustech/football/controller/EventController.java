@@ -219,7 +219,7 @@ public class EventController {
     @GetMapping("/getByIdList")
     @Operation(summary = "获取赛事", description = "根据 ID 列表获取赛事详细信息")
     @Parameter(name = "idList", description = "赛事 ID 列表", required = true)
-    public List<Event> getEventsByIdLists(List<Long> idList) {
+    public List<Event> getEventsByIdLists(@RequestParam List<Long> idList) {
         return eventService.listByIds(idList);
     }
 

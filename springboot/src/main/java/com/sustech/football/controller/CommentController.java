@@ -116,7 +116,8 @@ public class CommentController {
 
     @GetMapping("/match/getCommentWithReply")
     @Operation(summary = "列出一个比赛的评论和回复", description = "需要提供比赛 ID，返回该比赛的评论和回复列表，包括用户简要信息")
-    public List<VoMatchComment> getCommentsWithReplyByMatchId(@RequestParam Long matchId) {
+    @Parameter(name = "matchId", description = "比赛 ID", required = true)
+    public List<VoMatchComment> getCommentsWithReplyByMatchId(Long matchId) {
         if (matchId == null) {
             throw new BadRequestException("未提供比赛id");
         }
@@ -129,7 +130,7 @@ public class CommentController {
             @Parameter(name = "userId", description = "当前用户 ID", required = true),
             @Parameter(name = "commentIds", description = "需要获取的评论 ID 的列表", required = true)
     })
-    public List<VoMatchCommentLike> getCommentLikesByCommentIdList(Long userId, List<Long> commentIds) {
+    public List<VoMatchCommentLike> getCommentLikesByCommentIdList(Long userId, @RequestParam List<Long> commentIds) {
         if (commentIds == null || commentIds.isEmpty()) {
             throw new BadRequestException("未提供评论ID");
         }

@@ -107,7 +107,7 @@ public class TeamController {
     @GetMapping("/getByIdList")
     @Operation(summary = "获取球队列表", description = "根据 ID 列表获取球队信息")
     @Parameter(name = "idList", description = "球队 ID 列表", required = true)
-    public List<Team> getTeamsByIdList(List<Long> idList) {
+    public List<Team> getTeamsByIdList(@RequestParam List<Long> idList) {
         if (idList == null || idList.isEmpty()) {
             throw new BadRequestException("传入的队伍ID列表为空");
         }

@@ -70,7 +70,7 @@ public class PlayerController {
 
     @GetMapping("/getByIdList")
     @Operation(summary = "获取球员列表", description = "提供球员 ID 列表，获取球员信息")
-    public List<Player> getPlayersByIds(List<Long> idList) {
+    public List<Player> getPlayersByIds(@RequestParam List<Long> idList) {
         return playerService.listByIds(idList);
     }
 
