@@ -208,7 +208,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     @Override
     public boolean deletePlayer(Long teamId, Long playerId) {
         Team team = getById(teamId);
-        if (team.getTeamId() != null && team.getCaptainId().equals(playerId)) {
+        if (team.getCaptainId() != null && team.getCaptainId().equals(playerId)) {
             throw new ConflictException("队长不能被直接删除，请先转让");
         }
         if (!teamPlayerService.deleteByMultiId(new TeamPlayer(teamId, playerId))) {
