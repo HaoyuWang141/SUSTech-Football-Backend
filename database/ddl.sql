@@ -705,6 +705,9 @@ WHERE match_id = OLD.match_id;
 DELETE FROM event_match
 WHERE match_id = OLD.match_id;
 
+DELETE FROM favorite_match
+WHERE match_id = OLD.match_id;
+
 -- 返回OLD以允许删除操作继续
 RETURN OLD;
 END
@@ -825,6 +828,10 @@ WHERE event_id = OLD.event_id;
 
 DELETE
 FROM event_manager
+WHERE event_id = OLD.event_id;
+
+DELETE
+FROM favorite_event
 WHERE event_id = OLD.event_id;
 
 -- 返回OLD以允许删除操作继续
