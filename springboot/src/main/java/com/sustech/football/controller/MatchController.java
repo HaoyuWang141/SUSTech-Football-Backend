@@ -234,8 +234,14 @@ public class MatchController {
 
     @DeleteMapping("/delete")
     public void deleteMatch(Long matchId, Long userId) {
-        if (matchId == null) {
-            throw new BadRequestException("比赛ID不能为空");
+        if (matchId == null || userId == null){
+            throw new BadRequestException("传参含空");
+        }
+        if (matchService.getById(matchId) == null) {
+            throw new BadRequestException("比赛不存在");
+        }
+        if (userService.getById(userId) == null) {
+            throw new BadRequestException("用户不存在");
         }
         if (!matchService.deleteMatch(matchId, userId)) {
             throw new BadRequestException("删除比赛失败");

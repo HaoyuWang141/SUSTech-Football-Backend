@@ -116,7 +116,7 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
         eventMatchQueryWrapper.eq("match_id", matchId);
         List<EventMatch> eventMatch = eventMatchService.list(eventMatchQueryWrapper);
         if (!eventMatch.isEmpty()) {
-            throw new BadRequestException("比赛在赛事中，非友谊赛无法删除比赛");
+            throw new BadRequestException("赛事比赛，无法删除");
         }
 
         if (!removeById(matchId)) {
