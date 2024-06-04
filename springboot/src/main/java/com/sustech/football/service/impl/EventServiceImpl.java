@@ -7,6 +7,7 @@ import com.sustech.football.exception.ConflictException;
 import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.mapper.EventMapper;
+import com.sustech.football.mapper.MatchRefereeMapper;
 import com.sustech.football.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,8 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     private EventStageService eventStageService;
     @Autowired
     private EventStageTagService eventStageTagService;
+    @Autowired
+    private MatchRefereeService matchRefereeService;
 
     @Override
     @Transactional
@@ -358,6 +361,25 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         }
         if (!eventRefereeService.deleteByMultiId(eventReferee)) {
             throw new RuntimeException("删除赛事裁判失败");
+        }
+        return true;
+    }
+
+    @Override
+    public boolean setMatchReferee(Long eventId, Long matchId, Long refereeId) {
+        EventMatch eventMatch = new EventMatch(eventId, matchId);
+        if (eventMatchService.selectByMultiId(eventMatch) == null) {
+            throw new ResourceNotFoundException("赛事不含该比赛");
+        }
+        EventReferee eventReferee = new EventReferee(eventId, refereeId);
+        if (eventRefereeService.selectByMultiId(eventReferee) == null) {
+            throw new ResourceNotFoundException("赛事不含该裁判");
+        }
+        MatchReferee matchReferee = new MatchReferee();
+        matchReferee.setMatchId(matchId);
+        matchReferee.setRefereeId(refereeId);
+        if (!matchRefereeService.saveOrUpdateByMultiId(matchReferee)) {
+            throw new RuntimeException("设置比赛裁判失败");
         }
         return true;
     }

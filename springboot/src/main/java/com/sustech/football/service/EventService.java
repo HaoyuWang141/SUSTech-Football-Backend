@@ -44,4 +44,6 @@ public interface EventService extends IService<Event> {
     List<Referee> getReferees(Long eventId);
 
     boolean deleteReferee(EventReferee eventReferee);
+
+    boolean setMatchReferee(Long eventId, Long matchId, Long refereeId);
 }

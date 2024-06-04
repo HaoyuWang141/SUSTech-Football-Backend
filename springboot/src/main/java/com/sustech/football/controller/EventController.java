@@ -702,6 +702,31 @@ public class EventController {
         }
     }
 
+    @PostMapping("/match/setReferee")
+    @Operation(summary = "设置裁判", description = "直接设置比赛的裁判")
+    @Parameters({
+            @Parameter(name = "eventId", description = "赛事 ID", required = true),
+            @Parameter(name = "matchId", description = "比赛 ID", required = true),
+            @Parameter(name = "refereeId", description = "裁判 ID", required = true)
+    })
+    public void setMatchReferee(Long eventId, Long matchId, Long refereeId) {
+        if (eventId == null || matchId == null || refereeId == null) {
+            throw new BadRequestException("传参含空值");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        if (matchService.getById(matchId) == null) {
+            throw new ResourceNotFoundException("比赛不存在");
+        }
+        if (refereeService.getById(refereeId) == null) {
+            throw new ResourceNotFoundException("裁判不存在");
+        }
+        if (!eventService.setMatchReferee(eventId, matchId, refereeId)) {
+            throw new RuntimeException("设置裁判失败");
+        }
+    }
+
     @PostMapping("/referee/invite")
     @Operation(summary = "邀请裁判", description = "邀请裁判参与赛事")
     @Parameters({
