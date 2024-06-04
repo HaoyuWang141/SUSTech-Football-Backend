@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.List;
 
 @CrossOrigin
@@ -213,7 +214,7 @@ public class EventController {
     @GetMapping("/getAll")
     @Operation(summary = "获取所有赛事", description = "获取所有赛事的详细信息")
     public List<Event> getAllEvents() {
-        return eventService.list();
+        return eventService.list().stream().sorted(Comparator.comparing(Event::getEventId)).toList();
     }
 
     @GetMapping("/getByIdList")
