@@ -4,4 +4,7 @@ import com.github.jeffreyning.mybatisplus.service.IMppService;
 import com.sustech.football.entity.MatchPlayer;
 
 public interface MatchPlayerService extends IMppService<MatchPlayer> {
+
+    boolean addMatchPlayerByTeam(Long matchId, Long teamId);
+
 }

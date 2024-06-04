@@ -68,6 +68,7 @@ public class MatchController {
         if (!matchService.inviteManager(new MatchManager(match.getMatchId(), ownerId, true))) {
             throw new BadRequestException("创建比赛失败");
         }
+        matchPlayerService.addMatchPlayerByTeam(match.getMatchId(), match.getHomeTeamId());
         return match.getMatchId();
     }
 
@@ -252,7 +253,7 @@ public class MatchController {
             @Parameter(name = "userId", description = "用户 ID", required = true)
     })
     public void deleteMatch(Long matchId, Long userId) {
-        if (matchId == null || userId == null){
+        if (matchId == null || userId == null) {
             throw new BadRequestException("传参含空");
         }
         if (matchService.getById(matchId) == null) {

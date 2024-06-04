@@ -371,22 +371,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 更新比赛球员信息
-            QueryWrapper<TeamPlayer> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("team_id", teamId);
-            List<TeamPlayer> teamPlayerList = teamPlayerService.list(queryWrapper);
-            List<MatchPlayer> matchPlayerList = new ArrayList<>();
-            for (TeamPlayer teamPlayer : teamPlayerList) {
-                MatchPlayer matchPlayer = new MatchPlayer();
-                matchPlayer.setMatchId(matchId);
-                matchPlayer.setTeamId(teamId);
-                matchPlayer.setPlayerId(teamPlayer.getPlayerId());
-                matchPlayer.setNumber(teamPlayer.getNumber());
-                matchPlayer.setIsStart(false);
-                matchPlayerList.add(matchPlayer);
-            }
-            if (!matchPlayerService.saveOrUpdateBatchByMultiId(matchPlayerList)) {
-                throw new RuntimeException("更新比赛球员信息失败");
-            }
+            matchPlayerService.addMatchPlayerByTeam(matchId, teamId);
         }
         return true;
     }
