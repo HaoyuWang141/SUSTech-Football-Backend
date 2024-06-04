@@ -325,7 +325,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     @Override
     public boolean deleteMatch(EventMatch eventMatch) {
         if (eventMatchService.selectByMultiId(eventMatch) == null) {
-            throw new ResourceNotFoundException("该比赛不是该赛事的比赛");
+            throw new ResourceNotFoundException("赛事不含该比赛");
         }
         if (!eventMatchService.deleteByMultiId(eventMatch)) {
             throw new RuntimeException("删除赛事比赛失败");

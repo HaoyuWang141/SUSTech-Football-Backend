@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -43,6 +44,19 @@ public class EventController {
     @Autowired
     private EventTeamService eventTeamService;
 
+    public record Match_GET(
+            Long matchId,
+            Long homeTeamId,
+            Long awayTeamId,
+            Timestamp time,
+            String status,
+            String description,
+            Integer homeTeamScore,
+            Integer awayTeamScore,
+            Integer homeTeamPenalty,
+            Integer awayTeamPenalty
+    ) {
+    }
 
     @PostMapping("/create")
     @Operation(summary = "创建赛事", description = "创建一个新的赛事")
@@ -681,6 +695,47 @@ public class EventController {
         return eventService.getMatches(eventId);
     }
 
+    @PutMapping("/match/update")
+    @Operation(summary = "更新比赛", description = "更新赛事的比赛")
+    public void updateMatch(Long eventId, Long managerId, @RequestBody Match_GET match) {
+        if (eventId == null || managerId == null || match == null) {
+            throw new BadRequestException("传参含空值");
+        }
+        if (eventService.getById(eventId) == null) {
+            throw new ResourceNotFoundException("赛事不存在");
+        }
+        if (userService.getById(managerId) == null) {
+            throw new ResourceNotFoundException("管理员不存在");
+        }
+        if (!eventService.getManagers(eventId).contains(managerId)) {
+            throw new BadRequestException("非法管理员");
+        }
+        if (match.matchId() == null) {
+            throw new BadRequestException("比赛id为空");
+        }
+        Match match_update = matchService.getById(match.matchId());
+        if (match_update == null) {
+            throw new ResourceNotFoundException("比赛不存在");
+        }
+        if (eventService.getMatches(eventId).stream().noneMatch(m -> m.getMatchId().equals(match.matchId()))) {
+            throw new BadRequestException("赛事不含比赛");
+        }
+        // 也可以用Optional，这样允许部分更新
+//        match_update.setHomeTeamId(Optional.ofNullable(match.homeTeamId()).orElse(match_update.getHomeTeamId()));
+        match_update.setHomeTeamId(match.homeTeamId());
+        match_update.setAwayTeamId(match.awayTeamId());
+        match_update.setTime(match.time());
+        match_update.setStatus(match.status());
+        match_update.setDescription(match.description());
+        match_update.setHomeTeamScore(match.homeTeamScore());
+        match_update.setAwayTeamScore(match.awayTeamScore());
+        match_update.setHomeTeamPenalty(match.homeTeamPenalty());
+        match_update.setAwayTeamPenalty(match.awayTeamPenalty());
+        if (!matchService.updateById(match_update)) {
+            throw new RuntimeException("更新比赛失败");
+        }
+    }
+
     @DeleteMapping("/match/delete")
     @Operation(summary = "删除比赛", description = "删除赛事的比赛")
     @Parameters({
@@ -689,7 +744,7 @@ public class EventController {
     })
     public void deleteMatch(Long eventId, Long matchId) {
         if (eventId == null || matchId == null) {
-            throw new BadRequestException("传入的赛事ID或比赛ID为空");
+            throw new BadRequestException("传参含空值");
         }
         if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
