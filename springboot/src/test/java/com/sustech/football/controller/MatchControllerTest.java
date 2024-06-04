@@ -391,7 +391,11 @@ class MatchControllerTest {
     void deleteMatch_validMatchIdAndUserId_deletesMatch() {
         Long matchId = 1L;
         Long userId = 1L;
+        User user = new User();
+        Match match = new Match();
 
+        when(matchService.getById(matchId)).thenReturn(match);
+        when(userService.getById(userId)).thenReturn(user);
         when(matchService.deleteMatch(matchId, userId)).thenReturn(true);
 
         assertDoesNotThrow(() -> {
