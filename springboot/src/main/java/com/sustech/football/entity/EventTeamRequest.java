@@ -33,7 +33,6 @@ public class EventTeamRequest {
     @Schema(description = "类型", example = "APPLICATION")
     private String type;
 
-    @MppMultiId
     @Schema(description = "状态", example = "PENDING")
     private String status;
 

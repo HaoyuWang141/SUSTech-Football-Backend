@@ -436,12 +436,13 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamService.selectByMultiId(eventTeam) != null) {
             throw new ConflictException("该球队已经参加该赛事");
         }
-        String status = accept ? EventTeamRequest.STATUS_ACCEPTED : EventTeamRequest.STATUS_REJECTED;
         EventTeamRequest eventTeamRequest = new EventTeamRequest(eventId, teamId,
-                EventTeamRequest.TYPE_INVITATION, status);
+                EventTeamRequest.TYPE_INVITATION, EventTeamRequest.STATUS_PENDING);
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) == null) {
             throw new BadRequestException("该球队没有收到该赛事的邀请");
         }
+        String status = accept ? EventTeamRequest.STATUS_ACCEPTED : EventTeamRequest.STATUS_REJECTED;
+        eventTeamRequest.setStatus(status);
         if (!eventTeamRequestService.saveOrUpdateByMultiId(eventTeamRequest)) {
             throw new RuntimeException("回复赛事邀请失败");
         }
