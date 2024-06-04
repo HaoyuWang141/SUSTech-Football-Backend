@@ -48,16 +48,16 @@ public class PlayerServiceImpl extends ServiceImpl<PlayerMapper, Player> impleme
     @Override
     @Transactional
     public boolean replyTeamInvitation(Long playerId, Long teamId, Boolean accept) {
-        String status = accept ? TeamPlayerRequest.STATUS_ACCEPTED : TeamPlayerRequest.STATUS_REJECTED;
         TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest();
         teamPlayerRequest.setTeamId(teamId);
         teamPlayerRequest.setPlayerId(playerId);
         teamPlayerRequest.setType(TeamPlayerRequest.TYPE_INVITATION);
         teamPlayerRequest = teamPlayerRequestService.selectByMultiId(teamPlayerRequest);
         if (teamPlayerRequest == null) {
-            throw new ConflictException("球员未收到邀请");
+            throw new ConflictException("球队未邀请");
         }
 
+        // 若球员已经加入球队，则将status置为ACCEPTED并直接返回（不能抛异常，因为有@Transaction限制）
         TeamPlayer teamPlayer = new TeamPlayer();
         teamPlayer.setTeamId(teamId);
         teamPlayer.setPlayerId(playerId);
@@ -71,6 +71,7 @@ public class PlayerServiceImpl extends ServiceImpl<PlayerMapper, Player> impleme
             throw new ConflictException("邀请已处理");
         }
 
+        String status = accept ? TeamPlayerRequest.STATUS_ACCEPTED : TeamPlayerRequest.STATUS_REJECTED;
         teamPlayerRequest.setStatus(status);
         if (!teamPlayerRequestService.updateByMultiId(teamPlayerRequest)) {
             throw new RuntimeException("回应邀请失败");
@@ -78,6 +79,17 @@ public class PlayerServiceImpl extends ServiceImpl<PlayerMapper, Player> impleme
         if (accept) {
             if (!teamPlayerService.saveOrUpdateByMultiId(teamPlayer)) {
                 throw new RuntimeException("加入球队失败");
+            }
+
+            // 当球员同意加入球队（回复邀请）时，若还存在球员申请记录状态为PENDING，则将申请自动置为ACCEPTED
+            TeamPlayerRequest teamPlayerRequest_application = new TeamPlayerRequest();
+            teamPlayerRequest_application.setTeamId(teamId);
+            teamPlayerRequest_application.setPlayerId(playerId);
+            teamPlayerRequest_application.setType(TeamPlayerRequest.TYPE_APPLICATION);
+            teamPlayerRequest_application = teamPlayerRequestService.selectByMultiId(teamPlayerRequest_application);
+            if (teamPlayerRequest_application != null && teamPlayerRequest_application.getStatus().equals(TeamPlayerRequest.STATUS_PENDING)) {
+                teamPlayerRequest_application.setStatus(TeamPlayerRequest.STATUS_ACCEPTED);
+                teamPlayerRequestService.updateByMultiId(teamPlayerRequest_application);
             }
         }
 

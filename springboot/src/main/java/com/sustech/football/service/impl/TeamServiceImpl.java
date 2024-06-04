@@ -151,21 +151,48 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     @Override
     @Transactional
     public boolean replyPlayerApplication(Long teamId, Long playerId, Boolean accept) {
-        TeamPlayer teamPlayer = new TeamPlayer(teamId, playerId);
+        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest();
+        teamPlayerRequest.setTeamId(teamId);
+        teamPlayerRequest.setPlayerId(playerId);
+        teamPlayerRequest.setType(TeamPlayerRequest.TYPE_APPLICATION);
+        teamPlayerRequest = teamPlayerRequestService.selectByMultiId(teamPlayerRequest);
+        if (teamPlayerRequest == null) {
+            throw new BadRequestException("球员未申请");
+        }
+
+        // 若球员已经加入球队，则将status置为ACCEPTED并直接返回（不能抛异常，因为有@Transaction限制）
+        TeamPlayer teamPlayer = new TeamPlayer();
+        teamPlayer.setTeamId(teamId);
+        teamPlayer.setPlayerId(playerId);
         if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
-            throw new ConflictException("该球员已经在球队中");
+            teamPlayerRequest.setStatus(TeamPlayerRequest.STATUS_ACCEPTED);
+            teamPlayerRequestService.saveOrUpdateRequestWithTime(teamPlayerRequest);
+            return false;
+        }
+
+        if (!teamPlayerRequest.getStatus().equals(TeamPlayerRequest.STATUS_PENDING)) {
+            throw new ConflictException("申请已处理");
         }
 
         String status = accept ? TeamPlayerRequest.STATUS_ACCEPTED : TeamPlayerRequest.STATUS_REJECTED;
-        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest(teamId, playerId,
-                TeamPlayerRequest.TYPE_APPLICATION, status);
-        if (teamPlayerRequestService.selectByMultiId(teamPlayerRequest) == null) {
-            throw new BadRequestException("该球员没有申请加入球队");
+        teamPlayerRequest.setStatus(status);
+        if (!teamPlayerRequestService.saveOrUpdateRequestWithTime(teamPlayerRequest)) {
+            throw new RuntimeException("回应申请失败");
         }
-        teamPlayerRequestService.saveOrUpdateRequestWithTime(teamPlayerRequest);
         if (accept) {
             if (!teamPlayerService.saveOrUpdateByMultiId(teamPlayer)) {
                 throw new RuntimeException("加入球队失败");
+            }
+
+            // 当球队同意球员申请（回复申请）时，若还存在球队邀请记录状态为PENDING，则将邀请自动置为ACCEPTED
+            TeamPlayerRequest teamPlayerRequest_invitation = new TeamPlayerRequest();
+            teamPlayerRequest_invitation.setTeamId(teamId);
+            teamPlayerRequest_invitation.setPlayerId(playerId);
+            teamPlayerRequest_invitation.setType(TeamPlayerRequest.TYPE_INVITATION);
+            teamPlayerRequest_invitation = teamPlayerRequestService.selectByMultiId(teamPlayerRequest_invitation);
+            if (teamPlayerRequest_invitation != null && teamPlayerRequest_invitation.getStatus().equals(TeamPlayerRequest.STATUS_PENDING)) {
+                teamPlayerRequest_invitation.setStatus(TeamPlayerRequest.STATUS_ACCEPTED);
+                teamPlayerRequestService.saveOrUpdateRequestWithTime(teamPlayerRequest_invitation);
             }
         }
         return true;
