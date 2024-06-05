@@ -619,9 +619,7 @@ public class MatchController {
         // 删除该match该team的原有球员列表
         QueryWrapper<MatchPlayer> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("match_id", matchId).eq("team_id", teamId);
-        if (!matchPlayerService.remove(queryWrapper)) {
-            throw new InternalServerErrorException("删除原有球员列表失败");
-        }
+        matchPlayerService.remove(queryWrapper);
 
         // 插入新的球员列表
         if (!matchPlayerService.saveOrUpdateBatchByMultiId(matchPlayerList)) {
