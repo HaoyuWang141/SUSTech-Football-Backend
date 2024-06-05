@@ -371,22 +371,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 更新比赛球员信息
-            QueryWrapper<TeamPlayer> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("team_id", teamId);
-            List<TeamPlayer> teamPlayerList = teamPlayerService.list(queryWrapper);
-            List<MatchPlayer> matchPlayerList = new ArrayList<>();
-            for (TeamPlayer teamPlayer : teamPlayerList) {
-                MatchPlayer matchPlayer = new MatchPlayer();
-                matchPlayer.setMatchId(matchId);
-                matchPlayer.setTeamId(teamId);
-                matchPlayer.setPlayerId(teamPlayer.getPlayerId());
-                matchPlayer.setNumber(teamPlayer.getNumber());
-                matchPlayer.setIsStart(false);
-                matchPlayerList.add(matchPlayer);
-            }
-            if (!matchPlayerService.saveOrUpdateBatchByMultiId(matchPlayerList)) {
-                throw new RuntimeException("更新比赛球员信息失败");
-            }
+            matchPlayerService.addMatchPlayerByTeam(matchId, teamId);
         }
         return true;
     }
@@ -436,12 +421,13 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamService.selectByMultiId(eventTeam) != null) {
             throw new ConflictException("该球队已经参加该赛事");
         }
-        String status = accept ? EventTeamRequest.STATUS_ACCEPTED : EventTeamRequest.STATUS_REJECTED;
         EventTeamRequest eventTeamRequest = new EventTeamRequest(eventId, teamId,
-                EventTeamRequest.TYPE_INVITATION, status);
+                EventTeamRequest.TYPE_INVITATION, EventTeamRequest.STATUS_PENDING);
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) == null) {
             throw new BadRequestException("该球队没有收到该赛事的邀请");
         }
+        String status = accept ? EventTeamRequest.STATUS_ACCEPTED : EventTeamRequest.STATUS_REJECTED;
+        eventTeamRequest.setStatus(status);
         if (!eventTeamRequestService.saveOrUpdateByMultiId(eventTeamRequest)) {
             throw new RuntimeException("回复赛事邀请失败");
         }
