@@ -215,7 +215,7 @@ public class MatchController {
             match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
             match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
         });
-        return matchList;
+        return matchList.stream().sorted(Comparator.comparing(Match::getTime).reversed()).toList();
     }
 
     @GetMapping("/getByIdList")
