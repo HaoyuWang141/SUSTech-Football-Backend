@@ -50,6 +50,11 @@ public class MatchController {
             @Parameter(name = "ownerId", description = "比赛所有者 ID", required = true)
     )
     public Long createMatch(Long ownerId, @RequestBody Match match) {
+        /*
+          该方法仅用来创建“友谊赛”，不用来创建赛事比赛（它通过：/event/match/add 创建）
+          创建比赛（友谊赛）时，match仅给定比赛时间、主队ID，之后可能增加地点，其余要素均不给。
+          不要将主队球员注入MatchPlayer中，这一步完全由裁判进行操作。
+         */
         if (ownerId == null) {
             throw new BadRequestException("比赛所有者ID不能为空");
         }
@@ -68,7 +73,6 @@ public class MatchController {
         if (!matchService.inviteManager(new MatchManager(match.getMatchId(), ownerId, true))) {
             throw new BadRequestException("创建比赛失败");
         }
-        matchPlayerService.addMatchPlayerByTeam(match.getMatchId(), match.getHomeTeamId());
         return match.getMatchId();
     }
 

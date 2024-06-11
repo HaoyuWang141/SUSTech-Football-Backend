@@ -336,8 +336,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             throw new ConflictException("该比赛已经有两支球队参加");
         }
 
-
-        String status = accept ? MatchTeamRequest.STATUS_ACCEPTED : MatchTeamRequest.STATUS_REJECTED;
         MatchTeamRequest matchTeamRequest = new MatchTeamRequest();
         matchTeamRequest.setMatchId(matchId);
         matchTeamRequest.setTeamId(teamId);
@@ -351,6 +349,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (match.getAwayTeamId() != null && matchTeamRequest.getType().equals(MatchTeamRequest.TYPE_AWAY)) {
             throw new ConflictException("已经有另一只球队作为客队");
         }
+
+        String status = accept ? MatchTeamRequest.STATUS_ACCEPTED : MatchTeamRequest.STATUS_REJECTED;
         matchTeamRequest.setStatus(status);
         if (!matchTeamRequestService.saveOrUpdateByMultiId(matchTeamRequest)) {
             throw new RuntimeException("回复比赛邀请失败");
@@ -370,8 +370,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 throw new RuntimeException("更新比赛失败");
             }
 
-            // 更新比赛球员信息
-            matchPlayerService.addMatchPlayerByTeam(matchId, teamId);
+            // 同主队相同，本方法内不要更新比赛球员信息，由裁判统一操作
+            // matchPlayerService.addMatchPlayerByTeam(matchId, teamId);
         }
         return true;
     }
