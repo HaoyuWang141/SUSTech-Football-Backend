@@ -1,9 +1,12 @@
 package com.sustech.football.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.sustech.football.entity.FileHash;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
 
+import com.sustech.football.service.FileHashService;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -20,11 +23,15 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @Tag(name = "File Upload Controller", description = "文件上传下载接口")
 public class FileUploadController {
+    private FileHashService fileHashService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -33,13 +40,20 @@ public class FileUploadController {
     @Operation(summary = "上传文件", description = "上传文件到服务器")
     public String uploadFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            throw new BadRequestException("文件为空，请选择一个文件上传。");
+            throw new BadRequestException("文件为空，请选择一个文件上传");
         }
 
         try {
             // 保存文件到服务器
             String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null) {
+                throw new BadRequestException("文件名为空");
+            }
             String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            if (extension.isEmpty()) {
+                throw new BadRequestException("文件扩展名为空");
+            }
+
             String uniqueFileName = UUID.randomUUID() + extension;
 
             File saveFile = new File(uploadDir + uniqueFileName);
@@ -104,5 +118,24 @@ public class FileUploadController {
         } else {
             throw new ResourceNotFoundException("文件不存在：" + fileName);
         }
+    }
+
+
+    public static String calculateSHA256(MultipartFile file) throws IOException, NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        try (InputStream is = file.getInputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                md.update(buffer, 0, bytesRead);
+            }
+        }
+
+        byte[] bytes = md.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 }
