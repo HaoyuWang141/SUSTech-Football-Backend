@@ -1,15 +1,15 @@
 -- last_updated函数
 CREATE
-    OR REPLACE FUNCTION update_last_updated_column()
+OR REPLACE FUNCTION update_last_updated_column()
     RETURNS TRIGGER AS
 $$
 BEGIN
     NEW.last_updated
-        = transaction_timestamp();
-    RETURN NEW;
+= transaction_timestamp();
+RETURN NEW;
 END;
 $$
-    language 'plpgsql';
+language 'plpgsql';
 
 
 -- 用户表
@@ -63,11 +63,11 @@ CREATE TABLE referee
 -- 球队表
 CREATE TABLE team
 (
-    team_id    SERIAL PRIMARY KEY,
-    name       VARCHAR(255) NOT NULL,
-    logo_url   VARCHAR(255),
-    captain_id INT REFERENCES player (player_id),
-    description        TEXT
+    team_id     SERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    logo_url    VARCHAR(255),
+    captain_id  INT REFERENCES player (player_id),
+    description TEXT
 );
 
 -- 球队-队服
@@ -110,10 +110,10 @@ CREATE TABLE team_player_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-        UPDATE
+UPDATE
     ON team_player_request
     FOR EACH ROW
-EXECUTE FUNCTION update_last_updated_column();
+    EXECUTE FUNCTION update_last_updated_column();
 
 -- 球队-教练
 CREATE TABLE team_coach
@@ -136,10 +136,10 @@ CREATE TABLE team_coach_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-        UPDATE
+UPDATE
     ON team_coach_request
     FOR EACH ROW
-EXECUTE FUNCTION update_last_updated_column();
+    EXECUTE FUNCTION update_last_updated_column();
 
 
 -- 比赛表
@@ -149,10 +149,10 @@ CREATE TABLE match
     home_team_id      INT REFERENCES team (team_id),
     away_team_id      INT REFERENCES team (team_id),
     time              TIMESTAMP,
-    home_team_score   INT DEFAULT 0,
-    away_team_score   INT DEFAULT 0,
-    home_team_penalty INT DEFAULT 0,
-    away_team_penalty INT DEFAULT 0,
+    home_team_score   INT                                                            DEFAULT 0,
+    away_team_score   INT                                                            DEFAULT 0,
+    home_team_penalty INT                                                            DEFAULT 0,
+    away_team_penalty INT                                                            DEFAULT 0,
     status            VARCHAR CHECK ( status IN ('PENDING', 'ONGOING', 'FINISHED') ) DEFAULT 'PENDING',
     description       TEXT
 );
@@ -179,10 +179,10 @@ CREATE TABLE match_team_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-        UPDATE
+UPDATE
     ON match_team_request
     FOR EACH ROW
-EXECUTE FUNCTION update_last_updated_column();
+    EXECUTE FUNCTION update_last_updated_column();
 
 
 -- 比赛-裁判
@@ -206,10 +206,10 @@ CREATE TABLE match_referee_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-        UPDATE
+UPDATE
     ON match_referee_request
     FOR EACH ROW
-EXECUTE FUNCTION update_last_updated_column();
+    EXECUTE FUNCTION update_last_updated_column();
 
 -- 比赛-球员行为（进球、红牌、黄牌）
 CREATE TABLE match_player_action
@@ -218,7 +218,7 @@ CREATE TABLE match_player_action
     team_id   INT REFERENCES team,
     player_id INT REFERENCES player,
     action    VARCHAR CHECK ( action IN ('GOAL', 'ASSIST', 'YELLOW_CARD', 'RED_CARD', 'ON', 'OFF')
-        ),
+) ,
     time      INTEGER, -- 比赛开始的时间
     PRIMARY KEY (match_id, team_id, player_id, action, time)
 );
@@ -310,10 +310,10 @@ CREATE TABLE event_team_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-        UPDATE
+UPDATE
     ON event_team_request
     FOR EACH ROW
-EXECUTE FUNCTION update_last_updated_column();
+    EXECUTE FUNCTION update_last_updated_column();
 
 
 -- 赛事-裁判
@@ -337,10 +337,10 @@ CREATE TABLE event_referee_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-        UPDATE
+UPDATE
     ON event_referee_request
     FOR EACH ROW
-EXECUTE FUNCTION update_last_updated_column();
+    EXECUTE FUNCTION update_last_updated_column();
 
 
 -- 赛事-比赛阶段：小组赛、淘汰赛、排位赛等
@@ -446,18 +446,18 @@ CREATE TABLE match_comment_reply
 -- 评论点赞表
 CREATE TABLE match_comment_like
 (
-    user_id INT REFERENCES  t_user (user_id),
+    user_id    INT REFERENCES t_user (user_id),
     comment_id INT REFERENCES match_comment (comment_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, comment_id)
 );
 
 CREATE TABLE wx_article
 (
-    article_id  SERIAL PRIMARY KEY,
-    url         VARCHAR(255) NOT NULL ,
-    cover_url   VARCHAR(255),
-    title       VARCHAR(255),
-    time        TIMESTAMP DEFAULT now()
+    article_id SERIAL PRIMARY KEY,
+    url        VARCHAR(255) NOT NULL,
+    cover_url  VARCHAR(255),
+    title      VARCHAR(255),
+    time       TIMESTAMP DEFAULT now()
 );
 
 
@@ -630,9 +630,6 @@ CREATE TABLE zbak_match_player_action
 
 
 
-
-
-
 CREATE
 OR REPLACE FUNCTION backup_and_delete_match()
 RETURNS TRIGGER AS $$
@@ -678,34 +675,44 @@ SELECT *
 FROM match_player
 WHERE match_id = OLD.match_id;
 
-DELETE FROM match_player
+DELETE
+FROM match_player
 WHERE match_id = OLD.match_id;
 
-DELETE FROM match_video
+DELETE
+FROM match_video
 WHERE match_id = OLD.match_id;
 
-DELETE FROM match_live
+DELETE
+FROM match_live
 WHERE match_id = OLD.match_id;
 
-DELETE FROM match_player_action
+DELETE
+FROM match_player_action
 WHERE match_id = OLD.match_id;
 
-DELETE FROM match_referee_request
+DELETE
+FROM match_referee_request
 WHERE match_id = OLD.match_id;
 
-DELETE FROM match_referee
+DELETE
+FROM match_referee
 WHERE match_id = OLD.match_id;
 
-DELETE FROM match_team_request
+DELETE
+FROM match_team_request
 WHERE match_id = OLD.match_id;
 
-DELETE FROM match_manager
+DELETE
+FROM match_manager
 WHERE match_id = OLD.match_id;
 
-DELETE FROM event_match
+DELETE
+FROM event_match
 WHERE match_id = OLD.match_id;
 
-DELETE FROM favorite_match
+DELETE
+FROM favorite_match
 WHERE match_id = OLD.match_id;
 
 -- 返回OLD以允许删除操作继续
@@ -724,13 +731,14 @@ CREATE
 OR REPLACE FUNCTION backup_and_delete_event()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- 复制表A的被删除行到备份表
+
+-- 开始复制
+
 INSERT INTO zbak_event
 SELECT *
 FROM event
 WHERE event_id = OLD.event_id;
 
--- 查找表B中与表A相关联的行，复制到备份表B
 INSERT INTO zbak_event_manager
 SELECT *
 FROM event_manager
@@ -749,11 +757,9 @@ WHERE event_id = OLD.event_id;
 INSERT INTO zbak_event_group_team
 SELECT event_group_team.*
 FROM event_group_team
-WHERE event_group_team.group_id IN (
-    SELECT event_id
-    FROM event_group
-    WHERE event_id = OLD.event_id
-);
+WHERE event_group_team.group_id IN (SELECT group_id
+                                    FROM event_group
+                                    WHERE event_id = OLD.event_id);
 
 INSERT INTO zbak_event_team_request
 SELECT *
@@ -785,7 +791,8 @@ SELECT *
 FROM event_match
 WHERE event_id = OLD.event_id;
 
--- TODO:
+-- 开始删除
+
 DELETE
 FROM event_match
 WHERE event_id = OLD.event_id;
@@ -812,11 +819,9 @@ WHERE event_id = OLD.event_id;
 
 DELETE
 FROM event_group_team
-WHERE event_group_team.group_id IN (
-    SELECT event_id
-    FROM event_group
-    WHERE event_id = OLD.event_id
-);
+WHERE event_group_team.group_id IN (SELECT group_id
+                                    FROM event_group
+                                    WHERE event_id = OLD.event_id);
 
 DELETE
 FROM event_group
@@ -846,3 +851,11 @@ CREATE TRIGGER trigger_backup_and_delete
     ON event
     FOR EACH ROW
     EXECUTE FUNCTION backup_and_delete_event();
+
+-- 文件hash表
+CREATE TABLE file_hash
+(
+    file_id  SERIAL PRIMARY KEY,
+    hash     VARCHAR(255) NOT NULL,
+    filename VARCHAR(255) NOT NULL
+);
