@@ -79,7 +79,6 @@ public class MatchController {
     @GetMapping("/get")
     @Operation(summary = "获取比赛信息", description = "根据比赛ID获取比赛信息")
     @Parameter(name = "id", description = "比赛 ID", required = true)
-
     public VoMatch getMatch(Long id) {
         if (id == null) {
             throw new BadRequestException("比赛ID不能为空");
@@ -216,6 +215,20 @@ public class MatchController {
             match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
         });
         return matchList.stream().sorted(Comparator.comparing(Match::getTime).reversed()).toList();
+    }
+
+    @GetMapping("/getAllFriendlyMatches")
+    @Operation(summary = "获取所有友谊赛", description = "获取所有友谊赛信息")
+    public List<Match> getAllFriendlyMatches() {
+        List<Match> matchList = matchService.list();
+        matchList.forEach(match -> {
+            match.setMatchEvent(matchService.findMatchEvent(match));
+            match.setHomeTeam(teamService.getById(match.getHomeTeamId()));
+            match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
+        });
+        return matchList.stream()
+                .filter(match -> match.getMatchEvent() == null)
+                .sorted(Comparator.comparing(Match::getTime).reversed()).toList();
     }
 
     @GetMapping("/getByIdList")
