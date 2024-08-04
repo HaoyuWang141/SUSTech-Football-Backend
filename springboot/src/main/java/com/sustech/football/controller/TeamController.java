@@ -33,8 +33,6 @@ public class TeamController {
     private EventService eventService;
     @Autowired
     private TeamPlayerService teamPlayerService;
-    @Autowired
-    private TeamManagerService teamManagerService;
 
     @PostMapping("/create")
     @Operation(summary = "创建球队", description = "创建一个新的球队")
@@ -204,10 +202,7 @@ public class TeamController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        if (userId != 0 && teamManagerService.selectByMultiId(new TeamManager(userId, teamId, true)) == null) {
-            throw new BadRequestException("试图删除队伍的用户不是队伍拥有者");
-        }
-        if (!teamService.deleteTeam(teamId)) {
+        if (!teamService.deleteTeam(teamId, userId)) {
             throw new ConflictException("删除失败，队伍已有关联");
         }
 
