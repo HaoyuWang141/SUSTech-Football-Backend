@@ -241,7 +241,7 @@ public class MatchController {
             throw new ResourceNotFoundException("比赛不存在");
         }
         List<Long> managerList = matchService.getManagers(match.getMatchId());
-        if (!managerList.contains(managerId)) {
+        if (managerId != 0 && !managerList.contains(managerId)) {
             throw new BadRequestException("管理员非法");
         }
         if (!matchService.updateById(match)) {
@@ -263,7 +263,7 @@ public class MatchController {
         if (matchService.getById(matchId) == null) {
             throw new BadRequestException("比赛不存在");
         }
-        if (userService.getById(userId) == null) {
+        if (userId != 0 && userService.getById(userId) == null) {
             throw new BadRequestException("用户不存在");
         }
         if (!matchService.deleteMatch(matchId, userId)) {

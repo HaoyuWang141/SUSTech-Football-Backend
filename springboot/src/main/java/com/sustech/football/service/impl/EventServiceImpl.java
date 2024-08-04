@@ -84,7 +84,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     @Override
     public boolean deleteEvent(Long eventId, Long userId) {
         EventManager eventManager = eventManagerService.selectByMultiId(new EventManager(eventId, userId, true));
-        if (eventManager == null) {
+        if (userId != 0 && eventManager == null) {
             throw new ResourceNotFoundException("用户不是该赛事的创建者");
         }
         if (!removeById(eventId)) {

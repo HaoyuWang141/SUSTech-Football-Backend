@@ -66,11 +66,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
-    public boolean deleteTeam(Long teamId, Long userId) {
-        if (teamManagerService.selectByMultiId(new TeamManager(userId, teamId, true)) == null) {
-            throw new BadRequestException("试图删除队伍的用户不是队伍拥有者");
-        }
-
+    public boolean deleteTeam(Long teamId) {
         QueryWrapper<TeamManager> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("team_id", teamId);
         List<TeamManager> teamManagerList = teamManagerService.list(queryWrapper);

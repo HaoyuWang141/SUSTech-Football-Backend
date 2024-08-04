@@ -105,11 +105,13 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
 
     @Override
     public boolean deleteMatch(Long matchId, Long userId) {
-        QueryWrapper<MatchManager> matchManagerQueryWrapper = new QueryWrapper<>();
-        matchManagerQueryWrapper.eq("match_id", matchId).eq("user_id", userId);
-        List<MatchManager> managers = matchManagerService.list(matchManagerQueryWrapper);
-        if (managers == null) {
-            throw new BadRequestException("用户不是该比赛的管理员，无法删除比赛");
+        if (userId != 0) {
+            QueryWrapper<MatchManager> matchManagerQueryWrapper = new QueryWrapper<>();
+            matchManagerQueryWrapper.eq("match_id", matchId).eq("user_id", userId);
+            List<MatchManager> managers = matchManagerService.list(matchManagerQueryWrapper);
+            if (managers == null) {
+                throw new BadRequestException("用户不是该比赛的管理员，无法删除比赛");
+            }
         }
 
         QueryWrapper<EventMatch> eventMatchQueryWrapper = new QueryWrapper<>();

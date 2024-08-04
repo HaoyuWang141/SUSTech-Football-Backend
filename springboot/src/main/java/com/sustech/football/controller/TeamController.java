@@ -33,6 +33,8 @@ public class TeamController {
     private EventService eventService;
     @Autowired
     private TeamPlayerService teamPlayerService;
+    @Autowired
+    private TeamManagerService teamManagerService;
 
     @PostMapping("/create")
     @Operation(summary = "创建球队", description = "创建一个新的球队")
@@ -144,7 +146,7 @@ public class TeamController {
         if (managerId == null || teamRecord == null) {
             throw new BadRequestException("传参含空值");
         }
-        if (userService.getById(managerId) == null) {
+        if (managerId != 0 && userService.getById(managerId) == null) {
             throw new ResourceNotFoundException("管理员非法");
         }
         Long teamId = teamRecord.teamId();
@@ -196,13 +198,16 @@ public class TeamController {
         if (teamId == null || userId == null) {
             throw new BadRequestException("传入的管理员ID或队伍ID为空");
         }
-        if (userService.getById(userId) == null) {
+        if (userId != 0 && userService.getById(userId) == null) {
             throw new ResourceNotFoundException("删除的操作用户不存在");
         }
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        if (!teamService.deleteTeam(teamId, userId)) {
+        if (userId != 0 && teamManagerService.selectByMultiId(new TeamManager(userId, teamId, true)) == null) {
+            throw new BadRequestException("试图删除队伍的用户不是队伍拥有者");
+        }
+        if (!teamService.deleteTeam(teamId)) {
             throw new ConflictException("删除失败，队伍已有关联");
         }
 

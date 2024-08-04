@@ -265,7 +265,7 @@ public class EventController {
         if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
         }
-        if (userService.getById(userId) == null) {
+        if (userId != 0 && userService.getById(userId) == null) {
             throw new ResourceNotFoundException("删除者不存在");
         }
         if (!eventService.deleteEvent(eventId, userId)) {

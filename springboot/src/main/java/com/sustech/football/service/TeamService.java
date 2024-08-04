@@ -9,7 +9,7 @@ import com.sustech.football.entity.*;
 public interface TeamService extends IService<Team> {
     Team getTeamById(Long teamId);
 
-    boolean deleteTeam(Long teamId, Long userId);
+    boolean deleteTeam(Long teamId);
 
     List<Team> getTeamsByIdList(List<Long> teamIdList);
 
