@@ -253,7 +253,7 @@ public class EventControllerTest {
         Long userId = 1L;
         when(eventService.getById(eventId)).thenReturn(new Event());
         when(userService.getById(userId)).thenReturn(new User());
-        when(eventService.deleteEvent(eventId, userId)).thenReturn(false);
+        when(eventService.deleteEvent(eventId)).thenReturn(false);
         assertThrows(BadRequestException.class, () -> {
             eventController.deleteEvent(eventId, userId);
         });
@@ -265,9 +265,9 @@ public class EventControllerTest {
         Long userId = 1L;
         when(eventService.getById(eventId)).thenReturn(new Event());
         when(userService.getById(userId)).thenReturn(new User());
-        when(eventService.deleteEvent(eventId, userId)).thenReturn(true);
+        when(eventService.deleteEvent(eventId)).thenReturn(true);
         eventController.deleteEvent(eventId, userId);
-        verify(eventService, times(1)).deleteEvent(eventId, userId);
+        verify(eventService, times(1)).deleteEvent(eventId);
     }
 
     @Test

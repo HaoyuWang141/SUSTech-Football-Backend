@@ -268,7 +268,8 @@ public class EventController {
         if (userId != 0 && userService.getById(userId) == null) {
             throw new ResourceNotFoundException("删除者不存在");
         }
-        if (!eventService.deleteEvent(eventId, userId)) {
+        // TODO：记录删除者ID至数据库表or日志中
+        if (!eventService.deleteEvent(eventId)) {
             throw new BadRequestException("删除赛事失败");
         }
     }

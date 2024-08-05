@@ -11,7 +11,7 @@ public interface EventService extends IService<Event> {
 
     boolean updateEvent(Event event);
 
-    boolean deleteEvent(Long eventId, Long userId);
+    boolean deleteEvent(Long eventId);
 
     Event getDetailedEvent(Long eventId);
 
