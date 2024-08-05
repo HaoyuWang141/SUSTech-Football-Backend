@@ -227,7 +227,7 @@ public class MatchController {
             match.setAwayTeam(teamService.getById(match.getAwayTeamId()));
         });
         return matchList.stream()
-                .filter(match -> match.getMatchEvent() == null)
+                .filter(match -> match.getMatchEvent() == null || match.getMatchEvent().getEventId() == null)
                 .sorted(Comparator.comparing(Match::getTime).reversed()).toList();
     }
 
