@@ -20,5 +20,5 @@ public class SecondLevelAuthority {
 
     private String description;
 
-    private Long create_user_id;
+    private Long createUserId;
 }
