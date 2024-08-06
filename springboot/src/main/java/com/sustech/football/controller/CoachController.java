@@ -26,15 +26,6 @@ public class CoachController {
     @Autowired
     private TeamCoachRequestService teamCoachRequestService;
 
-    @Autowired
-    public CoachController(CoachService coachService,
-                           TeamService teamService,
-                           TeamCoachRequestService teamCoachRequestService) {
-        this.coachService = coachService;
-        this.teamService = teamService;
-        this.teamCoachRequestService = teamCoachRequestService;
-    }
-
     @PostMapping("/create")
     @Operation(summary = "创建教练", description = "创建一个新的教练")
     @Parameter(name = "coach", description = "教练信息", required = true)
