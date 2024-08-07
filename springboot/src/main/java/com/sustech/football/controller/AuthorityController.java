@@ -47,7 +47,7 @@ public class AuthorityController {
     }
 
     @PostMapping("/check/second")
-    public boolean checkSecondAuthority(@RequestBody SecondLevelAuthority secondLevelAuthority) {
+    public int checkSecondAuthority(@RequestBody SecondLevelAuthority secondLevelAuthority) {
         if (secondLevelAuthority == null) {
             throw new BadRequestException("传入权限为空");
         }
@@ -60,7 +60,11 @@ public class AuthorityController {
         QueryWrapper<SecondLevelAuthority> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", secondLevelAuthority.getUsername());
         queryWrapper.eq("password", secondLevelAuthority.getPassword());
-        return secondLevelAuthorityService.count(queryWrapper) > 0;
+        if (secondLevelAuthorityService.count(queryWrapper) > 0) {
+            return secondLevelAuthorityService.getOne(queryWrapper).getAuthorityId().intValue();
+        } else {
+            return -1;
+        }
     }
 
     @PostMapping("/check/third")
