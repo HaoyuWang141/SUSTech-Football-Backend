@@ -1,9 +1,12 @@
 package com.sustech.football.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.sustech.football.entity.FirstLevelAuthority;
 import com.sustech.football.entity.SecondLevelAuthority;
 import com.sustech.football.entity.ThirdLevelAuthority;
 import com.sustech.football.exception.BadRequestException;
+import com.sustech.football.exception.ResourceNotFoundException;
+import com.sustech.football.service.FirstLevelAuthorityService;
 import com.sustech.football.service.SecondLevelAuthorityService;
 import com.sustech.football.service.ThirdLevelAuthorityService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,9 +22,56 @@ import java.util.List;
 @Tag(name = "Authority Controller", description = "三级权限制相关的接口")
 public class AuthorityController {
     @Autowired
+    private FirstLevelAuthorityService firstLevelAuthorityService;
+    @Autowired
     private SecondLevelAuthorityService secondLevelAuthorityService;
     @Autowired
     private ThirdLevelAuthorityService thirdLevelAuthorityService;
+
+
+    @PostMapping("/check/first")
+    public boolean checkFirstAuthority(@RequestBody FirstLevelAuthority firstLevelAuthority) {
+        if (firstLevelAuthority == null) {
+            throw new BadRequestException("传入权限为空");
+        }
+        if (firstLevelAuthority.getUsername() == null || firstLevelAuthority.getUsername().isEmpty()) {
+            throw new BadRequestException("传入权限的用户名为空");
+        }
+        if (firstLevelAuthority.getPassword() == null || firstLevelAuthority.getPassword().isEmpty()) {
+            throw new BadRequestException("传入权限的密码为空");
+        }
+        QueryWrapper<FirstLevelAuthority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", firstLevelAuthority.getUsername());
+        queryWrapper.eq("password", firstLevelAuthority.getPassword());
+        return firstLevelAuthorityService.count(queryWrapper) > 0;
+    }
+
+    @PostMapping("/check/second")
+    public boolean checkSecondAuthority(@RequestBody SecondLevelAuthority secondLevelAuthority) {
+        if (secondLevelAuthority == null) {
+            throw new BadRequestException("传入权限为空");
+        }
+        if (secondLevelAuthority.getUsername() == null || secondLevelAuthority.getUsername().isEmpty()) {
+            throw new BadRequestException("传入权限的用户名为空");
+        }
+        if (secondLevelAuthority.getPassword() == null || secondLevelAuthority.getPassword().isEmpty()) {
+            throw new BadRequestException("传入权限的密码为空");
+        }
+        QueryWrapper<SecondLevelAuthority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", secondLevelAuthority.getUsername());
+        queryWrapper.eq("password", secondLevelAuthority.getPassword());
+        return secondLevelAuthorityService.count(queryWrapper) > 0;
+    }
+
+    @PostMapping("/check/third")
+    public boolean checkThirdAuthority(Long userId) {
+        if (userId == null) {
+            throw new BadRequestException("传入权限的ID为空");
+        }
+        QueryWrapper<ThirdLevelAuthority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        return thirdLevelAuthorityService.count(queryWrapper) > 0;
+    }
 
     @PostMapping("/secondAuthority/create")
     public void createSecondAuthority(@RequestBody SecondLevelAuthority secondLevelAuthority) {
@@ -58,6 +108,11 @@ public class AuthorityController {
         if (secondLevelAuthority.getPassword() == null || secondLevelAuthority.getPassword().isEmpty()) {
             throw new BadRequestException("传入权限的密码为空");
         }
+        SecondLevelAuthority old = secondLevelAuthorityService.getById(secondLevelAuthority.getAuthorityId());
+        if (old == null) {
+            throw new ResourceNotFoundException("传入权限的ID不存在");
+        }
+        secondLevelAuthority.setCreateUserId(old.getCreateUserId());
         if (!secondLevelAuthorityService.updateById(secondLevelAuthority)) {
             throw new BadRequestException("更新权限失败");
         }
