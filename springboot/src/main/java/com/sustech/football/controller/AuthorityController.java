@@ -73,6 +73,22 @@ public class AuthorityController {
         return thirdLevelAuthorityService.count(queryWrapper) > 0;
     }
 
+    @PutMapping("/first/update")
+    public void updateFirstAuthority(@RequestBody FirstLevelAuthority firstLevelAuthority) {
+        if (firstLevelAuthority == null) {
+            throw new BadRequestException("传入权限为空");
+        }
+        if (firstLevelAuthority.getUsername() == null || firstLevelAuthority.getUsername().isEmpty()) {
+            throw new BadRequestException("传入权限的用户名为空");
+        }
+        if (firstLevelAuthority.getPassword() == null || firstLevelAuthority.getPassword().isEmpty()) {
+            throw new BadRequestException("传入权限的密码为空");
+        }
+        if (!firstLevelAuthorityService.updateById(firstLevelAuthority)) {
+            throw new BadRequestException("更新权限失败");
+        }
+    }
+
     @PostMapping("/secondAuthority/create")
     public void createSecondAuthority(@RequestBody SecondLevelAuthority secondLevelAuthority) {
         if (secondLevelAuthority == null) {
