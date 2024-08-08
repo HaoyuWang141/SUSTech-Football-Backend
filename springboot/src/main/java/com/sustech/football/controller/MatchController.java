@@ -280,10 +280,12 @@ public class MatchController {
         List<MatchCreator> matchCreatorList = matchCreatorService.list(matchCreatorQueryWrapper);
 
         // 获取三级权限下的所有比赛
-        matchCreatorQueryWrapper = new QueryWrapper<>();
-        matchCreatorQueryWrapper.in("create_authority_level", 3);
-        matchCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
-        matchCreatorList.addAll(matchCreatorService.list(matchCreatorQueryWrapper));
+        if (!thirdAuthorityAuthorityIdList.isEmpty()) {
+            matchCreatorQueryWrapper = new QueryWrapper<>();
+            matchCreatorQueryWrapper.in("create_authority_level", 3);
+            matchCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
+            matchCreatorList.addAll(matchCreatorService.list(matchCreatorQueryWrapper));
+        }
 
         List<Long> matchIdList = matchCreatorList.stream().map(MatchCreator::getMatchId).toList();
         return matchService.getMatchByIdList(matchIdList);

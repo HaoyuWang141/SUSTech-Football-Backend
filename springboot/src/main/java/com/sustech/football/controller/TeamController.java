@@ -153,10 +153,12 @@ public class TeamController {
         List<TeamCreator> teamCreatorList = teamCreatorService.list(teamCreatorQueryWrapper);
 
         // 获取三级权限下的所有球队
-        teamCreatorQueryWrapper = new QueryWrapper<>();
-        teamCreatorQueryWrapper.eq("create_authority_level", 3);
-        teamCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
-        teamCreatorList.addAll(teamCreatorService.list(teamCreatorQueryWrapper));
+        if (!thirdAuthorityAuthorityIdList.isEmpty()) {
+            teamCreatorQueryWrapper = new QueryWrapper<>();
+            teamCreatorQueryWrapper.eq("create_authority_level", 3);
+            teamCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
+            teamCreatorList.addAll(teamCreatorService.list(teamCreatorQueryWrapper));
+        }
 
         List<Long> teamIdList = teamCreatorList.stream().map(TeamCreator::getTeamId).sorted().toList();
         return teamService.getTeamsByIdList(teamIdList);
