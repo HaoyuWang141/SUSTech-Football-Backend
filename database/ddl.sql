@@ -1,15 +1,15 @@
 -- last_updated函数
 CREATE
-OR REPLACE FUNCTION update_last_updated_column()
+    OR REPLACE FUNCTION update_last_updated_column()
     RETURNS TRIGGER AS
 $$
 BEGIN
     NEW.last_updated
-= transaction_timestamp();
-RETURN NEW;
+        = transaction_timestamp();
+    RETURN NEW;
 END;
 $$
-language 'plpgsql';
+    language 'plpgsql';
 
 
 -- 用户表
@@ -110,10 +110,10 @@ CREATE TABLE team_player_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-UPDATE
+        UPDATE
     ON team_player_request
     FOR EACH ROW
-    EXECUTE FUNCTION update_last_updated_column();
+EXECUTE FUNCTION update_last_updated_column();
 
 -- 球队-教练
 CREATE TABLE team_coach
@@ -136,10 +136,10 @@ CREATE TABLE team_coach_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-UPDATE
+        UPDATE
     ON team_coach_request
     FOR EACH ROW
-    EXECUTE FUNCTION update_last_updated_column();
+EXECUTE FUNCTION update_last_updated_column();
 
 
 -- 比赛表
@@ -179,10 +179,10 @@ CREATE TABLE match_team_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-UPDATE
+        UPDATE
     ON match_team_request
     FOR EACH ROW
-    EXECUTE FUNCTION update_last_updated_column();
+EXECUTE FUNCTION update_last_updated_column();
 
 
 -- 比赛-裁判
@@ -206,10 +206,10 @@ CREATE TABLE match_referee_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-UPDATE
+        UPDATE
     ON match_referee_request
     FOR EACH ROW
-    EXECUTE FUNCTION update_last_updated_column();
+EXECUTE FUNCTION update_last_updated_column();
 
 -- 比赛-球员行为（进球、红牌、黄牌）
 CREATE TABLE match_player_action
@@ -218,7 +218,7 @@ CREATE TABLE match_player_action
     team_id   INT REFERENCES team,
     player_id INT REFERENCES player,
     action    VARCHAR CHECK ( action IN ('GOAL', 'ASSIST', 'YELLOW_CARD', 'RED_CARD', 'ON', 'OFF')
-) ,
+        ),
     time      INTEGER, -- 比赛开始的时间
     PRIMARY KEY (match_id, team_id, player_id, action, time)
 );
@@ -310,10 +310,10 @@ CREATE TABLE event_team_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-UPDATE
+        UPDATE
     ON event_team_request
     FOR EACH ROW
-    EXECUTE FUNCTION update_last_updated_column();
+EXECUTE FUNCTION update_last_updated_column();
 
 
 -- 赛事-裁判
@@ -337,10 +337,10 @@ CREATE TABLE event_referee_request
 -- 更新last_updated触发器
 CREATE TRIGGER update_last_updated_trigger
     BEFORE INSERT or
-UPDATE
+        UPDATE
     ON event_referee_request
     FOR EACH ROW
-    EXECUTE FUNCTION update_last_updated_column();
+EXECUTE FUNCTION update_last_updated_column();
 
 
 -- 赛事-比赛阶段：小组赛、淘汰赛、排位赛等
@@ -631,226 +631,228 @@ CREATE TABLE zbak_match_player_action
 
 
 CREATE
-OR REPLACE FUNCTION backup_and_delete_match()
-RETURNS TRIGGER AS $$
+    OR REPLACE FUNCTION backup_and_delete_match()
+    RETURNS TRIGGER AS
+$$
 BEGIN
     -- 复制表A的被删除行到备份表
-INSERT INTO zbak_match
-SELECT *
-FROM match
-WHERE match_id = OLD.match_id;
+    INSERT INTO zbak_match
+    SELECT *
+    FROM match
+    WHERE match_id = OLD.match_id;
 
-INSERT INTO zbak_event_match
-SELECT *
-FROM event_match
-WHERE match_id = OLD.match_id;
+    INSERT INTO zbak_event_match
+    SELECT *
+    FROM event_match
+    WHERE match_id = OLD.match_id;
 
-INSERT INTO zbak_match_manager
-SELECT *
-FROM match_manager
-WHERE match_id = OLD.match_id;
+    INSERT INTO zbak_match_manager
+    SELECT *
+    FROM match_manager
+    WHERE match_id = OLD.match_id;
 
-INSERT INTO zbak_match_referee
-SELECT *
-FROM match_referee
-WHERE match_id = OLD.match_id;
+    INSERT INTO zbak_match_referee
+    SELECT *
+    FROM match_referee
+    WHERE match_id = OLD.match_id;
 
-INSERT INTO zbak_match_player_action
-SELECT *
-FROM match_player_action
-WHERE match_id = OLD.match_id;
+    INSERT INTO zbak_match_player_action
+    SELECT *
+    FROM match_player_action
+    WHERE match_id = OLD.match_id;
 
-INSERT INTO zbak_match_live
-SELECT *
-FROM match_live
-WHERE match_id = OLD.match_id;
+    INSERT INTO zbak_match_live
+    SELECT *
+    FROM match_live
+    WHERE match_id = OLD.match_id;
 
-INSERT INTO zbak_match_video
-SELECT *
-FROM match_video
-WHERE match_id = OLD.match_id;
+    INSERT INTO zbak_match_video
+    SELECT *
+    FROM match_video
+    WHERE match_id = OLD.match_id;
 
-INSERT INTO zbak_match_player
-SELECT *
-FROM match_player
-WHERE match_id = OLD.match_id;
+    INSERT INTO zbak_match_player
+    SELECT *
+    FROM match_player
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM match_player
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM match_player
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM match_video
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM match_video
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM match_live
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM match_live
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM match_player_action
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM match_player_action
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM match_referee_request
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM match_referee_request
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM match_referee
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM match_referee
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM match_team_request
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM match_team_request
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM match_manager
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM match_manager
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM event_match
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM event_match
+    WHERE match_id = OLD.match_id;
 
-DELETE
-FROM favorite_match
-WHERE match_id = OLD.match_id;
+    DELETE
+    FROM favorite_match
+    WHERE match_id = OLD.match_id;
 
 -- 返回OLD以允许删除操作继续
-RETURN OLD;
+    RETURN OLD;
 END
 $$
-LANGUAGE plpgsql;
+    LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_backup_and_delete
     BEFORE DELETE
     ON match
     FOR EACH ROW
-    EXECUTE FUNCTION backup_and_delete_match();
+EXECUTE FUNCTION backup_and_delete_match();
 
 CREATE
-OR REPLACE FUNCTION backup_and_delete_event()
-RETURNS TRIGGER AS $$
+    OR REPLACE FUNCTION backup_and_delete_event()
+    RETURNS TRIGGER AS
+$$
 BEGIN
 
--- 开始复制
+    -- 开始复制
 
-INSERT INTO zbak_event
-SELECT *
-FROM event
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event
+    SELECT *
+    FROM event
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_manager
-SELECT *
-FROM event_manager
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_manager
+    SELECT *
+    FROM event_manager
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_team
-SELECT *
-FROM event_team
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_team
+    SELECT *
+    FROM event_team
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_group
-SELECT *
-FROM event_group
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_group
+    SELECT *
+    FROM event_group
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_group_team
-SELECT event_group_team.*
-FROM event_group_team
-WHERE event_group_team.group_id IN (SELECT group_id
-                                    FROM event_group
-                                    WHERE event_id = OLD.event_id);
+    INSERT INTO zbak_event_group_team
+    SELECT event_group_team.*
+    FROM event_group_team
+    WHERE event_group_team.group_id IN (SELECT group_id
+                                        FROM event_group
+                                        WHERE event_id = OLD.event_id);
 
-INSERT INTO zbak_event_team_request
-SELECT *
-FROM event_team_request
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_team_request
+    SELECT *
+    FROM event_team_request
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_referee
-SELECT *
-FROM event_referee
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_referee
+    SELECT *
+    FROM event_referee
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_referee_request
-SELECT *
-FROM event_referee_request
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_referee_request
+    SELECT *
+    FROM event_referee_request
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_stage
-SELECT *
-FROM event_stage
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_stage
+    SELECT *
+    FROM event_stage
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_stage_tag
-SELECT *
-FROM event_stage_tag
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_stage_tag
+    SELECT *
+    FROM event_stage_tag
+    WHERE event_id = OLD.event_id;
 
-INSERT INTO zbak_event_match
-SELECT *
-FROM event_match
-WHERE event_id = OLD.event_id;
+    INSERT INTO zbak_event_match
+    SELECT *
+    FROM event_match
+    WHERE event_id = OLD.event_id;
 
 -- 开始删除
 
-DELETE
-FROM event_match
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_match
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM event_stage_tag
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_stage_tag
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM event_stage
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_stage
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM event_referee_request
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_referee_request
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM event_referee
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_referee
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM event_team_request
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_team_request
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM event_group_team
-WHERE event_group_team.group_id IN (SELECT group_id
-                                    FROM event_group
-                                    WHERE event_id = OLD.event_id);
+    DELETE
+    FROM event_group_team
+    WHERE event_group_team.group_id IN (SELECT group_id
+                                        FROM event_group
+                                        WHERE event_id = OLD.event_id);
 
-DELETE
-FROM event_group
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_group
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM event_team
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_team
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM event_manager
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM event_manager
+    WHERE event_id = OLD.event_id;
 
-DELETE
-FROM favorite_event
-WHERE event_id = OLD.event_id;
+    DELETE
+    FROM favorite_event
+    WHERE event_id = OLD.event_id;
 
 -- 返回OLD以允许删除操作继续
-RETURN OLD;
+    RETURN OLD;
 END;
 $$
-LANGUAGE plpgsql;
+    LANGUAGE plpgsql;
 
 -- 创建触发器
 CREATE TRIGGER trigger_backup_and_delete
     BEFORE DELETE
     ON event
     FOR EACH ROW
-    EXECUTE FUNCTION backup_and_delete_event();
+EXECUTE FUNCTION backup_and_delete_event();
 
 -- 文件hash表
 CREATE TABLE file_hash
@@ -858,4 +860,61 @@ CREATE TABLE file_hash
     file_id  SERIAL PRIMARY KEY,
     hash     VARCHAR(255) NOT NULL,
     filename VARCHAR(255) NOT NULL
+);
+
+-- -------------
+-- 三级权限制相关的表
+
+-- 第一级权限表
+CREATE TABLE first_level_authority
+(
+    username     VARCHAR(255) PRIMARY KEY ,
+    password     VARCHAR(255) NOT NULL
+);
+
+-- 第二级权限表
+CREATE TABLE second_level_authority
+(
+    authority_id   SERIAL PRIMARY KEY,
+    username       VARCHAR(255) NOT NULL UNIQUE,
+    password       VARCHAR(255) NOT NULL,
+    description    TEXT,
+    create_user_id INT REFERENCES t_user
+);
+
+-- 第三级权限表
+CREATE TABLE third_level_authority
+(
+    authority_id              SERIAL PRIMARY KEY,
+    second_level_authority_id INT REFERENCES second_level_authority,
+    user_id                   INT REFERENCES t_user,
+    description               TEXT,
+    create_user_id            INT REFERENCES t_user
+);
+
+-- 关系表：球队-创建者
+CREATE TABLE team_creator
+(
+    team_id                INT REFERENCES team PRIMARY KEY,
+    user_id                INT REFERENCES t_user, -- 创建的用户
+    create_authority_level INT DEFAULT 0,         -- 0：未知；1：一级权限创建；2：二级权限创建；3：三级权限创建
+    create_authority_id    INT DEFAULT 0          -- 创建者若为二级权限或三级权限，则记录其ID，否则为0
+);
+
+-- 关系表：友谊赛-创建者（赛事比赛不在此记录）
+CREATE TABLE match_creator
+(
+    match_id               INT REFERENCES match PRIMARY KEY,
+    user_id                INT REFERENCES t_user, -- 创建的用户
+    create_authority_level INT DEFAULT 0,         -- 0：未知；1：一级权限创建；2：二级权限创建；3：三级权限创建
+    create_authority_id    INT DEFAULT 0          -- 创建者若为二级权限或三级权限，则记录其ID，否则为0
+);
+
+-- 关系表：赛事-创建者
+CREATE TABLE event_creator
+(
+    event_id               INT REFERENCES event PRIMARY KEY,
+    user_id                INT REFERENCES t_user, -- 创建的用户
+    create_authority_level INT DEFAULT 0,         -- 0：未知；1：一级权限创建；2：二级权限创建；3：三级权限创建
+    create_authority_id    INT DEFAULT 0          -- 创建者若为二级权限或三级权限，则记录其ID，否则为0
 );
