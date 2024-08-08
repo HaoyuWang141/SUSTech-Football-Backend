@@ -66,9 +66,8 @@ class TeamControllerTest {
         when(teamService.save(any())).thenReturn(true);
         when(teamService.inviteManager(any())).thenReturn(true);
 
-        String result = teamController.createTeam(ownerId, 0, 0L, team);
+        teamController.createTeam(ownerId, 0, 0L, team);
 
-        assertEquals("创建球队成功", result);
         verify(teamService, times(1)).save(any());
         verify(teamService, times(1)).inviteManager(any());
     }

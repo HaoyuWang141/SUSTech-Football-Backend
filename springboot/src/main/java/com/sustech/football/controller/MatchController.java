@@ -52,9 +52,11 @@ public class MatchController {
     @PostMapping("/create")
     @Transactional
     @Operation(summary = "创建比赛", description = "创建一个新的比赛")
-    @Parameters(
-            @Parameter(name = "ownerId", description = "比赛所有者 ID", required = true)
-    )
+    @Parameters({
+            @Parameter(name = "ownerId", description = "比赛所有者 ID", required = true),
+            @Parameter(name = "createAuthorityLevel", description = "创建者的权限等级", required = true),
+            @Parameter(name = "createAuthorityId", description = "创建者的权限 ID", required = true)
+    })
     public Long createMatch(Long ownerId, Integer createAuthorityLevel, Long createAuthorityId, @RequestBody Match match) {
         /*
           该方法仅用来创建“友谊赛”，不用来创建赛事比赛（赛事比赛通过：/event/match/add 创建）
@@ -77,11 +79,12 @@ public class MatchController {
             throw new BadRequestException("创建比赛失败");
         }
         if (!matchService.inviteManager(new MatchManager(match.getMatchId(), ownerId, true))) {
-            throw new BadRequestException("创建比赛失败");
+            throw new BadRequestException("比赛管理员设置失败");
         }
 
         MatchCreator matchCreator = new MatchCreator();
         matchCreator.setMatchId(match.getMatchId());
+        matchCreator.setUserId(ownerId);
         matchCreator.setCreateAuthorityLevel(createAuthorityLevel);
         matchCreator.setCreateAuthorityId(createAuthorityId);
         if (!matchCreatorService.save(matchCreator)) {

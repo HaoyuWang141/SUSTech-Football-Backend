@@ -46,7 +46,7 @@ public class TeamController {
     @Operation(summary = "创建球队", description = "创建一个新的球队")
     @Parameter(name = "ownerId", description = "管理员 ID", required = true)
     @Transactional
-    public String createTeam(Long ownerId, Integer createAuthorityLevel, Long createAuthorityId, @RequestBody Team team) {
+    public Long createTeam(Long ownerId, Integer createAuthorityLevel, Long createAuthorityId, @RequestBody Team team) {
         if (ownerId == null) {
             throw new BadRequestException("传入的队伍管理员ID为空");
         }
@@ -75,7 +75,7 @@ public class TeamController {
             throw new BadRequestException("创建球队失败");
         }
 
-        return "创建球队成功";
+        return team.getTeamId();
     }
 
     @GetMapping("/get")

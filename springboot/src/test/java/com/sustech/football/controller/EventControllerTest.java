@@ -77,17 +77,15 @@ public class EventControllerTest {
         when(eventService.createEvent(any(Event.class))).thenReturn(true);
         when(eventService.inviteManager(any(EventManager.class))).thenReturn(true);
 
-        String result = eventController.createEvent(ownerId, event);
+        eventController.createEvent(ownerId, 0, 0L, event);
 
         verify(eventService, times(1)).createEvent(any(Event.class));
         verify(eventService, times(1)).inviteManager(any(EventManager.class));
-
-        assert result.equals("创建赛事成功");
     }
 
     @Test
     public void testCreateEvent_NullOwnerId() {
-        assertThrows(BadRequestException.class, () -> eventController.createEvent(null, new Event()));
+        assertThrows(BadRequestException.class, () -> eventController.createEvent(null, 0, 0L, new Event()));
     }
 
     @Test
@@ -97,7 +95,7 @@ public class EventControllerTest {
 
         when(userService.getById(ownerId)).thenReturn(null); // Mocking userService
 
-        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, event));
+        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, 0, 0L, event));
     }
 
     @Test
@@ -106,7 +104,7 @@ public class EventControllerTest {
 
         when(userService.getById(ownerId)).thenReturn(new User()); // Mocking userService
 
-        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, null));
+        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, 0, 0L, null));
     }
 
     @Test
@@ -117,7 +115,7 @@ public class EventControllerTest {
 
         when(userService.getById(ownerId)).thenReturn(new User()); // Mocking userService
 
-        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, event));
+        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, 0, 0L, event));
     }
 
     @Test
@@ -128,7 +126,7 @@ public class EventControllerTest {
         when(userService.getById(ownerId)).thenReturn(new User()); // Mocking userService
         when(eventService.createEvent(any(Event.class))).thenReturn(false);
 
-        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, event));
+        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, 0, 0L, event));
     }
 
     @Test
@@ -140,7 +138,7 @@ public class EventControllerTest {
         when(eventService.createEvent(any(Event.class))).thenReturn(true);
         when(eventService.inviteManager(any(EventManager.class))).thenReturn(false);
 
-        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, event));
+        assertThrows(BadRequestException.class, () -> eventController.createEvent(ownerId, 0, 0L, event));
     }
 
     @Test

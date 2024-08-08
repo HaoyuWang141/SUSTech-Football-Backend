@@ -43,6 +43,12 @@ public class EventController {
     private EventStageTagService eventStageTagService;
     @Autowired
     private EventTeamService eventTeamService;
+    @Autowired
+    private SecondLevelAuthorityService secondLevelAuthorityService;
+    @Autowired
+    private ThirdLevelAuthorityService thirdLevelAuthorityService;
+    @Autowired
+    private EventCreatorService eventCreatorService;
 
     public record Match_GET(
             Long matchId,
@@ -60,7 +66,7 @@ public class EventController {
 
     @PostMapping("/create")
     @Operation(summary = "创建赛事", description = "创建一个新的赛事")
-    public String createEvent(Long ownerId, @RequestBody Event event) {
+    public Long createEvent(Long ownerId, Integer createAuthorityLevel, Long createAuthorityId, @RequestBody Event event) {
         if (ownerId == null || event == null) {
             throw new BadRequestException("传参为空");
         }
@@ -74,9 +80,19 @@ public class EventController {
             throw new BadRequestException("创建赛事失败");
         }
         if (!eventService.inviteManager(new EventManager(event.getEventId(), ownerId, true))) {
-            throw new BadRequestException("比赛管理员设置失败");
+            throw new BadRequestException("赛事管理员设置失败");
         }
-        return "创建赛事成功";
+
+        EventCreator eventCreator = new EventCreator();
+        eventCreator.setEventId(event.getEventId());
+        eventCreator.setUserId(ownerId);
+        eventCreator.setCreateAuthorityLevel(createAuthorityLevel);
+        eventCreator.setCreateAuthorityId(createAuthorityId);
+        if (!eventCreatorService.save(eventCreator)) {
+            throw new BadRequestException("创建者设置失败");
+        }
+
+        return event.getEventId();
     }
 
     @GetMapping("/get")
@@ -236,6 +252,31 @@ public class EventController {
     @Parameter(name = "idList", description = "赛事 ID 列表", required = true)
     public List<Event> getEventsByIdLists(@RequestParam List<Long> idList) {
         return eventService.listByIds(idList);
+    }
+
+    @GetMapping("/getBySecondAuthority")
+    @Operation(summary = "获取赛事", description = "根据二级权限获取赛事详细信息")
+    @Parameter(name = "authorityId", description = "二级权限 ID", required = true)
+    public List<Event> getEventsBySecondAuthority(Long authorityId) {
+        // 获取二级权限下的所有三级权限
+        QueryWrapper<ThirdLevelAuthority> thirdLevelAuthorityQueryWrapper = new QueryWrapper<>();
+        thirdLevelAuthorityQueryWrapper.eq("second_level_authority_id", authorityId);
+        List<ThirdLevelAuthority> thirdLevelAuthorityList = thirdLevelAuthorityService.list(thirdLevelAuthorityQueryWrapper);
+        List<Long> thirdAuthorityAuthorityIdList = thirdLevelAuthorityList.stream().map(ThirdLevelAuthority::getAuthorityId).toList();
+
+        // 获取二级权限下的所有赛事
+        QueryWrapper<EventCreator> eventCreatorQueryWrapper = new QueryWrapper<>();
+        eventCreatorQueryWrapper.eq("create_authority_level", 2);
+        eventCreatorQueryWrapper.eq("create_authority_id", authorityId);
+        List<EventCreator> eventCreatorList = eventCreatorService.list(eventCreatorQueryWrapper);
+
+        // 获取三级权限下的所有赛事
+        eventCreatorQueryWrapper = new QueryWrapper<>();
+        eventCreatorQueryWrapper.eq("create_authority_level", 3);
+        eventCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
+        eventCreatorList.addAll(eventCreatorService.list(eventCreatorQueryWrapper));
+
+        return eventService.listByIds(eventCreatorList.stream().map(EventCreator::getEventId).sorted().toList());
     }
 
     @PutMapping("/update")
