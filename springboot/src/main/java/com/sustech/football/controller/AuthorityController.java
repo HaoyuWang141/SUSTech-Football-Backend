@@ -160,6 +160,18 @@ public class AuthorityController {
         if (thirdLevelAuthority.getAuthorityId() != null) {
             throw new BadRequestException("传入权限的ID不为空");
         }
+        if (thirdLevelAuthority.getUserId() == null) {
+            throw new BadRequestException("传入权限的用户ID为空");
+        }
+        if (thirdLevelAuthority.getSecondLevelAuthorityId() == null) {
+            throw new BadRequestException("传入权限的二级权限ID为空");
+        }
+        if (secondLevelAuthorityService.getById(thirdLevelAuthority.getSecondLevelAuthorityId()) == null) {
+            throw new ResourceNotFoundException("传入权限的二级权限ID不存在");
+        }
+        if (thirdLevelAuthorityService.getOne(new QueryWrapper<ThirdLevelAuthority>().eq("user_id", thirdLevelAuthority.getUserId())) != null) {
+            throw new BadRequestException("该用户已经有三级权限");
+        }
         if (!thirdLevelAuthorityService.save(thirdLevelAuthority)) {
             throw new BadRequestException("创建权限失败");
         }
