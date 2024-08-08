@@ -258,6 +258,14 @@ public class EventController {
     @Operation(summary = "获取赛事", description = "根据二级权限获取赛事详细信息")
     @Parameter(name = "authorityId", description = "二级权限 ID", required = true)
     public List<Event> getEventsBySecondAuthority(Long authorityId) {
+        if (authorityId == null) {
+            throw new BadRequestException("传入的二级权限ID为空");
+        }
+
+        if (secondLevelAuthorityService.getById(authorityId) == null) {
+            throw new ResourceNotFoundException("二级权限不存在");
+        }
+
         // 获取二级权限下的所有三级权限
         QueryWrapper<ThirdLevelAuthority> thirdLevelAuthorityQueryWrapper = new QueryWrapper<>();
         thirdLevelAuthorityQueryWrapper.eq("second_level_authority_id", authorityId);

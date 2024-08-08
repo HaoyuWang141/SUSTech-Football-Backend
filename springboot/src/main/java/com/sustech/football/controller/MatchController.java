@@ -267,6 +267,10 @@ public class MatchController {
             throw new BadRequestException("二级权限ID不能为空");
         }
 
+        if (secondLevelAuthorityService.getById(authorityId) == null) {
+            throw new ResourceNotFoundException("二级权限不存在");
+        }
+
         // 获取二级权限下的所有三级权限
         QueryWrapper<ThirdLevelAuthority> thirdLevelAuthorityQueryWrapper = new QueryWrapper<>();
         thirdLevelAuthorityQueryWrapper.eq("second_level_authority_id", authorityId);
