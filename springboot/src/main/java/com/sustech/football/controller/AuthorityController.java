@@ -97,7 +97,7 @@ public class AuthorityController {
         }
     }
 
-    @PostMapping("/secondAuthority/create")
+    @PostMapping("/second/create")
     public void createSecondAuthority(@RequestBody SecondLevelAuthority secondLevelAuthority) {
         if (secondLevelAuthority == null) {
             throw new BadRequestException("传入权限为空");
@@ -110,7 +110,7 @@ public class AuthorityController {
         }
     }
 
-    @GetMapping("/secondAuthority/getAll")
+    @GetMapping("/second/getAll")
     public List<SecondLevelAuthority> getAllSecondAuthority() {
         return secondLevelAuthorityService.list()
                 .stream()
@@ -118,7 +118,7 @@ public class AuthorityController {
                 .toList();
     }
 
-    @PutMapping("/secondAuthority/update")
+    @PutMapping("/second/update")
     public void updateSecondAuthority(@RequestBody SecondLevelAuthority secondLevelAuthority) {
         if (secondLevelAuthority == null) {
             throw new BadRequestException("传入权限为空");
@@ -142,7 +142,7 @@ public class AuthorityController {
         }
     }
 
-    @DeleteMapping("/secondAuthority/delete")
+    @DeleteMapping("/second/delete")
     public void deleteSecondAuthority(Long authorityId) {
         if (authorityId == null) {
             throw new BadRequestException("传入权限的ID为空");
@@ -152,7 +152,7 @@ public class AuthorityController {
         }
     }
 
-    @PostMapping("thirdAuthority/create")
+    @PostMapping("third/create")
     public void createThirdAuthority(@RequestBody ThirdLevelAuthority thirdLevelAuthority) {
         if (thirdLevelAuthority == null) {
             throw new BadRequestException("传入权限为空");
@@ -177,32 +177,7 @@ public class AuthorityController {
         }
     }
 
-    @PutMapping("thirdAuthority/update")
-    public void updateThirdAuthority(@RequestBody ThirdLevelAuthority thirdLevelAuthority) {
-        if (thirdLevelAuthority == null) {
-            throw new BadRequestException("传入权限为空");
-        }
-        if (thirdLevelAuthority.getAuthorityId() == null) {
-            throw new BadRequestException("传入权限的ID为空");
-        }
-        if (thirdLevelAuthority.getUserId() == null) {
-            throw new BadRequestException("传入权限的用户ID为空");
-        }
-        if (userService.getById(thirdLevelAuthority.getUserId()) == null) {
-            throw new ResourceNotFoundException("传入权限的用户ID不存在");
-        }
-        if (thirdLevelAuthority.getSecondLevelAuthorityId() == null) {
-            throw new BadRequestException("传入权限的二级权限ID为空");
-        }
-        if (secondLevelAuthorityService.getById(thirdLevelAuthority.getSecondLevelAuthorityId()) == null) {
-            throw new ResourceNotFoundException("传入权限的二级权限ID不存在");
-        }
-        if (!thirdLevelAuthorityService.updateById(thirdLevelAuthority)) {
-            throw new BadRequestException("更新权限失败");
-        }
-    }
-
-    @GetMapping("thirdAuthority/getAll")
+    @GetMapping("third/getAll")
     public List<ThirdLevelAuthority> getAllThirdAuthority() {
         return thirdLevelAuthorityService.list()
                 .stream()
@@ -210,7 +185,7 @@ public class AuthorityController {
                 .toList();
     }
 
-    @GetMapping("thirdAuthority/getBySecond")
+    @GetMapping("third/getBySecond")
     public List<ThirdLevelAuthority> getThirdAuthorityBySecond(Long authorityId) {
         if (authorityId == null) {
             throw new BadRequestException("传入权限的ID为空");
@@ -233,7 +208,7 @@ public class AuthorityController {
         return thirdLevelAuthorityList.stream().sorted(Comparator.comparing(ThirdLevelAuthority::getAuthorityId)).toList();
     }
 
-    @DeleteMapping("thirdAuthority/delete")
+    @DeleteMapping("third/delete")
     public void deleteThirdAuthority(Long authorityId) {
         if (authorityId == null) {
             throw new BadRequestException("传入权限的ID为空");
