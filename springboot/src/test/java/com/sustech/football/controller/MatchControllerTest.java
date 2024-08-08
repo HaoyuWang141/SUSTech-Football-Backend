@@ -89,7 +89,7 @@ class MatchControllerTest {
         Match match = new Match();
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.createMatch(ownerId, match);
+            matchController.createMatch(ownerId, 0, 0L, match);
         });
     }
 
@@ -101,7 +101,7 @@ class MatchControllerTest {
         when(userService.getById(ownerId)).thenReturn(null);
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.createMatch(ownerId, match);
+            matchController.createMatch(ownerId, 0, 0L, match);
         });
     }
 
@@ -111,7 +111,7 @@ class MatchControllerTest {
         Match match = null;
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.createMatch(ownerId, match);
+            matchController.createMatch(ownerId, 0, 0L, match);
         });
     }
 
@@ -124,7 +124,7 @@ class MatchControllerTest {
         when(userService.getById(ownerId)).thenReturn(new User());
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.createMatch(ownerId, match);
+            matchController.createMatch(ownerId, 0, 0L, match);
         });
     }
 
@@ -137,7 +137,7 @@ class MatchControllerTest {
         when(matchService.save(match)).thenReturn(false);
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.createMatch(ownerId, match);
+            matchController.createMatch(ownerId, 0, 0L, match);
         });
     }
 
@@ -151,7 +151,7 @@ class MatchControllerTest {
         when(matchService.inviteManager(any())).thenReturn(false);
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.createMatch(ownerId, match);
+            matchController.createMatch(ownerId, 0, 0L, match);
         });
     }
 
