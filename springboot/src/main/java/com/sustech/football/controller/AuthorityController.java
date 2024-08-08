@@ -170,12 +170,12 @@ public class AuthorityController {
     }
 
     @GetMapping("thirdAuthority/getBySecond")
-    public List<ThirdLevelAuthority> getThirdAuthorityBySecond(Long secondLevelAuthorityId) {
-        if (secondLevelAuthorityId == null) {
+    public List<ThirdLevelAuthority> getThirdAuthorityBySecond(Long authorityId) {
+        if (authorityId == null) {
             throw new BadRequestException("传入权限的ID为空");
         }
         QueryWrapper<ThirdLevelAuthority> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("second_level_authority_id", secondLevelAuthorityId);
+        queryWrapper.eq("second_level_authority_id", authorityId);
         return thirdLevelAuthorityService.list(queryWrapper);
     }
 
