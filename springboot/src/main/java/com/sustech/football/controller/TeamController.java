@@ -158,7 +158,7 @@ public class TeamController {
         teamCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
         teamCreatorList.addAll(teamCreatorService.list(teamCreatorQueryWrapper));
 
-        List<Long> teamIdList = teamCreatorList.stream().map(TeamCreator::getTeamId).toList();
+        List<Long> teamIdList = teamCreatorList.stream().map(TeamCreator::getTeamId).sorted().toList();
         return teamService.getTeamsByIdList(teamIdList);
     }
 

@@ -493,6 +493,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             team.setPlayerList(teamPlayerList.stream().map(TeamPlayer::getPlayer).toList());
         }
 
-        return teamList;
+        return teamList.stream()
+                .sorted(Comparator.comparing(Team::getTeamId))
+                .toList();
     }
 }
