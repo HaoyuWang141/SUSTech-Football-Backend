@@ -66,7 +66,7 @@ class TeamControllerTest {
         when(teamService.save(any())).thenReturn(true);
         when(teamService.inviteManager(any())).thenReturn(true);
 
-        String result = teamController.createTeam(ownerId, team);
+        String result = teamController.createTeam(ownerId, 0, 0L, team);
 
         assertEquals("创建球队成功", result);
         verify(teamService, times(1)).save(any());
@@ -76,7 +76,7 @@ class TeamControllerTest {
     @Test
     void createTeam_nullOwnerId_throwsBadRequestException() {
         assertThrows(BadRequestException.class, () -> {
-            teamController.createTeam(null, new Team());
+            teamController.createTeam(null, 0, 0L, new Team());
         });
     }
 
@@ -87,7 +87,7 @@ class TeamControllerTest {
         when(userService.getById(ownerId)).thenReturn(null);
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            teamController.createTeam(ownerId, new Team());
+            teamController.createTeam(ownerId, 0, 0L, new Team());
         });
     }
 
@@ -98,7 +98,7 @@ class TeamControllerTest {
         when(userService.getById(ownerId)).thenReturn(new User());
 
         assertThrows(BadRequestException.class, () -> {
-            teamController.createTeam(ownerId, null);
+            teamController.createTeam(ownerId, 0, 0L, null);
         });
     }
 
@@ -111,7 +111,7 @@ class TeamControllerTest {
         when(userService.getById(ownerId)).thenReturn(new User());
 
         assertThrows(BadRequestException.class, () -> {
-            teamController.createTeam(ownerId, team);
+            teamController.createTeam(ownerId, 0, 0L, team);
         });
     }
 
@@ -125,7 +125,7 @@ class TeamControllerTest {
         when(teamService.save(any())).thenReturn(false);
 
         assertThrows(BadRequestException.class, () -> {
-            teamController.createTeam(ownerId, team);
+            teamController.createTeam(ownerId, 0, 0L, team);
         });
     }
 
@@ -140,7 +140,7 @@ class TeamControllerTest {
         when(teamService.inviteManager(any())).thenReturn(false);
 
         assertThrows(BadRequestException.class, () -> {
-            teamController.createTeam(ownerId, team);
+            teamController.createTeam(ownerId, 0, 0L, team);
         });
     }
 

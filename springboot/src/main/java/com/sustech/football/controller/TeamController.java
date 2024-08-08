@@ -46,7 +46,7 @@ public class TeamController {
     @Operation(summary = "创建球队", description = "创建一个新的球队")
     @Parameter(name = "ownerId", description = "管理员 ID", required = true)
     @Transactional
-    public String createTeam(Long ownerId, @RequestBody Team team) {
+    public String createTeam(Long ownerId, Integer createAuthorityLevel, Long createAuthorityId, @RequestBody Team team) {
         if (ownerId == null) {
             throw new BadRequestException("传入的队伍管理员ID为空");
         }
@@ -65,6 +65,16 @@ public class TeamController {
         if (!teamService.inviteManager(new TeamManager(ownerId, team.getTeamId(), true))) {
             throw new BadRequestException("创建球队失败");
         }
+
+        TeamCreator teamCreator = new TeamCreator();
+        teamCreator.setTeamId(team.getTeamId());
+        teamCreator.setUserId(ownerId);
+        teamCreator.setCreateAuthorityLevel(createAuthorityLevel);
+        teamCreator.setCreateAuthorityId(createAuthorityId);
+        if (!teamCreatorService.save(teamCreator)) {
+            throw new BadRequestException("创建球队失败");
+        }
+
         return "创建球队成功";
     }
 
