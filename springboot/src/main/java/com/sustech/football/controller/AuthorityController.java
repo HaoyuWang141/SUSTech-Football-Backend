@@ -193,7 +193,7 @@ public class AuthorityController {
             thirdLevelAuthority.setUser(user);
         }
 
-        return thirdLevelAuthorityList;
+        return thirdLevelAuthorityList.stream().sorted(Comparator.comparing(ThirdLevelAuthority::getAuthorityId)).toList();
     }
 
     @DeleteMapping("thirdAuthority/delete")
