@@ -163,7 +163,7 @@ public class TeamController {
     }
 
 
-    private record TeamRecord(Long teamId, String name, String logoUrl, Long captainId, String description) {
+    public record TeamRecord(Long teamId, String name, String logoUrl, Long captainId, String description) {
     }
 
     @PostMapping("captain/updateByPlayerId")
@@ -189,12 +189,9 @@ public class TeamController {
 
     @PutMapping("/update")
     @Operation(summary = "更新球队", description = "更新球队信息")
-    public void updateTeam(Long managerId, @RequestBody TeamRecord teamRecord) {
-        if (managerId == null || teamRecord == null) {
+    public void updateTeam(@RequestBody TeamRecord teamRecord) {
+        if (teamRecord == null) {
             throw new BadRequestException("传参含空值");
-        }
-        if (managerId != 0 && userService.getById(managerId) == null) {
-            throw new ResourceNotFoundException("管理员非法");
         }
         Long teamId = teamRecord.teamId();
         if (teamId == null) {
@@ -203,10 +200,6 @@ public class TeamController {
         Team team = teamService.getById(teamId);
         if (team == null) {
             throw new ResourceNotFoundException("球队不存在");
-        }
-        List<Long> managerIdList = teamService.getManagers(teamId);
-        if (managerIdList == null || !managerIdList.contains(managerId)) {
-            throw new BadRequestException("无权修改");
         }
         if (teamRecord.name() != null) {
             team.setName(teamRecord.name());

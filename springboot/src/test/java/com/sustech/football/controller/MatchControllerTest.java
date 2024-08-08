@@ -310,7 +310,7 @@ class MatchControllerTest {
         when(matchService.updateById(match)).thenReturn(true);
 
         assertDoesNotThrow(() -> {
-            matchController.updateMatch(managerId, match);
+            matchController.updateMatch(match);
         });
     }
 
@@ -321,7 +321,7 @@ class MatchControllerTest {
         match.setMatchId(1L);
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.updateMatch(managerId, match);
+            matchController.updateMatch(match);
         });
     }
 
@@ -331,7 +331,7 @@ class MatchControllerTest {
         Match match = null;
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.updateMatch(managerId, match);
+            matchController.updateMatch(match);
         });
     }
 
@@ -341,7 +341,7 @@ class MatchControllerTest {
         Match match = new Match();
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.updateMatch(managerId, match);
+            matchController.updateMatch(match);
         });
     }
 
@@ -354,7 +354,7 @@ class MatchControllerTest {
         when(matchService.getById(match.getMatchId())).thenReturn(null);
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            matchController.updateMatch(managerId, match);
+            matchController.updateMatch(match);
         });
     }
 
@@ -368,7 +368,7 @@ class MatchControllerTest {
         when(matchService.getManagers(match.getMatchId())).thenReturn(List.of(2L));
 
         assertThrows(BadRequestException.class, () -> {
-            matchController.updateMatch(managerId, match);
+            matchController.updateMatch(match);
         });
     }
 
@@ -383,7 +383,7 @@ class MatchControllerTest {
         when(matchService.updateById(match)).thenReturn(false);
 
         assertThrows(InternalServerErrorException.class, () -> {
-            matchController.updateMatch(managerId, match);
+            matchController.updateMatch(match);
         });
     }
 
