@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 public class EventCreator {
 
     @TableId(value = "event_id")
-    private Integer eventId;
+    private Long eventId;
 
-    private Integer userId;
+    private Long userId;
 
     private Integer createAuthorityLevel;
 
-    private Integer createAuthorityId;
+    private Long createAuthorityId;
 }

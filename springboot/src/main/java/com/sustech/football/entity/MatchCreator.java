@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 public class MatchCreator {
 
     @TableId(value = "match_id")
-    private Integer matchId;
+    private Long matchId;
 
-    private Integer userId;
+    private Long userId;
 
     private Integer createAuthorityLevel;
 
-    private Integer createAuthorityId;
+    private Long createAuthorityId;
 }

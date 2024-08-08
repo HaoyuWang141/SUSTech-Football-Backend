@@ -1,5 +1,6 @@
 package com.sustech.football.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.model.team.VoTeam;
 
 import io.swagger.v3.oas.annotations.*;
@@ -12,6 +13,7 @@ import com.sustech.football.service.*;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,12 @@ public class TeamController {
     private EventService eventService;
     @Autowired
     private TeamPlayerService teamPlayerService;
+    @Autowired
+    private SecondLevelAuthorityService secondLevelAuthorityService;
+    @Autowired
+    private ThirdLevelAuthorityService thirdLevelAuthorityService;
+    @Autowired
+    private TeamCreatorService teamCreatorService;
 
     @PostMapping("/create")
     @Operation(summary = "创建球队", description = "创建一个新的球队")
@@ -113,6 +121,37 @@ public class TeamController {
         }
         return teamService.getTeamsByIdList(idList);
     }
+
+    @GetMapping("/getBySecondAuthority")
+    @Operation(summary = "获取球队列表", description = "根据二级权限 ID 获取球队信息")
+    @Parameter(name = "authorityId", description = "二级权限 ID", required = true)
+    public List<Team> getTeamsBySecondAuthority(Long authorityId) {
+        if (authorityId == null) {
+            throw new BadRequestException("传入的二级权限ID为空");
+        }
+
+        // 获取二级权限下的所有三级权限
+        QueryWrapper<ThirdLevelAuthority> thirdLevelAuthorityQueryWrapper = new QueryWrapper<>();
+        thirdLevelAuthorityQueryWrapper.eq("second_level_authority_id", authorityId);
+        List<ThirdLevelAuthority> thirdLevelAuthorityList = thirdLevelAuthorityService.list(thirdLevelAuthorityQueryWrapper);
+        List<Long> thirdAuthorityAuthorityIdList = thirdLevelAuthorityList.stream().map(ThirdLevelAuthority::getAuthorityId).toList();
+
+        // 获取二级权限下的所有球队
+        QueryWrapper<TeamCreator> teamCreatorQueryWrapper = new QueryWrapper<>();
+        teamCreatorQueryWrapper.eq("authority_level", 2);
+        teamCreatorQueryWrapper.eq("authority_id", authorityId);
+        List<TeamCreator> teamCreatorList = teamCreatorService.list(teamCreatorQueryWrapper);
+
+        // 获取三级权限下的所有球队
+        teamCreatorQueryWrapper = new QueryWrapper<>();
+        teamCreatorQueryWrapper.eq("authority_level", 3);
+        teamCreatorQueryWrapper.in("authority_id", thirdAuthorityAuthorityIdList);
+        teamCreatorList.addAll(teamCreatorService.list(teamCreatorQueryWrapper));
+
+        List<Long> teamIdList = teamCreatorList.stream().map(TeamCreator::getTeamId).toList();
+        return teamService.getTeamsByIdList(teamIdList);
+    }
+
 
     private record TeamRecord(Long teamId, String name, String logoUrl, Long captainId, String description) {
     }

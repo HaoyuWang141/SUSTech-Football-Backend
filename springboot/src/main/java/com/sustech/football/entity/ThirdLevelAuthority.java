@@ -14,9 +14,9 @@ public class ThirdLevelAuthority {
     @TableId(value = "authority_id", type = IdType.AUTO)
     private Long authorityId;
 
-    private Integer secondLevelAuthorityId;
+    private Long secondLevelAuthorityId;
 
-    private Integer userId;
+    private Long userId;
 
     private String description;
 
