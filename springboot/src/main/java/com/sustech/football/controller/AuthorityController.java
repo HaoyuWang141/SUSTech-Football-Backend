@@ -177,6 +177,31 @@ public class AuthorityController {
         }
     }
 
+    @PutMapping("thirdAuthority/update")
+    public void updateThirdAuthority(@RequestBody ThirdLevelAuthority thirdLevelAuthority) {
+        if (thirdLevelAuthority == null) {
+            throw new BadRequestException("传入权限为空");
+        }
+        if (thirdLevelAuthority.getAuthorityId() == null) {
+            throw new BadRequestException("传入权限的ID为空");
+        }
+        if (thirdLevelAuthority.getUserId() == null) {
+            throw new BadRequestException("传入权限的用户ID为空");
+        }
+        if (userService.getById(thirdLevelAuthority.getUserId()) == null) {
+            throw new ResourceNotFoundException("传入权限的用户ID不存在");
+        }
+        if (thirdLevelAuthority.getSecondLevelAuthorityId() == null) {
+            throw new BadRequestException("传入权限的二级权限ID为空");
+        }
+        if (secondLevelAuthorityService.getById(thirdLevelAuthority.getSecondLevelAuthorityId()) == null) {
+            throw new ResourceNotFoundException("传入权限的二级权限ID不存在");
+        }
+        if (!thirdLevelAuthorityService.updateById(thirdLevelAuthority)) {
+            throw new BadRequestException("更新权限失败");
+        }
+    }
+
     @GetMapping("thirdAuthority/getAll")
     public List<ThirdLevelAuthority> getAllThirdAuthority() {
         return thirdLevelAuthorityService.list()
