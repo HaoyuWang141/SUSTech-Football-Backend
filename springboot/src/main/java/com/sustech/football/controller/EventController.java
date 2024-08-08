@@ -279,11 +279,16 @@ public class EventController {
         List<EventCreator> eventCreatorList = eventCreatorService.list(eventCreatorQueryWrapper);
 
         // 获取三级权限下的所有赛事
+        System.out.println(thirdAuthorityAuthorityIdList);
         if (!thirdAuthorityAuthorityIdList.isEmpty()) {
             eventCreatorQueryWrapper = new QueryWrapper<>();
             eventCreatorQueryWrapper.eq("create_authority_level", 3);
             eventCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
             eventCreatorList.addAll(eventCreatorService.list(eventCreatorQueryWrapper));
+        }
+
+        if (eventCreatorList.isEmpty()) {
+            return List.of();
         }
         return eventService.listByIds(eventCreatorList.stream().map(EventCreator::getEventId).sorted().toList());
     }
