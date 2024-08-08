@@ -42,6 +42,12 @@ public class MatchController {
     private MatchPlayerService matchPlayerService;
     @Autowired
     private RefereeService refereeService;
+    @Autowired
+    private SecondLevelAuthorityService secondLevelAuthorityService;
+    @Autowired
+    private ThirdLevelAuthorityService thirdLevelAuthorityService;
+    @Autowired
+    private MatchCreatorService matchCreatorService;
 
     @PostMapping("/create")
     @Transactional
@@ -49,9 +55,9 @@ public class MatchController {
     @Parameters(
             @Parameter(name = "ownerId", description = "比赛所有者 ID", required = true)
     )
-    public Long createMatch(Long ownerId, @RequestBody Match match) {
+    public Long createMatch(Long ownerId, Integer createAuthorityLevel, Long createAuthorityId, @RequestBody Match match) {
         /*
-          该方法仅用来创建“友谊赛”，不用来创建赛事比赛（它通过：/event/match/add 创建）
+          该方法仅用来创建“友谊赛”，不用来创建赛事比赛（赛事比赛通过：/event/match/add 创建）
           创建比赛（友谊赛）时，match仅给定比赛时间、主队ID，之后可能增加地点，其余要素均不给。
           不要将主队球员注入MatchPlayer中，这一步完全由裁判进行操作。
          */
@@ -73,6 +79,15 @@ public class MatchController {
         if (!matchService.inviteManager(new MatchManager(match.getMatchId(), ownerId, true))) {
             throw new BadRequestException("创建比赛失败");
         }
+
+        MatchCreator matchCreator = new MatchCreator();
+        matchCreator.setMatchId(match.getMatchId());
+        matchCreator.setCreateAuthorityLevel(createAuthorityLevel);
+        matchCreator.setCreateAuthorityId(createAuthorityId);
+        if (!matchCreatorService.save(matchCreator)) {
+            throw new InternalServerErrorException("创建比赛失败");
+        }
+
         return match.getMatchId();
     }
 
@@ -239,6 +254,36 @@ public class MatchController {
             throw new BadRequestException("比赛ID列表不能为空");
         }
         return matchService.getMatchByIdList(idList);
+    }
+
+    @GetMapping("/getFriendlyMatchesBySecondAuthority")
+    @Operation(summary = "获取比赛信息", description = "根据二级权限ID获取友谊赛信息")
+    @Parameter(name = "secondAuthorityId", description = "二级权限 ID", required = true)
+    public List<Match> getFriendlyMatchesBySecondAuthority(Long authorityId) {
+        if (authorityId == null) {
+            throw new BadRequestException("二级权限ID不能为空");
+        }
+
+        // 获取二级权限下的所有三级权限
+        QueryWrapper<ThirdLevelAuthority> thirdLevelAuthorityQueryWrapper = new QueryWrapper<>();
+        thirdLevelAuthorityQueryWrapper.eq("second_level_authority_id", authorityId);
+        List<ThirdLevelAuthority> thirdLevelAuthorityList = thirdLevelAuthorityService.list(thirdLevelAuthorityQueryWrapper);
+        List<Long> thirdAuthorityAuthorityIdList = thirdLevelAuthorityList.stream().map(ThirdLevelAuthority::getAuthorityId).toList();
+
+        // 获取二级权限下的所有比赛
+        QueryWrapper<MatchCreator> matchCreatorQueryWrapper = new QueryWrapper<>();
+        matchCreatorQueryWrapper.in("create_authority_level", 2);
+        matchCreatorQueryWrapper.eq("create_authority_id", authorityId);
+        List<MatchCreator> matchCreatorList = matchCreatorService.list(matchCreatorQueryWrapper);
+
+        // 获取三级权限下的所有比赛
+        matchCreatorQueryWrapper = new QueryWrapper<>();
+        matchCreatorQueryWrapper.in("create_authority_level", 3);
+        matchCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
+        matchCreatorList.addAll(matchCreatorService.list(matchCreatorQueryWrapper));
+
+        List<Long> matchIdList = matchCreatorList.stream().map(MatchCreator::getMatchId).toList();
+        return matchService.getMatchByIdList(matchIdList);
     }
 
     @PutMapping("/update")

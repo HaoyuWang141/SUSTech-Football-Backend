@@ -698,18 +698,12 @@ public class EventController {
 
     @PutMapping("/match/update")
     @Operation(summary = "更新比赛", description = "更新赛事的比赛")
-    public void updateMatch(Long eventId, Long managerId, @RequestBody Match_GET match) {
-        if (eventId == null || managerId == null || match == null) {
+    public void updateMatch(Long eventId, @RequestBody Match_GET match) {
+        if (eventId == null || match == null) {
             throw new BadRequestException("传参含空值");
         }
         if (eventService.getById(eventId) == null) {
             throw new ResourceNotFoundException("赛事不存在");
-        }
-        if (userService.getById(managerId) == null) {
-            throw new ResourceNotFoundException("管理员不存在");
-        }
-        if (!eventService.getManagers(eventId).contains(managerId)) {
-            throw new BadRequestException("非法管理员");
         }
         if (match.matchId() == null) {
             throw new BadRequestException("比赛id为空");
