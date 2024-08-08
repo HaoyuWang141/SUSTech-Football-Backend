@@ -76,21 +76,15 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
         QueryWrapper<TeamManager> teamManagerQueryWrapper = new QueryWrapper<>();
         teamManagerQueryWrapper.eq("team_id", teamId);
-        if (!teamManagerService.remove(teamManagerQueryWrapper)) {
-            throw new ConflictException("删除队伍管理员失败");
-        }
+        teamManagerService.remove(teamManagerQueryWrapper);
 
         QueryWrapper<TeamCreator> teamCreatorQueryWrapper = new QueryWrapper<>();
         teamCreatorQueryWrapper.eq("team_id", teamId);
-        if (!teamCreatorService.remove(teamCreatorQueryWrapper)) {
-            throw new ConflictException("删除队伍创建者失败");
-        }
+        teamCreatorService.remove(teamCreatorQueryWrapper);
 
         QueryWrapper<TeamPlayer> teamPlayerQueryWrapper = new QueryWrapper<>();
         teamPlayerQueryWrapper.eq("team_id", teamId);
-        if (!teamPlayerService.remove(teamPlayerQueryWrapper)) {
-            throw new ConflictException("删除队伍球员失败");
-        }
+        teamPlayerService.remove(teamPlayerQueryWrapper);
 
         if (!removeById(teamId)) {
             throw new ConflictException("删除队伍失败，若球队已进行比赛或参加赛事，则无法删除球队");
