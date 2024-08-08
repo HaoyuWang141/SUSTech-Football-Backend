@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sustech.football.entity.FirstLevelAuthority;
 import com.sustech.football.entity.SecondLevelAuthority;
 import com.sustech.football.entity.ThirdLevelAuthority;
+import com.sustech.football.entity.User;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.service.FirstLevelAuthorityService;
 import com.sustech.football.service.SecondLevelAuthorityService;
 import com.sustech.football.service.ThirdLevelAuthorityService;
+import com.sustech.football.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,8 @@ public class AuthorityController {
     private SecondLevelAuthorityService secondLevelAuthorityService;
     @Autowired
     private ThirdLevelAuthorityService thirdLevelAuthorityService;
+    @Autowired
+    private UserService userService;
 
 
     @PostMapping("/check/first")
@@ -174,9 +178,22 @@ public class AuthorityController {
         if (authorityId == null) {
             throw new BadRequestException("传入权限的ID为空");
         }
+
+        if (secondLevelAuthorityService.getById(authorityId) == null) {
+            throw new ResourceNotFoundException("传入权限的ID不存在");
+        }
+
         QueryWrapper<ThirdLevelAuthority> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("second_level_authority_id", authorityId);
-        return thirdLevelAuthorityService.list(queryWrapper);
+        List<ThirdLevelAuthority> thirdLevelAuthorityList = thirdLevelAuthorityService.list(queryWrapper);
+
+        for (ThirdLevelAuthority thirdLevelAuthority : thirdLevelAuthorityList) {
+            Long userId = thirdLevelAuthority.getUserId();
+            User user = userService.getById(userId);
+            thirdLevelAuthority.setUser(user);
+        }
+
+        return thirdLevelAuthorityList;
     }
 
     @DeleteMapping("thirdAuthority/delete")
