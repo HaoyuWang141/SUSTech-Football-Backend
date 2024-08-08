@@ -44,6 +44,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     private UserService userService;
     @Autowired
     private MatchPlayerService matchPlayerService;
+    @Autowired
+    private TeamCreatorService teamCreatorService;
 
     @Override
     public Team getTeamById(Long teamId) {
@@ -66,23 +68,34 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     @Override
+    @Transactional
     public boolean deleteTeam(Long teamId, Long userId) {
         if (userId != 0 && teamManagerService.selectByMultiId(new TeamManager(userId, teamId, true)) == null) {
             throw new BadRequestException("试图删除队伍的用户不是队伍拥有者");
         }
 
-        QueryWrapper<TeamManager> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("team_id", teamId);
-        List<TeamManager> teamManagerList = teamManagerService.list(queryWrapper);
-        teamManagerService.remove(queryWrapper);
-
-        try {
-            this.removeById(teamId);
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-            teamManagerService.saveBatch(teamManagerList);
-            throw new ConflictException("删除队伍失败，队伍可能已有关联");
+        QueryWrapper<TeamManager> teamManagerQueryWrapper = new QueryWrapper<>();
+        teamManagerQueryWrapper.eq("team_id", teamId);
+        if (!teamManagerService.remove(teamManagerQueryWrapper)) {
+            throw new ConflictException("删除队伍管理员失败");
         }
+
+        QueryWrapper<TeamCreator> teamCreatorQueryWrapper = new QueryWrapper<>();
+        teamCreatorQueryWrapper.eq("team_id", teamId);
+        if (!teamCreatorService.remove(teamCreatorQueryWrapper)) {
+            throw new ConflictException("删除队伍创建者失败");
+        }
+
+        QueryWrapper<TeamPlayer> teamPlayerQueryWrapper = new QueryWrapper<>();
+        teamPlayerQueryWrapper.eq("team_id", teamId);
+        if (!teamPlayerService.remove(teamPlayerQueryWrapper)) {
+            throw new ConflictException("删除队伍球员失败");
+        }
+
+        if (!removeById(teamId)) {
+            throw new ConflictException("删除队伍失败，若球队已进行比赛或参加赛事，则无法删除球队");
+        }
+
         return true;
     }
 
