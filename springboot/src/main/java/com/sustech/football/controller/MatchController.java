@@ -258,7 +258,7 @@ public class MatchController {
 
     @GetMapping("/getFriendlyMatchesBySecondAuthority")
     @Operation(summary = "获取比赛信息", description = "根据二级权限ID获取友谊赛信息")
-    @Parameter(name = "secondAuthorityId", description = "二级权限 ID", required = true)
+    @Parameter(name = "authorityId", description = "二级权限 ID", required = true)
     public List<Match> getFriendlyMatchesBySecondAuthority(Long authorityId) {
         if (authorityId == null) {
             throw new BadRequestException("二级权限ID不能为空");
