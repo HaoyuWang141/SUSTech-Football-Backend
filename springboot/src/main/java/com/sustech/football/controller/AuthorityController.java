@@ -72,13 +72,19 @@ public class AuthorityController {
     }
 
     @PostMapping("/check/third")
-    public boolean checkThirdAuthority(Long userId) {
+    public long checkThirdAuthority(Long userId) {
         if (userId == null) {
-            throw new BadRequestException("传入权限的ID为空");
+            throw new BadRequestException("传入userId为空");
+        }
+        if (userService.getById(userId) == null) {
+            throw new ResourceNotFoundException("传入的userId不存在");
         }
         QueryWrapper<ThirdLevelAuthority> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
-        return thirdLevelAuthorityService.count(queryWrapper) > 0;
+        if (thirdLevelAuthorityService.count(queryWrapper) == 0) {
+            return 0;
+        }
+        return thirdLevelAuthorityService.getOne(queryWrapper).getAuthorityId();
     }
 
     @PutMapping("/first/update")
