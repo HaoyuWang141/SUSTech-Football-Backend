@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
@@ -40,6 +42,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public List<Match> getUserManageMatches(Long userId) {
+        Set<Long> friendlyMatchIdSet = matchManagerMapper.selectList(new QueryWrapper<>()).stream()
+                .map(MatchManager::getMatchId)
+                .collect(Collectors.toSet());
+
         QueryWrapper<TeamManager> teamManagerQueryWrapper = new QueryWrapper<>();
         teamManagerQueryWrapper.eq("user_id", userId);
         List<Team> teamList = teamManagerMapper.selectTeamWithManager(userId).stream().map(TeamManager::getTeam).toList();
@@ -49,7 +55,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         for (Team team : teamList) {
             matchQueryWrapper = new QueryWrapper<>();
             matchQueryWrapper.eq("home_team_id", team.getTeamId()).or().eq("away_team_id", team.getTeamId());
-            List<Match> subMatches = matchMapper.selectList(matchQueryWrapper);
+            List<Match> subMatches = matchMapper.selectList(matchQueryWrapper).stream()
+                    .filter(match -> friendlyMatchIdSet.contains(match.getMatchId()))
+                    .toList();
             for (Match match : subMatches) {
                 match.setHomeTeam(teamMapper.selectById(match.getHomeTeamId()));
                 match.setAwayTeam(teamMapper.selectById(match.getAwayTeamId()));
