@@ -20,7 +20,7 @@ public class TeamManager {
     @Schema(description = "球队 ID", example = "1")
     private Long teamId;
 
-    @Schema(description = "是否为队长", example = "true")
+    @Schema(description = "是否为创建者", example = "true")
     private Boolean isOwner;
 
     @TableField(exist = false)

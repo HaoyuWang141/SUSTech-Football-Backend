@@ -151,6 +151,9 @@ public class UserController {
         if (userId == null) {
             throw new BadRequestException("用户ID不能为空");
         }
+        if (userService.getById(userId) == null) {
+            throw new ResourceNotFoundException("用户不存在");
+        }
         return userService.getUserManageMatches(userId);
     }
 

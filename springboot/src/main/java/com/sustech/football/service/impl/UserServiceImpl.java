@@ -10,6 +10,7 @@ import com.sustech.football.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -33,16 +34,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private RefereeMapper refereeMapper;
     @Autowired
     private TeamPlayerMapper teamPlayerMapper;
+    @Autowired
+    private MatchMapper matchMapper;
 
 
     @Override
     public List<Match> getUserManageMatches(Long userId) {
-        List<Match> matches = matchManagerMapper.selectMatchWithManager(userId).stream().map(MatchManager::getMatch).toList();
-        for (Match match : matches) {
-            match.setAwayTeam(teamMapper.selectById(match.getAwayTeamId()));
-            match.setHomeTeam(teamMapper.selectById(match.getHomeTeamId()));
+        QueryWrapper<TeamManager> teamManagerQueryWrapper = new QueryWrapper<>();
+        teamManagerQueryWrapper.eq("user_id", userId);
+        List<Team> teamList = teamManagerMapper.selectTeamWithManager(userId).stream().map(TeamManager::getTeam).toList();
+
+        List<Match> matches = new ArrayList<>();
+        QueryWrapper<Match> matchQueryWrapper;
+        for (Team team : teamList) {
+            matchQueryWrapper = new QueryWrapper<>();
+            matchQueryWrapper.eq("home_team_id", team.getTeamId()).or().eq("away_team_id", team.getTeamId());
+            List<Match> subMatches = matchMapper.selectList(matchQueryWrapper);
+            for (Match match : subMatches) {
+                match.setHomeTeam(teamMapper.selectById(match.getHomeTeamId()));
+                match.setAwayTeam(teamMapper.selectById(match.getAwayTeamId()));
+            }
+            matches.addAll(subMatches);
         }
-        return matches.stream().sorted(Comparator.comparing(Match::getTime)).toList();
+
+        return matches.stream().sorted(Comparator.comparing(Match::getTime).reversed()).toList();
     }
 
     @Override
