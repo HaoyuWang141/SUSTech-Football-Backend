@@ -65,7 +65,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             matches.addAll(subMatches);
         }
 
-        return matches.stream().sorted(Comparator.comparing(Match::getTime).reversed()).toList();
+        return matches.stream()
+                .distinct()
+                .sorted(Comparator.comparing(Match::getTime).reversed())
+                .toList();
     }
 
     @Override
