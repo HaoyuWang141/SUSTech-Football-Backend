@@ -47,6 +47,8 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     private EventStageTagService eventStageTagService;
     @Autowired
     private MatchRefereeService matchRefereeService;
+    @Autowired
+    private EventCreatorService eventCreatorService;
 
     @Override
     @Transactional
@@ -83,6 +85,10 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
 
     @Override
     public boolean deleteEvent(Long eventId) {
+        QueryWrapper<EventCreator> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("event_id", eventId);
+        eventCreatorService.remove(queryWrapper);
+
         if (!removeById(eventId)) {
             throw new RuntimeException("删除赛事失败");
         }
