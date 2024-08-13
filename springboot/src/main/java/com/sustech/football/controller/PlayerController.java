@@ -154,28 +154,42 @@ public class PlayerController {
 
     @GetMapping("/team/getApplications")
     @Operation(summary = "获取球员申请", description = "提供球员 ID，获取球员的所有申请")
-    @Parameter(name = "playerId", description = "球员 ID", required = true)
-    public List<TeamPlayerRequest> getTeamApplications(Long playerId) {
+    @Parameters({
+            @Parameter(name = "playerId", description = "球员 ID", required = true),
+            @Parameter(name = "status", description = "申请状态")
+    })
+    public List<TeamPlayerRequest> getTeamApplications(Long playerId, @RequestParam(required = false) String status) {
         if (playerId == null) {
             throw new BadRequestException("球员id不能为空");
         }
         if (playerService.getById(playerId) == null) {
             throw new ResourceNotFoundException("球员不存在");
         }
-        return teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_APPLICATION);
+        List<TeamPlayerRequest> teamPlayerRequests = teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_APPLICATION);
+        if (status != null) {
+            teamPlayerRequests.removeIf(request -> !request.getStatus().equals(status));
+        }
+        return teamPlayerRequests;
     }
 
     @GetMapping("/team/getInvitations")
     @Operation(summary = "获取球员邀请", description = "提供球员 ID，获取球员的所有邀请")
-    @Parameter(name = "playerId", description = "球员 ID", required = true)
-    public List<TeamPlayerRequest> getTeamInvitations(Long playerId) {
+    @Parameters({
+            @Parameter(name = "playerId", description = "球员 ID", required = true),
+            @Parameter(name = "status", description = "邀请状态")
+    })
+    public List<TeamPlayerRequest> getTeamInvitations(Long playerId, @RequestParam(required = false) String status) {
         if (playerId == null) {
             throw new BadRequestException("球员id不能为空");
         }
         if (playerService.getById(playerId) == null) {
             throw new ResourceNotFoundException("球员不存在");
         }
-        return teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_INVITATION);
+        List<TeamPlayerRequest> teamPlayerRequests = teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_INVITATION);
+        if (status != null) {
+            teamPlayerRequests.removeIf(request -> !request.getStatus().equals(status));
+        }
+        return teamPlayerRequests;
     }
 
     @PostMapping("/team/replyInvitation")
