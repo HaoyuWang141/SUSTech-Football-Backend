@@ -272,14 +272,14 @@ class PlayerControllerTest {
         when(playerService.getById(playerId)).thenReturn(new Player());
         when(teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_APPLICATION)).thenReturn(applications);
 
-        List<TeamPlayerRequest> result = playerController.getTeamApplications(playerId);
+        List<TeamPlayerRequest> result = playerController.getTeamApplications(playerId, null);
 
         assertEquals(2, result.size());
     }
 
     @Test
     void getTeamApplications_nullPlayerId_throwsBadRequestException() {
-        assertThrows(BadRequestException.class, () -> playerController.getTeamApplications(null));
+        assertThrows(BadRequestException.class, () -> playerController.getTeamApplications(null, null));
     }
 
     @Test
@@ -288,7 +288,7 @@ class PlayerControllerTest {
 
         when(playerService.getById(playerId)).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> playerController.getTeamApplications(playerId));
+        assertThrows(ResourceNotFoundException.class, () -> playerController.getTeamApplications(playerId, null));
     }
 
     @Test
@@ -301,14 +301,14 @@ class PlayerControllerTest {
         when(playerService.getById(playerId)).thenReturn(new Player());
         when(teamPlayerRequestService.listWithTeam(playerId, TeamPlayerRequest.TYPE_INVITATION)).thenReturn(invitations);
 
-        List<TeamPlayerRequest> result = playerController.getTeamInvitations(playerId);
+        List<TeamPlayerRequest> result = playerController.getTeamInvitations(playerId, null);
 
         assertEquals(2, result.size());
     }
 
     @Test
     void getTeamInvitations_nullPlayerId_throwsBadRequestException() {
-        assertThrows(BadRequestException.class, () -> playerController.getTeamInvitations(null));
+        assertThrows(BadRequestException.class, () -> playerController.getTeamInvitations(null, null));
     }
 
     @Test
@@ -317,7 +317,7 @@ class PlayerControllerTest {
 
         when(playerService.getById(playerId)).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> playerController.getTeamInvitations(playerId));
+        assertThrows(ResourceNotFoundException.class, () -> playerController.getTeamInvitations(playerId, null));
     }
 
     @Test
