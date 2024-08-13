@@ -190,7 +190,7 @@ public class PlayerController {
         );
         teamPlayerRequests.forEach(request -> {
             request.setHasRead(true);
-            teamPlayerRequestService.updateById(request);
+            teamPlayerRequestService.updateByMultiId(request);
         });
     }
 
