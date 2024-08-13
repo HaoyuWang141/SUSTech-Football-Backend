@@ -131,10 +131,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
             throw new ConflictException("该球员已经在球队中");
         }
-        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest(
-                teamPlayer.getTeamId(), teamPlayer.getPlayerId(),
-                TeamPlayerRequest.TYPE_INVITATION,
-                TeamPlayerRequest.STATUS_PENDING);
+        TeamPlayerRequest teamPlayerRequest = new TeamPlayerRequest();
+        teamPlayerRequest.setTeamId(teamPlayer.getTeamId());
+        teamPlayerRequest.setPlayerId(teamPlayer.getPlayerId());
+        teamPlayerRequest.setType(TeamPlayerRequest.TYPE_INVITATION);
+        teamPlayerRequest.setStatus(TeamPlayerRequest.STATUS_PENDING);
         TeamPlayerRequest teamPlayerRequestRes = teamPlayerRequestService.selectByMultiId(teamPlayerRequest);
         if (teamPlayerRequestRes != null && teamPlayerRequestRes.getStatus().equals(TeamPlayerRequest.STATUS_PENDING)) {
             throw new BadRequestException("曾经向该球员发出过邀请，请勿重复发送");
