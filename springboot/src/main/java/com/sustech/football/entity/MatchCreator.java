@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MatchCreator {
 
-    @TableId(value = "match_id")
+    @TableId
     private Long matchId;
 
     private Long userId;

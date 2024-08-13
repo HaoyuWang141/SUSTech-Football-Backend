@@ -8,10 +8,7 @@ import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ConflictException;
 import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
-import com.sustech.football.mapper.EventGroupMapper;
-import com.sustech.football.mapper.EventGroupTeamMapper;
-import com.sustech.football.mapper.EventMatchMapper;
-import com.sustech.football.mapper.MatchMapper;
+import com.sustech.football.mapper.*;
 import com.sustech.football.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +44,8 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     private EventGroupMapper eventGroupMapper;
     @Autowired
     private EventGroupTeamMapper eventGroupTeamMapper;
+    @Autowired
+    private MatchCreatorMapper matchCreatorMapper;
 
 
     @Override
@@ -104,6 +103,7 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
     }
 
     @Override
+    @Transactional
     public boolean deleteMatch(Long matchId, Long userId) {
         if (userId != 0) {
             QueryWrapper<MatchManager> matchManagerQueryWrapper = new QueryWrapper<>();
@@ -121,10 +121,9 @@ public class MatchServiceImpl extends ServiceImpl<MatchMapper, Match> implements
             throw new BadRequestException("赛事比赛，无法删除");
         }
 
-        Match match = getById(matchId);
-        if (!match.getStatus().equals(Match.STATUS_PENDING)) {
-            throw new BadRequestException("比赛已开始，无法删除");
-        }
+        MatchCreator matchCreator = new MatchCreator();
+        matchCreator.setMatchId(matchId);
+        matchCreatorMapper.deleteById(matchCreator);
 
         if (!removeById(matchId)) {
             throw new RuntimeException("删除比赛失败");
