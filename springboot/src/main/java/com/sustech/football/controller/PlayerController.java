@@ -172,6 +172,28 @@ public class PlayerController {
         return teamPlayerRequests;
     }
 
+    @PostMapping("/team/readApplications")
+    @Operation(summary = "表示已经阅读申请回复", description = "提供球员 ID，表示已经阅读该球员所有申请的回复")
+    @Parameter(name = "playerId", description = "球员 ID", required = true)
+    public void readApplications(Long playerId) {
+        if (playerId == null) {
+            throw new BadRequestException("球员id不能为空");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        List<TeamPlayerRequest> teamPlayerRequests = teamPlayerRequestService.list(
+                new QueryWrapper<TeamPlayerRequest>()
+                        .eq("player_id", playerId)
+                        .eq("type", TeamPlayerRequest.TYPE_APPLICATION)
+                        .eq("has_read", false)
+        );
+        teamPlayerRequests.forEach(request -> {
+            request.setHasRead(true);
+            teamPlayerRequestService.updateById(request);
+        });
+    }
+
     @GetMapping("/team/getInvitations")
     @Operation(summary = "获取球员邀请", description = "提供球员 ID，获取球员的所有邀请")
     @Parameters({

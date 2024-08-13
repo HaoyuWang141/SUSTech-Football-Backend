@@ -294,8 +294,12 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (teamCoachService.selectByMultiId(teamCoach) != null) {
             throw new ConflictException("该教练已经在球队中");
         }
-        TeamCoachRequest teamCoachRequest = new TeamCoachRequest(
-                teamCoach.getTeamId(), teamCoach.getCoachId(), TeamCoachRequest.STATUS_PENDING);
+
+        TeamCoachRequest teamCoachRequest = new TeamCoachRequest();
+        teamCoachRequest.setTeamId(teamCoach.getTeamId());
+        teamCoachRequest.setCoachId(teamCoach.getCoachId());
+        teamCoachRequest.setStatus(TeamCoachRequest.STATUS_PENDING);
+
         TeamCoachRequest teamCoachRequestRes = teamCoachRequestService.selectByMultiId(teamCoachRequest);
         if (teamCoachRequestRes != null && teamCoachRequestRes.getStatus().equals(TeamCoachRequest.STATUS_PENDING)) {
             throw new ConflictException("曾经向该教练发出过邀请，请勿重复发送");
@@ -405,8 +409,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamService.selectByMultiId(eventTeam) != null) {
             throw new ConflictException("该球队已经参加该赛事");
         }
-        EventTeamRequest eventTeamRequest = new EventTeamRequest(
-                eventTeam.getEventId(), eventTeam.getTeamId(), EventTeamRequest.TYPE_APPLICATION);
+        EventTeamRequest eventTeamRequest = new EventTeamRequest();
+        eventTeamRequest.setEventId(eventTeam.getEventId());
+        eventTeamRequest.setTeamId(eventTeam.getTeamId());
+        eventTeamRequest.setType(EventTeamRequest.TYPE_APPLICATION);
+
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) != null) {
             throw new ConflictException("曾经向该赛事发出过申请，请勿重复发送");
         }
@@ -428,8 +435,13 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (eventTeamService.selectByMultiId(eventTeam) != null) {
             throw new ConflictException("该球队已经参加该赛事");
         }
-        EventTeamRequest eventTeamRequest = new EventTeamRequest(eventId, teamId,
-                EventTeamRequest.TYPE_INVITATION, EventTeamRequest.STATUS_PENDING);
+
+        EventTeamRequest eventTeamRequest = new EventTeamRequest();
+        eventTeamRequest.setEventId(eventId);
+        eventTeamRequest.setTeamId(teamId);
+        eventTeamRequest.setType(EventTeamRequest.TYPE_INVITATION);
+        eventTeamRequest.setStatus(EventTeamRequest.STATUS_PENDING);
+
         if (eventTeamRequestService.selectByMultiId(eventTeamRequest) == null) {
             throw new BadRequestException("该球队没有收到该赛事的邀请");
         }

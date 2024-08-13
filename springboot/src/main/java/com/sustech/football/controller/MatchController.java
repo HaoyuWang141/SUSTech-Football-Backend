@@ -407,7 +407,12 @@ public class MatchController {
             throw new BadRequestException("球队不存在");
         }
         String type = isHomeTeam ? MatchTeamRequest.TYPE_HOME : MatchTeamRequest.TYPE_AWAY;
-        if (!matchService.inviteTeam(new MatchTeamRequest(matchId, teamId, type))) {
+
+        MatchTeamRequest matchTeamRequest = new MatchTeamRequest();
+        matchTeamRequest.setMatchId(matchId);
+        matchTeamRequest.setTeamId(teamId);
+        matchTeamRequest.setType(type);
+        if (!matchService.inviteTeam(matchTeamRequest)) {
             throw new BadRequestException("邀请失败");
         }
     }

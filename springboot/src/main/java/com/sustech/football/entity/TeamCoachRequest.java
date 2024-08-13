@@ -18,18 +18,6 @@ public class TeamCoachRequest {
     public static final String STATUS_ACCEPTED = "ACCEPTED";
     public static final String STATUS_REJECTED = "REJECTED";
 
-    public TeamCoachRequest(Long teamId, Long coachId) {
-        this.teamId = teamId;
-        this.coachId = coachId;
-        this.status = STATUS_PENDING;
-    }
-
-    public TeamCoachRequest(Long teamId, Long coachId, String status) {
-        this.teamId = teamId;
-        this.coachId = coachId;
-        this.status = status;
-    }
-
     @MppMultiId
     @Schema(description = "球队 ID", example = "1")
     private Long teamId;
@@ -43,6 +31,10 @@ public class TeamCoachRequest {
 
     @Schema(description = "邀请最后更新时间", example = "2024-06-01 12:00:00")
     private Timestamp lastUpdated;
+
+    private Boolean hasRead;
+
+    private Boolean isDeleted;
 
     @TableField(exist = false)
     @Schema(description = "球队信息")

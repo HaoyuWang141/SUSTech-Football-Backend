@@ -400,9 +400,12 @@ public class EventController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        if (!eventService.inviteTeam(new EventTeamRequest(
-                eventId, teamId, EventTeamRequest.TYPE_INVITATION
-        ))) {
+
+        EventTeamRequest eventTeamRequest = new EventTeamRequest();
+        eventTeamRequest.setEventId(eventId);
+        eventTeamRequest.setTeamId(teamId);
+        eventTeamRequest.setType(EventTeamRequest.TYPE_INVITATION);
+        if (!eventService.inviteTeam(eventTeamRequest)) {
             throw new RuntimeException("邀请球队失败");
         }
     }
@@ -450,10 +453,13 @@ public class EventController {
         if (teamService.getById(teamId) == null) {
             throw new ResourceNotFoundException("球队不存在");
         }
-        if (!eventService.replyTeamApplication(new EventTeamRequest(
-                eventId, teamId, EventTeamRequest.TYPE_APPLICATION,
-                accepted ? EventTeamRequest.STATUS_ACCEPTED : EventTeamRequest.STATUS_REJECTED
-        ))) {
+
+        EventTeamRequest eventTeamRequest = new EventTeamRequest();
+        eventTeamRequest.setEventId(eventId);
+        eventTeamRequest.setTeamId(teamId);
+        eventTeamRequest.setType(EventTeamRequest.TYPE_APPLICATION);
+        eventTeamRequest.setStatus(accepted ? EventTeamRequest.STATUS_ACCEPTED : EventTeamRequest.STATUS_REJECTED);
+        if (!eventService.replyTeamApplication(eventTeamRequest)) {
             throw new RuntimeException("回复球队申请失败");
         }
     }
@@ -848,7 +854,10 @@ public class EventController {
         if (refereeService.getById(refereeId) == null) {
             throw new ResourceNotFoundException("裁判不存在");
         }
-        if (!eventService.inviteReferee(new EventRefereeRequest(eventId, refereeId))) {
+        EventRefereeRequest eventRefereeRequest = new EventRefereeRequest();
+        eventRefereeRequest.setEventId(eventId);
+        eventRefereeRequest.setRefereeId(refereeId);
+        if (!eventService.inviteReferee(eventRefereeRequest)) {
             throw new RuntimeException("邀请裁判失败");
         }
     }

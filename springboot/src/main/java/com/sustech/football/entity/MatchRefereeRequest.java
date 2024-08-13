@@ -32,6 +32,10 @@ public class MatchRefereeRequest {
     @Schema(description = "邀请最后更新时间", example = "2024-06-01 12:00:00")
     private Timestamp lastUpdated;
 
+    private Boolean hasRead;
+
+    private Boolean isDeleted;
+
     @TableField(exist = false)
     @Schema(description = "比赛信息")
     private Match match;
@@ -39,16 +43,4 @@ public class MatchRefereeRequest {
     @TableField(exist = false)
     @Schema(description = "裁判信息")
     private Referee referee;
-
-    public MatchRefereeRequest(Long matchId, Long refereeId) {
-        this.matchId = matchId;
-        this.refereeId = refereeId;
-        this.status = STATUS_PENDING;
-    }
-
-    public MatchRefereeRequest(Long matchId, Long refereeId, String status) {
-        this.matchId = matchId;
-        this.refereeId = refereeId;
-        this.status = status;
-    }
 }

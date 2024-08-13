@@ -39,6 +39,10 @@ public class TeamPlayerRequest {
     @Schema(description = "申请最后更新时间", example = "2024-06-01 12:00:00")
     private Timestamp lastUpdated;
 
+    private Boolean hasRead;
+
+    private Boolean isDeleted;
+
     @TableField(exist = false)
     @Schema(description = "球队信息")
     private Team team;
@@ -46,11 +50,4 @@ public class TeamPlayerRequest {
     @TableField(exist = false)
     @Schema(description = "球员信息")
     private Player player;
-
-    public TeamPlayerRequest(Long teamId, Long playerId, String type, String status) {
-        this.teamId = teamId;
-        this.playerId = playerId;
-        this.type = type;
-        this.status = status;
-    }
 }

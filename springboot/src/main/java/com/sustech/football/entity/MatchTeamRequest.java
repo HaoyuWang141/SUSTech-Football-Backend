@@ -37,6 +37,10 @@ public class MatchTeamRequest {
     @Schema(description = "邀请最后更新时间", example = "2024-06-01 12:00:00")
     private Timestamp lastUpdated;
 
+    private Boolean hasRead;
+
+    private Boolean isDeleted;
+
     @TableField(exist = false)
     @Schema(description = "比赛信息")
     private Match match;
@@ -44,18 +48,4 @@ public class MatchTeamRequest {
     @TableField(exist = false)
     @Schema(description = "球队信息")
     private Team team;
-
-    public MatchTeamRequest(Long matchId, Long teamId, String type) {
-        this.matchId = matchId;
-        this.teamId = teamId;
-        this.type = type;
-        this.status = STATUS_PENDING;
-    }
-
-    public MatchTeamRequest(Long matchId, Long teamId, String type, String status) {
-        this.matchId = matchId;
-        this.teamId = teamId;
-        this.type = type;
-        this.status = status;
-    }
 }
