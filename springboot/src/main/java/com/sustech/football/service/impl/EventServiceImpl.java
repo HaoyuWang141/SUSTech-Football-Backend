@@ -84,6 +84,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
     }
 
     @Override
+    @Transactional
     public boolean deleteEvent(Long eventId) {
         QueryWrapper<EventCreator> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("event_id", eventId);
