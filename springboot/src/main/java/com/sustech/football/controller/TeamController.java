@@ -150,13 +150,13 @@ public class TeamController {
         List<ThirdLevelAuthority> thirdLevelAuthorityList = thirdLevelAuthorityService.list(thirdLevelAuthorityQueryWrapper);
         List<Long> thirdAuthorityAuthorityIdList = thirdLevelAuthorityList.stream().map(ThirdLevelAuthority::getAuthorityId).toList();
 
-        // 获取二级权限下的所有球队
+        // 获取二级权限创建的所有球队
         QueryWrapper<TeamCreator> teamCreatorQueryWrapper = new QueryWrapper<>();
         teamCreatorQueryWrapper.eq("create_authority_level", 2);
         teamCreatorQueryWrapper.eq("create_authority_id", authorityId);
         List<TeamCreator> teamCreatorList = teamCreatorService.list(teamCreatorQueryWrapper);
 
-        // 获取三级权限下的所有球队
+        // 获取三级权限创建的所有球队
         if (!thirdAuthorityAuthorityIdList.isEmpty()) {
             teamCreatorQueryWrapper = new QueryWrapper<>();
             teamCreatorQueryWrapper.eq("create_authority_level", 3);
@@ -597,6 +597,19 @@ public class TeamController {
             throw new ResourceNotFoundException("球队不存在");
         }
         return teamService.getMatches(teamId);
+    }
+
+    @GetMapping("/match/getFriendlyMatches")
+    @Operation(summary = "获取友谊赛", description = "根据队伍 ID，获取球队的所有友谊赛")
+    @Parameter(name = "teamId", description = "球队 ID", required = true)
+    public List<Match> getFriendlyMatches(Long teamId) {
+        if (teamId == null) {
+            throw new BadRequestException("传入的队伍ID为空");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        return teamService.getFriendlyMatches(teamId);
     }
 
     @PostMapping("/event/applyToJoin")

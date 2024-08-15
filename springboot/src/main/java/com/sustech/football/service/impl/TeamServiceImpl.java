@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.*;
+import com.sustech.football.mapper.MatchManagerMapper;
 import com.sustech.football.mapper.TeamMapper;
 import com.sustech.football.service.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +49,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     private MatchPlayerService matchPlayerService;
     @Autowired
     private TeamCreatorService teamCreatorService;
+    @Autowired
+    private MatchManagerMapper matchManagerMapper;
 
     @Override
     public Team getTeamById(Long teamId) {
@@ -403,6 +408,17 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 })
                 .toList();
         return matchList;
+    }
+
+    @Override
+    public List<Match> getFriendlyMatches(Long teamId) {
+        List<Match> allMatches = getMatches(teamId);
+        Set<Long> friendlyMatchIdSet = matchManagerMapper.selectList(new QueryWrapper<>()).stream()
+                .map(MatchManager::getMatchId)
+                .collect(Collectors.toSet());
+        return allMatches.stream()
+                .filter(match -> friendlyMatchIdSet.contains(match.getMatchId()))
+                .toList();
     }
 
     @Override

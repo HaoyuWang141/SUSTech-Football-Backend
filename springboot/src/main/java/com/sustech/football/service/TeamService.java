@@ -49,6 +49,8 @@ public interface TeamService extends IService<Team> {
 
     List<Match> getMatches(Long teamId);
 
+    List<Match> getFriendlyMatches(Long teamId);
+
     boolean requestJoinEvent(EventTeam eventTeam);
 
     List<EventTeamRequest> getEventInvitations(Long teamId);

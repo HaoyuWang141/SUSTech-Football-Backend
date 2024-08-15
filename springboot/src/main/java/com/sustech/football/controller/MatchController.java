@@ -48,6 +48,8 @@ public class MatchController {
     private ThirdLevelAuthorityService thirdLevelAuthorityService;
     @Autowired
     private MatchCreatorService matchCreatorService;
+    @Autowired
+    private TeamCreatorService teamCreatorService;
 
     @PostMapping("/create")
     @Transactional
@@ -271,28 +273,61 @@ public class MatchController {
             throw new ResourceNotFoundException("二级权限不存在");
         }
 
+        /**
+         * 二级权限下的友谊赛：先获取二级权限+三级权限**创建**的球队，再获取这些球队的友谊赛
+         */
+
         // 获取二级权限下的所有三级权限
         QueryWrapper<ThirdLevelAuthority> thirdLevelAuthorityQueryWrapper = new QueryWrapper<>();
         thirdLevelAuthorityQueryWrapper.eq("second_level_authority_id", authorityId);
         List<ThirdLevelAuthority> thirdLevelAuthorityList = thirdLevelAuthorityService.list(thirdLevelAuthorityQueryWrapper);
         List<Long> thirdAuthorityAuthorityIdList = thirdLevelAuthorityList.stream().map(ThirdLevelAuthority::getAuthorityId).toList();
 
-        // 获取二级权限下的所有比赛
-        QueryWrapper<MatchCreator> matchCreatorQueryWrapper = new QueryWrapper<>();
-        matchCreatorQueryWrapper.in("create_authority_level", 2);
-        matchCreatorQueryWrapper.eq("create_authority_id", authorityId);
-        List<MatchCreator> matchCreatorList = matchCreatorService.list(matchCreatorQueryWrapper);
+        // 获取二级权限创建的所有球队
+        QueryWrapper<TeamCreator> teamCreatorQueryWrapper = new QueryWrapper<>();
+        teamCreatorQueryWrapper.eq("create_authority_level", 2);
+        teamCreatorQueryWrapper.eq("create_authority_id", authorityId);
+        List<TeamCreator> teamCreatorList = teamCreatorService.list(teamCreatorQueryWrapper);
 
-        // 获取三级权限下的所有比赛
+        // 获取三级权限创建的所有球队
         if (!thirdAuthorityAuthorityIdList.isEmpty()) {
-            matchCreatorQueryWrapper = new QueryWrapper<>();
-            matchCreatorQueryWrapper.in("create_authority_level", 3);
-            matchCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
-            matchCreatorList.addAll(matchCreatorService.list(matchCreatorQueryWrapper));
+            teamCreatorQueryWrapper = new QueryWrapper<>();
+            teamCreatorQueryWrapper.eq("create_authority_level", 3);
+            teamCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
+            teamCreatorList.addAll(teamCreatorService.list(teamCreatorQueryWrapper));
         }
 
-        List<Long> matchIdList = matchCreatorList.stream().map(MatchCreator::getMatchId).toList();
-        return matchService.getMatchByIdList(matchIdList);
+        List<Long> teamIdList = teamCreatorList.stream().map(TeamCreator::getTeamId).sorted().toList();
+        List<Match> matchList = new ArrayList<>();
+        for (Long teamId : teamIdList) {
+            matchList.addAll(teamService.getFriendlyMatches(teamId));
+        }
+
+        return matchList;
+
+        /**
+         * 下面的实现为：获取二级权限级它的三级权限创建的友谊赛，改方式弃用
+         */
+
+//        // 获取二级权限下的所有三级权限
+//        QueryWrapper<ThirdLevelAuthority> thirdLevelAuthorityQueryWrapper = new QueryWrapper<>();
+//        thirdLevelAuthorityQueryWrapper.eq("second_level_authority_id", authorityId);
+//        List<ThirdLevelAuthority> thirdLevelAuthorityList = thirdLevelAuthorityService.list(thirdLevelAuthorityQueryWrapper);
+//        List<Long> thirdAuthorityAuthorityIdList = thirdLevelAuthorityList.stream().map(ThirdLevelAuthority::getAuthorityId).toList();
+//
+//        // 获取二级权限下的所有比赛
+//        QueryWrapper<MatchCreator> matchCreatorQueryWrapper = new QueryWrapper<>();
+//        matchCreatorQueryWrapper.in("create_authority_level", 2);
+//        matchCreatorQueryWrapper.eq("create_authority_id", authorityId);
+//        List<MatchCreator> matchCreatorList = matchCreatorService.list(matchCreatorQueryWrapper);
+//
+//        // 获取三级权限下的所有比赛
+//        if (!thirdAuthorityAuthorityIdList.isEmpty()) {
+//            matchCreatorQueryWrapper = new QueryWrapper<>();
+//            matchCreatorQueryWrapper.in("create_authority_level", 3);
+//            matchCreatorQueryWrapper.in("create_authority_id", thirdAuthorityAuthorityIdList);
+//            matchCreatorList.addAll(matchCreatorService.list(matchCreatorQueryWrapper));
+//        }
     }
 
     @PutMapping("/update")
