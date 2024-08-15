@@ -103,7 +103,7 @@ public class PlayerServiceImpl extends ServiceImpl<PlayerMapper, Player> impleme
         TeamPlayer teamPlayer = new TeamPlayer();
         teamPlayer.setPlayerId(playerId);
         teamPlayer.setTeamId(teamId);
-        if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
+        if (teamPlayerService.selectByMultiId(teamPlayer) == null) {
             throw new ResourceNotFoundException("球员不在球队中，无法退出");
         }
         if (!teamPlayerService.deleteByMultiId(teamPlayer)) {
