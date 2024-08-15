@@ -17,4 +17,6 @@ public interface CoachService extends IService<Coach> {
     List<Match> getMatches(Long coachId);
 
     List<Event> getEvents(Long coachId);
+
+    boolean exitTeam(Long coachId, Long teamId);
 }

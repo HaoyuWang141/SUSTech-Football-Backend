@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
 import com.sustech.football.exception.ConflictException;
+import com.sustech.football.exception.InternalServerErrorException;
+import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.mapper.CoachMapper;
 import com.sustech.football.service.*;
 
@@ -106,5 +108,19 @@ public class CoachServiceImpl extends ServiceImpl<CoachMapper, Coach> implements
                 .flatMap(List::stream)
                 .distinct()
                 .toList();
+    }
+
+    @Override
+    public boolean exitTeam(Long coachId, Long teamId) {
+        TeamCoach teamCoach = new TeamCoach();
+        teamCoach.setCoachId(coachId);
+        teamCoach.setTeamId(teamId);
+        if (teamCoachService.selectByMultiId(teamCoach) == null) {
+            throw new ResourceNotFoundException("教练不在球队中，无法退出");
+        }
+        if (!teamCoachService.deleteByMultiId(teamCoach)) {
+            throw new InternalServerErrorException("删除失败");
+        }
+        return true;
     }
 }

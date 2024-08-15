@@ -2,6 +2,7 @@ package com.sustech.football.controller;
 
 import com.sustech.football.entity.*;
 import com.sustech.football.exception.BadRequestException;
+import com.sustech.football.exception.InternalServerErrorException;
 import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.service.CoachService;
 import com.sustech.football.service.TeamCoachRequestService;
@@ -131,6 +132,22 @@ public class CoachController {
             throw new ResourceNotFoundException("教练不存在");
         }
         return coachService.getTeams(coachId);
+    }
+
+    @PostMapping("/team/exit")
+    public void exitTeam(Long coachId, Long teamId) {
+        if (coachId == null || teamId == null) {
+            throw new BadRequestException("传参含空");
+        }
+        if (coachService.getById(coachId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        if (!coachService.exitTeam(coachId, teamId)) {
+            throw new InternalServerErrorException("退出失败");
+        }
     }
 
     @GetMapping("/match/getAll")
