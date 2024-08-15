@@ -250,7 +250,8 @@ public class PlayerController {
         if (teamPlayers.isEmpty()) {
             return List.of();
         }
-        return teamService.listByIds(teamPlayers.stream().map(TeamPlayer::getTeamId).toList());
+        List<Long> teamIdList = teamPlayers.stream().map(TeamPlayer::getTeamId).toList();
+        return teamService.getTeamsByIdList(teamIdList);
     }
 
     @PostMapping("/team/exit")
