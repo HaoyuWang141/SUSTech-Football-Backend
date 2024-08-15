@@ -11,4 +11,6 @@ public interface PlayerService extends IService<Player> {
     List<Match> getPlayerMatches(Long playerId);
 
     boolean replyTeamInvitation(Long playerId, Long teamId, Boolean accept);
+
+    boolean exitTeam(Long playerId, Long teamId);
 }

@@ -8,6 +8,8 @@ import com.sustech.football.entity.Player;
 import com.sustech.football.entity.TeamPlayer;
 import com.sustech.football.entity.TeamPlayerRequest;
 import com.sustech.football.exception.ConflictException;
+import com.sustech.football.exception.InternalServerErrorException;
+import com.sustech.football.exception.ResourceNotFoundException;
 import com.sustech.football.mapper.PlayerMapper;
 import com.sustech.football.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,4 +97,19 @@ public class PlayerServiceImpl extends ServiceImpl<PlayerMapper, Player> impleme
 
         return true;
     }
+
+    @Override
+    public boolean exitTeam(Long playerId, Long teamId) {
+        TeamPlayer teamPlayer = new TeamPlayer();
+        teamPlayer.setPlayerId(playerId);
+        teamPlayer.setTeamId(teamId);
+        if (teamPlayerService.selectByMultiId(teamPlayer) != null) {
+            throw new ResourceNotFoundException("球员不在球队中，无法退出");
+        }
+        if (!teamPlayerService.deleteByMultiId(teamPlayer)) {
+            throw new InternalServerErrorException("删除失败");
+        }
+        return true;
+    }
+
 }

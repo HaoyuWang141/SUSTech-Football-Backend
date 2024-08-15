@@ -253,6 +253,22 @@ public class PlayerController {
         return teamService.listByIds(teamPlayers.stream().map(TeamPlayer::getTeamId).toList());
     }
 
+    @PostMapping("/team/exit")
+    public void exitTeam(Long playerId, Long teamId) {
+        if (playerId == null || teamId == null) {
+            throw new BadRequestException("传参含空");
+        }
+        if (playerService.getById(playerId) == null) {
+            throw new ResourceNotFoundException("球员不存在");
+        }
+        if (teamService.getById(teamId) == null) {
+            throw new ResourceNotFoundException("球队不存在");
+        }
+        if (!playerService.exitTeam(playerId, teamId)) {
+            throw new InternalServerErrorException("退出失败");
+        }
+    }
+
     @GetMapping("/match/getAll")
     @Operation(summary = "获取球员比赛", description = "提供球员 ID，获取球员参加的所有比赛")
     @Parameter(name = "playerId", description = "球员 ID", required = true)

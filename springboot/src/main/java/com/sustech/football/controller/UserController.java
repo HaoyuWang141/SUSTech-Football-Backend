@@ -89,6 +89,8 @@ public class UserController {
         if (user == null) {
             throw new ResourceNotFoundException("用户不存在");
         }
+        user.setOpenid(null);
+        user.setSessionKey(null);
         return user;
     }
 
